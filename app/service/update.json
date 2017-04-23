@@ -1,5 +1,10 @@
 {
-  "latestVersion": "1.0.1",
-  "url": "",
-  "releaseNotes": ""
+  "latestVersion": "1.2.2",
+  "latestVersionCode": 10,
+  "url": "https://staticlive.douyucdn.cn/upload/client/douyu_client_1_0v2_4_8_1.apk",
+  "releaseNotes": [
+    "- First evolution",
+    "- Second evolution",
+    "- Bug fixes"
+  ]
 }
