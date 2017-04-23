@@ -54,7 +54,7 @@ public class SplashActivity extends BaseActivity {
         splashVersion = (TextView) findViewById(R.id.splash_version);
         splashCopyright = (TextView) findViewById(R.id.splash_copyright);
 
-        Retrofit.newService(GankService.BASE_URL, GankService.class)
+        Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
                 .getGankData("福利", 1, 1)
                 .map(gankData -> gankData.results.get(0).url)
                 .timeout(3, TimeUnit.SECONDS, Observable.create(subscriber -> {

@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class Retrofit {
     public final static long DEFAULT_TIMEOUT = 30;
 
-    public static <T> T newService(@NonNull String baseUrl, @NonNull Class<T> baseService, long timeout) {
+    public static <T> T newSimpleService(@NonNull String baseUrl, @NonNull Class<T> baseService, long timeout) {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -34,7 +34,7 @@ public class Retrofit {
         return retrofit.create(baseService);
     }
 
-    public static <T> T newService(@NonNull String baseUrl, @NonNull Class<T> baseService) {
-        return newService(baseUrl, baseService, DEFAULT_TIMEOUT);
+    public static <T> T newSimpleService(@NonNull String baseUrl, @NonNull Class<T> baseService) {
+        return newSimpleService(baseUrl, baseService, DEFAULT_TIMEOUT);
     }
 }
