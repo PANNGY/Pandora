@@ -11,7 +11,7 @@ import retrofit2.http.Path;
  */
 
 public interface GankService {
-    public final static String BASE_URL = "http://gank.io/";
+    String BASE_URL = "http://gank.io/";
 
     @GET("/api/data/{type}/{size}/{page}")
     Observable<GankData> getGankData(@Path("type") String type, @Path("size") int size, @Path("page") int page);
