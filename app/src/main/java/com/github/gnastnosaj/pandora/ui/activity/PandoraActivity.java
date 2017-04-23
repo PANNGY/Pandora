@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
@@ -10,6 +11,7 @@ import com.github.gnastnosaj.pandora.datasource.Retrofit;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
@@ -33,32 +35,33 @@ public class PandoraActivity extends BaseActivity {
     }
 
     private void checkForUpdate() {
-        AppUpdater appUpdater = new AppUpdater(this)
-                .setDisplay(Display.SNACKBAR)
-                .setDisplay(Display.DIALOG)
-                .setDisplay(Display.NOTIFICATION)
-                .setUpdateFrom(UpdateFrom.JSON)
-                .setUpdateJSON(getResources().getString(R.string.update_url))
-                .setButtonUpdateClickListener((dialog, which) -> {
-                    Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
-                            .getUpdateData()
-                            .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                            .subscribeOn(Schedulers.newThread())
-                            .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
-                                            .download(updateData.url)
+        new RxPermissions(this).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
+                .subscribe(grant -> {
+                    AppUpdater appUpdater = new AppUpdater(this)
+                            .setDisplay(Display.NOTIFICATION)
+                            .setUpdateFrom(UpdateFrom.JSON)
+                            .setUpdateJSON(getResources().getString(R.string.update_url))
+                            .setButtonUpdateClickListener((dialog, which) ->
+                                    Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
+                                            .getUpdateData()
                                             .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                                            .subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribe(downloadStatus -> {
-                                            }, throwable -> Timber.e(throwable, "update download exception"), () -> {
-                                                File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
-                                                if (files != null) {
-                                                    File file = files[0];
-                                                    PackageUtils.install(Boilerplate.getInstance(), file.getPath());
-                                                }
-                                            })
-                                    , throwable -> Timber.e(throwable, "update check exception"));
+                                            .subscribeOn(Schedulers.newThread())
+                                            .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
+                                                            .download(updateData.url)
+                                                            .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                                                            .subscribeOn(Schedulers.io())
+                                                            .observeOn(AndroidSchedulers.mainThread())
+                                                            .subscribe(downloadStatus -> {
+                                                            }, throwable -> Timber.e(throwable, "update download exception"), () -> {
+                                                                File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
+                                                                if (files != null) {
+                                                                    File file = files[0];
+                                                                    PackageUtils.install(Boilerplate.getInstance(), file.getPath());
+                                                                }
+                                                            })
+                                                    , throwable -> Timber.e(throwable, "update check exception"))
+                            );
+                    appUpdater.start();
                 });
-        appUpdater.start();
     }
 }
