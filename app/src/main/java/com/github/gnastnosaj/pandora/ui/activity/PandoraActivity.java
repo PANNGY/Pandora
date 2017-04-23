@@ -1,5 +1,7 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.os.Bundle;
+
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 
 /**
@@ -7,4 +9,8 @@ import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
  */
 
 public class PandoraActivity extends BaseActivity {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 }
