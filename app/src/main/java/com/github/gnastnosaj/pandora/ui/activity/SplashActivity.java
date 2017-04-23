@@ -104,11 +104,7 @@ public class SplashActivity extends BaseActivity {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
-                }, throwable -> {
-                    if (throwable instanceof TimeoutException) {
-                        startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
-                    }
-                });
+                }, throwable -> startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)));
 
         splashVersion.setText(getResources().getString(R.string.splash_version, Boilerplate.versionName));
         splashCopyright.setText(getResources().getString(R.string.splash_copyright, new SimpleDateFormat("yyyy").format(new Date())));
