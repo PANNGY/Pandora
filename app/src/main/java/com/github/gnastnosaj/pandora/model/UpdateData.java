@@ -1,5 +1,7 @@
 package com.github.gnastnosaj.pandora.model;
 
+import java.util.List;
+
 /**
  * Created by jasontsang on 4/23/17.
  */
@@ -7,5 +9,5 @@ package com.github.gnastnosaj.pandora.model;
 public class UpdateData {
     public String latestVersion;
     public String url;
-    public String releaseNotes;
+    public List<String> releaseNotes;
 }

@@ -38,7 +38,7 @@ public class PandoraActivity extends BaseActivity {
         new RxPermissions(this).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
                 .subscribe(grant -> {
                     AppUpdater appUpdater = new AppUpdater(this)
-                            .setDisplay(Display.NOTIFICATION)
+                            .setDisplay(Display.DIALOG)
                             .setUpdateFrom(UpdateFrom.JSON)
                             .setUpdateJSON(getResources().getString(R.string.update_url))
                             .setButtonUpdateClickListener((dialog, which) ->
