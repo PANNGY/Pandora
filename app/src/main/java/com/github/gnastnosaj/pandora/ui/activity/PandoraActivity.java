@@ -3,6 +3,10 @@ package com.github.gnastnosaj.pandora.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
@@ -20,6 +24,9 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import br.com.mauker.materialsearchview.MaterialSearchView;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cn.trinea.android.common.util.PackageUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -31,9 +38,29 @@ import zlc.season.rxdownload2.RxDownload;
  */
 
 public class PandoraActivity extends BaseActivity {
+    @BindView(R.id.app_bar)
+    AppBarLayout appBar;
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.tab)
+    TabLayout tabLayout;
+
+    @BindView(R.id.view_pager)
+    ViewPager viewPager;
+
+    @BindView(R.id.search_view)
+    MaterialSearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_view_pager_with_tab);
+        ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        initSystemBar();
 
         checkForUpdate();
     }
