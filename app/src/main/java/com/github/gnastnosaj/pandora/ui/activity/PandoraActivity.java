@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import cn.trinea.android.common.util.PackageUtils;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -51,7 +52,9 @@ public class PandoraActivity extends BaseActivity {
     }
 
     private void checkForUpdate() {
-        new RxPermissions(this).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
+        Observable.interval(0, 1, TimeUnit.HOURS)
+                .flatMap(aLong -> new RxPermissions(this).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS))
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(grant -> {
                     AppUpdater appUpdater = new AppUpdater(this)
                             .setDisplay(Display.DIALOG)
