@@ -4,7 +4,7 @@
         <objectAnimator
             android:duration="1"
             android:propertyName="elevation"
-            android:valueTo="@dimen/len_16"
+            android:valueTo="@dimen/len_8"
             android:valueType="floatType" />
     </item>
 </selector>
