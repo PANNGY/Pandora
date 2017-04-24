@@ -1,7 +1,9 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
@@ -32,6 +34,18 @@ public class PandoraActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
 
         checkForUpdate();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            Intent i = new Intent(Intent.ACTION_MAIN);
+            i.addCategory(Intent.CATEGORY_HOME);
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(i);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void checkForUpdate() {
