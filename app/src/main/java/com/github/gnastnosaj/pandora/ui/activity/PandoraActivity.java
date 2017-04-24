@@ -56,32 +56,33 @@ public class PandoraActivity extends BaseActivity {
                 .flatMap(aLong -> new RxPermissions(this).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS))
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(grant -> {
-                    AppUpdater appUpdater = new AppUpdater(this)
-                            .setDisplay(Display.DIALOG)
-                            .setUpdateFrom(UpdateFrom.JSON)
-                            .setUpdateJSON(getResources().getString(R.string.update_url))
-                            .setButtonUpdateClickListener((dialog, which) ->
-                                    Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
-                                            .getUpdateData()
-                                            .timeout(3, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
-                                            .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                                            .subscribeOn(Schedulers.newThread())
-                                            .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
-                                                            .download(updateData.url)
-                                                            .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                                                            .subscribeOn(Schedulers.io())
-                                                            .observeOn(AndroidSchedulers.mainThread())
-                                                            .subscribe(downloadStatus -> {
-                                                            }, throwable -> Timber.e(throwable, "update download exception"), () -> {
-                                                                File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
-                                                                if (files != null) {
-                                                                    File file = files[0];
-                                                                    PackageUtils.install(Boilerplate.getInstance(), file.getPath());
-                                                                }
-                                                            })
-                                                    , throwable -> Timber.e(throwable, "update check exception"))
-                            );
-                    appUpdater.start();
-                });
+                            AppUpdater appUpdater = new AppUpdater(this)
+                                    .setDisplay(Display.DIALOG)
+                                    .setUpdateFrom(UpdateFrom.JSON)
+                                    .setUpdateJSON(getResources().getString(R.string.update_url))
+                                    .setButtonUpdateClickListener((dialog, which) ->
+                                            Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
+                                                    .getUpdateData()
+                                                    .timeout(3, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
+                                                    .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                                                    .subscribeOn(Schedulers.newThread())
+                                                    .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
+                                                                    .download(updateData.url)
+                                                                    .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                                                                    .subscribeOn(Schedulers.io())
+                                                                    .observeOn(AndroidSchedulers.mainThread())
+                                                                    .subscribe(downloadStatus -> {
+                                                                    }, throwable -> Timber.e(throwable, "update download exception"), () -> {
+                                                                        File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
+                                                                        if (files != null) {
+                                                                            File file = files[0];
+                                                                            PackageUtils.install(Boilerplate.getInstance(), file.getPath());
+                                                                        }
+                                                                    })
+                                                            , throwable -> Timber.e(throwable, "update check exception"))
+                                    );
+                            appUpdater.start();
+                        }
+                        , throwable -> Timber.e(throwable, "update interval exception"));
     }
 }
