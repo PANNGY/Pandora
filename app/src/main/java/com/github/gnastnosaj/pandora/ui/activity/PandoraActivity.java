@@ -8,6 +8,7 @@ import android.view.KeyEvent;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
 import com.github.javiersantos.appupdater.AppUpdater;
@@ -17,6 +18,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import cn.trinea.android.common.util.PackageUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -58,6 +60,7 @@ public class PandoraActivity extends BaseActivity {
                             .setButtonUpdateClickListener((dialog, which) ->
                                     Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
                                             .getUpdateData()
+                                            .timeout(3, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
                                             .compose(bindUntilEvent(ActivityEvent.DESTROY))
                                             .subscribeOn(Schedulers.newThread())
                                             .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
