@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -37,22 +39,25 @@ import io.reactivex.schedulers.Schedulers;
 public class SplashActivity extends BaseActivity {
     public final static String PRE_SPLASH_IMAGE = "SPLASH_IMAGE";
 
-    private SimpleDraweeView splashImage;
-    private TextView splashSlogan;
-    private TextView splashVersion;
-    private TextView splashCopyright;
+    @BindView(R.id.splash_image)
+    SimpleDraweeView splashImage;
+
+    @BindView(R.id.splash_slogan)
+    TextView splashSlogan;
+
+    @BindView(R.id.splash_version)
+    TextView splashVersion;
+
+    @BindView(R.id.splash_copyright)
+    TextView splashCopyright;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        ButterKnife.bind(this);
 
         initSystemBar();
-
-        splashImage = (SimpleDraweeView) findViewById(R.id.splash_image);
-        splashSlogan = (TextView) findViewById(R.id.splash_slogan);
-        splashVersion = (TextView) findViewById(R.id.splash_version);
-        splashCopyright = (TextView) findViewById(R.id.splash_copyright);
 
         Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
                 .getGankData("福利", 1, 1)
