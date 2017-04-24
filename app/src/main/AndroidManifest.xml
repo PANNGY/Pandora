@@ -12,8 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <meta-data
+            android:name="com.samsung.android.sdk.multiwindow.enable"
+            android:value="true" />
+        <meta-data
+            android:name="com.samsung.android.sdk.multiwindow.style"
+            android:value="forceTitleBar|fullscreenOnly" />
+
         <activity
             android:name=".ui.activity.SplashActivity"
+            android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,7 +31,7 @@
 
         <activity
             android:name=".ui.activity.PandoraActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:theme="@style/AppTheme.NoActionBar" />
 
     </application>
