@@ -72,17 +72,19 @@ public class PandoraActivity extends BaseActivity {
                                                                     .subscribeOn(Schedulers.io())
                                                                     .observeOn(AndroidSchedulers.mainThread())
                                                                     .subscribe(downloadStatus -> {
-                                                                    }, throwable -> Timber.e(throwable, "update download exception"), () -> {
-                                                                        File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
-                                                                        if (files != null) {
-                                                                            File file = files[0];
-                                                                            PackageUtils.install(Boilerplate.getInstance(), file.getPath());
-                                                                        }
-                                                                    })
-                                                            , throwable -> Timber.e(throwable, "update check exception"))
+                                                                            },
+                                                                            throwable -> Timber.e(throwable, "update download exception"),
+                                                                            () -> {
+                                                                                File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
+                                                                                if (files != null) {
+                                                                                    File file = files[0];
+                                                                                    PackageUtils.install(Boilerplate.getInstance(), file.getPath());
+                                                                                }
+                                                                            }),
+                                                            throwable -> Timber.e(throwable, "update check exception"))
                                     );
                             appUpdater.start();
-                        }
-                        , throwable -> Timber.e(throwable, "update interval exception"));
+                        },
+                        throwable -> Timber.e(throwable, "update interval exception"));
     }
 }
