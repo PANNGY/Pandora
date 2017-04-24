@@ -19,6 +19,13 @@
             android:name="com.samsung.android.sdk.multiwindow.style"
             android:value="forceTitleBar|fullscreenOnly" />
 
+        <provider
+            android:name="br.com.mauker.materialsearchview.db.HistoryProvider"
+            android:authorities="com.github.gnastnosaj.pandora.searchhistorydatabase"
+            android:exported="false"
+            android:protectionLevel="signature"
+            android:syncable="true" />
+
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="orientation|screenLayout|screenSize|smallestScreenSize"
