@@ -15,61 +15,87 @@
         tools:ignore="ContentDescription" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/len_40"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/splash_app_name"
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:ignore="UselessLeaf" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="@string/app_name"
-            android:textColor="@color/white"
-            android:textSize="@dimen/font_56"
-            android:textStyle="bold" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/splash_slogan"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/splash_app_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_56"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/splash_slogan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/len_10"
+                android:text="@string/splash_slogan"
+                android:textColor="@color/white_alpha_96" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/len_10"
-            android:text="@string/splash_slogan"
-            android:textColor="@color/white_alpha_96" />
+            android:layout_weight="1">
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/white_alpha_16"
+                android:orientation="vertical"
+                android:padding="@dimen/len_10"
+                tools:ignore="UselessParent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="@dimen/len_40"
-        android:background="@color/white_alpha_16"
-        android:orientation="vertical"
-        android:padding="@dimen/len_10">
+                <TextView
+                    android:id="@+id/splash_version"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:text="@string/splash_version"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_16" />
 
-        <TextView
-            android:id="@+id/splash_version"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/splash_copyright"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/len_10"
+                    android:gravity="center_horizontal"
+                    android:text="@string/splash_copyright"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/font_12" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/splash_version"
-            android:textColor="@color/white"
-            android:textSize="@dimen/font_16" />
-
-        <TextView
-            android:id="@+id/splash_copyright"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/len_10"
-            android:gravity="center_horizontal"
-            android:text="@string/splash_copyright"
-            android:textColor="@color/white"
-            android:textSize="@dimen/font_12" />
+            android:layout_weight="0.4"
+            tools:ignore="UselessLeaf" />
 
     </LinearLayout>
 
