@@ -1,0 +1,29 @@
+{
+  "typeSelector": {
+    "url": "http://www.j12lib.com/genres.php",
+    "selector": "div#rightcolumn div.textbox",
+    "titleSelector": {
+      "selector": "div.boxtitle",
+      "analyzer": {
+        "method": 0
+      }
+    },
+    "tagSelector": {
+      "selector": "div.genreitem",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "selector": "a",
+        "analyzer": {
+          "method": 2,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    }
+  }
+}
