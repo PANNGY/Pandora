@@ -12,6 +12,7 @@ import retrofit2.http.Path;
 
 public interface GithubService {
     String BASE_URL = "https://raw.githubusercontent.com/";
+    String DATA_SOURCE_LABEL_JAVLIB = "javlib";
 
     @GET("/gnastnosaj/Pandora/master/app/service/update.json")
     Observable<UpdateData> getUpdateData();

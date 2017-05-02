@@ -1,6 +1,6 @@
 {
   "typeSelector": {
-    "url": "http://www.j12lib.com/genres.php",
+    "url": "http://www.j12lib.com/cn/genres.php",
     "selector": "div#rightcolumn div.textbox",
     "titleSelector": {
       "selector": "div.boxtitle",
