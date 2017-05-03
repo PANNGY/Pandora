@@ -119,12 +119,12 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 for (Element tabElement : tabElements) {
                     JSoupTab tab = new JSoupTab();
                     if (tabSelector.titleSelector != null) {
-                        String catalogTitle = tabSelector.titleSelector.parse(tabElement);
-                        tab.title = catalogTitle;
+                        String tabTitle = tabSelector.titleSelector.parse(tabElement);
+                        tab.title = tabTitle;
                     }
                     if (tabSelector.urlSelector != null) {
-                        String catalogUrl = tabSelector.urlSelector.parse(tabElement);
-                        tab.url = betterData(catalogUrl);
+                        String tabUrl = tabSelector.urlSelector.parse(tabElement);
+                        tab.url = betterData(tabUrl);
                     }
                     tabs.add(tab);
                 }

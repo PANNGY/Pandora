@@ -42,7 +42,7 @@ public class JSoupSelector {
             }
             return elements;
         } else {
-            return null;
+            return new Elements(element);
         }
     }
 
