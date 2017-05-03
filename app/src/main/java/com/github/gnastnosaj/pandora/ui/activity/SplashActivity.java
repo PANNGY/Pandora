@@ -18,6 +18,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.GankService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
 
@@ -41,6 +42,7 @@ import timber.log.Timber;
 
 public class SplashActivity extends BaseActivity {
     public final static String PRE_SPLASH_IMAGE = "SPLASH_IMAGE";
+    public final static String PRE_PRO_VERSION = "PRO_VERSION";
 
     @BindView(R.id.splash_image)
     SimpleDraweeView splashImage;
@@ -62,16 +64,28 @@ public class SplashActivity extends BaseActivity {
 
         initSystemBar();
 
-        GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-        githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-                .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                .flatMap(data -> Observable.fromIterable(data))
-                .lastOrError()
-                .map(data -> data.attrs.get("cover"))
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        Single<String> splashImageSingle;
+        if (sharedPreferences.getBoolean(PRE_PRO_VERSION, false)) {
+            GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+            splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
+                    .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                    .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                    .flatMap(data -> Observable.fromIterable(data))
+                    .lastOrError()
+                    .map(data -> data.attrs.get("cover"));
+        } else {
+            splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
+                    .getGankData("福利", 1, 1)
+                    .flatMap(gankData -> Observable.fromIterable(gankData.results))
+                    .lastOrError()
+                    .map(result -> result.url);
+        }
+
+        splashImageSingle
                 .timeout(60, TimeUnit.SECONDS, Single.create(subscriber -> {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                     if (sharedPreferences.contains(PRE_SPLASH_IMAGE)) {
                         subscriber.onSuccess(sharedPreferences.getString(PRE_SPLASH_IMAGE, null));
                     } else {
@@ -112,7 +126,6 @@ public class SplashActivity extends BaseActivity {
                             }).build();
                     splashImage.setController(draweeController);
 
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
