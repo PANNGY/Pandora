@@ -85,7 +85,7 @@ public class SplashActivity extends BaseActivity {
         }
 
         splashImageSingle
-                .timeout(60, TimeUnit.SECONDS, Single.create(subscriber -> {
+                .timeout(5, TimeUnit.SECONDS, Single.create(subscriber -> {
                     if (sharedPreferences.contains(PRE_SPLASH_IMAGE)) {
                         subscriber.onSuccess(sharedPreferences.getString(PRE_SPLASH_IMAGE, null));
                     } else {

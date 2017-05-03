@@ -99,7 +99,7 @@ public class PandoraActivity extends BaseActivity {
                                     .setButtonUpdateClickListener((dialog, which) ->
                                             Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
                                                     .getUpdateData()
-                                                    .timeout(3, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
+                                                    .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
                                                     .compose(bindUntilEvent(ActivityEvent.DESTROY))
                                                     .subscribeOn(Schedulers.newThread())
                                                     .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
