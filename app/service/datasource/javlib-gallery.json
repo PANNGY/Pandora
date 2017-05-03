@@ -97,7 +97,7 @@
     ],
     "tagSelector": {
       "global": true,
-      "cssQuery": "div[id^=video_] span a",
+      "cssQuery": "div#video_info div[id^=video_] span a",
       "titleSelector": {
         "analyzer": {
           "method": 0
