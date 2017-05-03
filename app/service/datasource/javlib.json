@@ -32,7 +32,7 @@
           "args": [
             "href"
           ],
-          "format": "{baseUrl}%s"
+          "format": "{baseUrl}/{area}/%s"
         }
       }
     }
