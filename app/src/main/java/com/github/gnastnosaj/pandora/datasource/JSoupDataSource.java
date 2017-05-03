@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 import cn.trinea.android.common.util.ArrayUtils;
 import cn.trinea.android.common.util.MapUtils;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -45,7 +44,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     private String nextPage;
 
     public Observable<List<JSoupCatalog>> loadCatalogs() {
-        return Observable.<List<JSoupCatalog>>create(subscriber -> {
+        return Observable.create(subscriber -> {
             try {
                 catalogSelector.url = betterData(catalogSelector.url);
                 Document document = catalogSelector.loadDocument();
@@ -105,11 +104,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 subscriber.onError(e);
             }
             subscriber.onComplete();
-        }).subscribeOn(Schedulers.newThread());
+        });
     }
 
     public Observable<List<JSoupTab>> loadTabs() {
-        return Observable.<List<JSoupTab>>create(subscriber -> {
+        return Observable.create(subscriber -> {
             try {
                 tabSelector.url = betterData(tabSelector.url);
                 Document document = tabSelector.loadDocument();
@@ -134,7 +133,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 subscriber.onError(e);
             }
             subscriber.onComplete();
-        }).subscribeOn(Schedulers.newThread());
+        });
     }
 
     public Observable<List<JSoupData>> loadData() {
@@ -146,7 +145,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public Observable<List<JSoupData>> loadData(String page) {
-        return Observable.<List<JSoupData>>create(subscriber -> {
+        return Observable.create(subscriber -> {
             try {
                 if (page == null) {
                     subscriber.onError(new Throwable("page is empty"));
@@ -223,7 +222,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 subscriber.onError(e);
             }
             subscriber.onComplete();
-        }).subscribeOn(Schedulers.newThread());
+        });
     }
 
     public void setNextPage(String nextPage) {
