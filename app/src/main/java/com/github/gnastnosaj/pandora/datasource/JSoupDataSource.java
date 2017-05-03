@@ -184,6 +184,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     }
                     if (data.isEmpty()) {
                         JSoupData jsoupData = new JSoupData();
+                        jsoupData.attrs = new HashMap<>();
                         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
                             if (attrSelector.global) {
                                 String attr = attrSelector.parse(document, null);
