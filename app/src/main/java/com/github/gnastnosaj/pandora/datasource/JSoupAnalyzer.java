@@ -33,7 +33,7 @@ public class JSoupAnalyzer {
                 }
                 break;
         }
-        if (format != null) {
+        if (format != null && content != null) {
             content = String.format(format, content);
         }
         return content;
