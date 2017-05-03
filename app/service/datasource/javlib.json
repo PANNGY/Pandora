@@ -1,6 +1,10 @@
 {
+  "baseUrl": "http://www.j12lib.com",
+  "pages": [
+    "/genres.php"
+  ],
   "typeSelector": {
-    "url": "http://www.j12lib.com/cn/genres.php",
+    "url": "{baseUrl}/cn{pages[0]}",
     "selector": "div#rightcolumn div.textbox",
     "titleSelector": {
       "selector": "div.boxtitle",

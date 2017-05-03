@@ -14,7 +14,10 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import cn.trinea.android.common.util.ArrayUtils;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -23,6 +26,9 @@ import io.reactivex.schedulers.Schedulers;
  */
 
 public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+
+    public String baseUrl;
+    public String[] pages;
 
     public TypeSelector typeSelector;
     public String firstPageSelector;
@@ -33,6 +39,14 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     public Observable loadType() {
         return Observable.create(subscriber -> {
+            typeSelector.url = typeSelector.url.replace("{baseUrl}", baseUrl);
+            Matcher matcher = Pattern.compile("pages\\[[1-9]\\d*]").matcher(typeSelector.url);
+            if (matcher.find()) {
+                int offset = Integer.parseInt(matcher.group().substring(5, 6));
+                if (!ArrayUtils.isEmpty(pages) && pages.length > offset) {
+                    typeSelector.url.replace(matcher.group(), pages[offset]);
+                }
+            }
             Connection connection = Jsoup.connect(typeSelector.url);
             if (typeSelector.headers != null) {
                 connection.headers(typeSelector.headers);

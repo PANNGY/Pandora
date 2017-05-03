@@ -2,6 +2,8 @@ package com.github.gnastnosaj.pandora.datasource;
 
 import com.github.gnastnosaj.pandora.model.UpdateData;
 
+import java.util.List;
+
 import io.reactivex.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -12,11 +14,13 @@ import retrofit2.http.Path;
 
 public interface GithubService {
     String BASE_URL = "https://raw.githubusercontent.com/";
-    String DATA_SOURCE_LABEL_JAVLIB = "javlib";
 
     @GET("/gnastnosaj/Pandora/master/app/service/update.json")
     Observable<UpdateData> getUpdateData();
 
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/{label}.json")
     Observable<JSoupDataSource> getDataSource(@Path("label") String label);
+
+    @GET("/gnastnosaj/Pandora/master/app/service/datasource/include.json")
+    Observable<List<String>> getDataSources();
 }
