@@ -164,6 +164,22 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             attr = betterData(attr);
                             jsoupData.attrs.put(attrSelector.label, attr);
                         }
+                        if (dataSelector.tagSelector != null) {
+                            jsoupData.tags = new ArrayList<>();
+                            Elements tagElements = dataSelector.tagSelector.call(document);
+                            for (Element tagElement : tagElements) {
+                                JSoupCatalog tag = new JSoupCatalog();
+                                if (dataSelector.tagSelector.titleSelector != null) {
+                                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(tagElement);
+                                    tag.title = tagTitle;
+                                }
+                                if (dataSelector.tagSelector.urlSelector != null) {
+                                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(tagElement);
+                                    tag.url = betterData(tagUrl);
+                                }
+                                jsoupData.tags.add(tag);
+                            }
+                        }
                         data.add(jsoupData);
                     }
 
@@ -215,6 +231,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     public static class DataSelector extends JSoupSelector {
         public JSoupSelector[] attrSelectors;
         public JSoupSelector nextPageSelector;
+        public CatalogSelector tagSelector;
     }
 
     private String betterData(String data) {
