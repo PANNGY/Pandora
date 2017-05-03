@@ -28,7 +28,7 @@
       "urlSelector": {
         "selector": "a",
         "analyzer": {
-          "method": 2,
+          "method": 1,
           "args": [
             "href"
           ],
