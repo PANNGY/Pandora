@@ -12,6 +12,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -35,10 +36,10 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     public CatalogSelector catalogSelector;
     public DataSelector dataSelector;
-    public String nextPageSelecttor;
-    public String previousPageSelector;
 
     private String currentPage;
+    private String nextPage;
+    private String previousPage;
 
     public Observable<List<JSoupCatalog>> loadCatalogs() {
         return Observable.<List<JSoupCatalog>>create(subscriber -> {
@@ -151,6 +152,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     Elements dataElements = document.select(dataSelector.selector);
                     for (Element dataElement : dataElements) {
                         JSoupData jsoupData = new JSoupData();
+                        jsoupData.attrs = new HashMap<>();
                         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
                             String attr = null;
                             if (attrSelector.selector == null) {
@@ -158,10 +160,22 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             } else {
                                 attr = attrSelector.analyzer.analyze(dataElement.select(attrSelector.selector));
                             }
+                            attr = betterUrl(attr);
                             jsoupData.attrs.put(attrSelector.label, attr);
                         }
                         data.add(jsoupData);
                     }
+
+                    if (dataSelector.nextPageSelector != null) {
+                        nextPage = dataSelector.nextPageSelector.analyzer.analyze(document.select(dataSelector.nextPageSelector.selector));
+                        nextPage = betterUrl(nextPage);
+                    }
+
+                    if (dataSelector.previousPageSelector != null) {
+                        previousPage = dataSelector.previousPageSelector.analyzer.analyze(document.select(dataSelector.previousPageSelector.selector));
+                        previousPage = betterUrl(previousPage);
+                    }
+
                     subscriber.onNext(data);
                 }
             } catch (Exception e) {
@@ -200,6 +214,8 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     public static class DataSelector extends JSoupSelector {
         public JSoupSelector[] attrSelectors;
+        public JSoupSelector nextPageSelector;
+        public JSoupSelector previousPageSelector;
     }
 
     private String betterUrl(String url) {

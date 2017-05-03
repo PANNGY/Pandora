@@ -18,7 +18,11 @@ public class JSoupAnalyzer {
     public String format;
 
     public String analyze(Elements elements) {
-        return analyze(elements.first());
+        if (elements.isEmpty()) {
+            return null;
+        } else {
+            return analyze(elements.first());
+        }
     }
 
     public String analyze(Element element) {

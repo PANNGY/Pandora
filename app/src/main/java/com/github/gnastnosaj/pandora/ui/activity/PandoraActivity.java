@@ -70,7 +70,7 @@ public class PandoraActivity extends BaseActivity {
                 .flatMap(labels -> Observable.fromIterable(labels))
                 .flatMap(label -> githubService.getDataSource(label))
                 .subscribeOn(Schedulers.newThread())
-                .flatMap(jSoupDataSource -> jSoupDataSource.loadCatalogs()).subscribe(catalogs -> {
+                .flatMap(jSoupDataSource -> jSoupDataSource.loadData()).subscribe(data -> {
             int i = 0;
             int j = 1;
         });

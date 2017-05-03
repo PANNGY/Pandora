@@ -82,6 +82,16 @@
           "format": "{baseUrl}/{area}/%s"
         }
       }
-    ]
+    ],
+    "nextPageSelector": {
+      "selector": "div.page_selector a.next",
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}/{area}/%s"
+      }
+    }
   }
 }
