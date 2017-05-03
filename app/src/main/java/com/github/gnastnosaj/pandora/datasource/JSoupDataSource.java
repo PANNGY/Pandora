@@ -1,5 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import android.text.TextUtils;
+
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupData;
@@ -203,7 +205,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     @Override
     public boolean hasMore() {
-        return false;
+        return !TextUtils.isEmpty(nextPage);
     }
 
     public static class CatalogSelector extends JSoupSelector {
