@@ -31,7 +31,8 @@
           "method": 2,
           "args": [
             "href"
-          ]
+          ],
+          "format": "{baseUrl}%s"
         }
       }
     }
