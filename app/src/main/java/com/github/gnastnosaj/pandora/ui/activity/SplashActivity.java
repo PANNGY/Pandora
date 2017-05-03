@@ -18,19 +18,22 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.datasource.GankService;
+import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Created by jasontsang on 4/21/17.
@@ -59,17 +62,21 @@ public class SplashActivity extends BaseActivity {
 
         initSystemBar();
 
-        Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
-                .getGankData("福利", 1, 1)
-                .map(gankData -> gankData.results.get(0).url)
-                .timeout(3, TimeUnit.SECONDS, Observable.create(subscriber -> {
+        GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+        githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                .flatMap(data -> Observable.fromIterable(data))
+                .lastOrError()
+                .map(data -> data.attrs.get("cover"))
+                .timeout(60, TimeUnit.SECONDS, Single.create(subscriber -> {
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                     if (sharedPreferences.contains(PRE_SPLASH_IMAGE)) {
-                        subscriber.onNext(sharedPreferences.getString(PRE_SPLASH_IMAGE, null));
+                        subscriber.onSuccess(sharedPreferences.getString(PRE_SPLASH_IMAGE, null));
                     } else {
                         subscriber.onError(new TimeoutException());
                     }
-                    subscriber.onComplete();
                 }))
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
@@ -109,7 +116,10 @@ public class SplashActivity extends BaseActivity {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
-                }, throwable -> startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK)));
+                }, throwable -> {
+                    Timber.e(throwable, "load splash image exception");
+                    startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                });
 
         splashVersion.setText(getResources().getString(R.string.splash_version, Boilerplate.versionName));
         splashCopyright.setText(getResources().getString(R.string.splash_copyright, new SimpleDateFormat("yyyy").format(new Date())));

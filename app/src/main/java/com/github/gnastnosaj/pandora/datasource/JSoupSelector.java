@@ -6,8 +6,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.io.IOException;
 import java.util.Map;
+
+import timber.log.Timber;
 
 /**
  * Created by jasontsang on 5/2/17.
@@ -70,11 +71,11 @@ public class JSoupSelector {
         }
     }
 
-    public Document loadDocument() throws IOException {
+    public Document loadDocument() {
         return loadDocument(url);
     }
 
-    public Document loadDocument(String url) throws IOException {
+    public Document loadDocument(String url) {
         Connection connection = Jsoup.connect(url);
         if (headers != null) {
             connection.headers(headers);
@@ -83,11 +84,15 @@ public class JSoupSelector {
             connection.data(data);
         }
         connection.timeout(timeout == 0 ? JSoupSelector.DEFAULT_TIMEOUT : timeout);
-        Document document;
-        if (method == JSoupSelector.METHOD_GET) {
-            document = connection.get();
-        } else {
-            document = connection.post();
+        Document document = null;
+        try {
+            if (method == JSoupSelector.METHOD_GET) {
+                document = connection.get();
+            } else {
+                document = connection.post();
+            }
+        } catch (Exception e) {
+            Timber.e(e, "load document exception");
         }
         return document;
     }

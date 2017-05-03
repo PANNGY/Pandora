@@ -226,6 +226,10 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         }).subscribeOn(Schedulers.newThread());
     }
 
+    public void setNextPage(String nextPage) {
+        this.nextPage = nextPage;
+    }
+
     @Override
     public List<JSoupData> loadCache(boolean isEmpty) {
         return null;
@@ -279,6 +283,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             if (!MapUtils.isEmpty(areas) && areas.containsKey(Boilerplate.getInstance().getString(R.string.area))) {
                 data = data.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
             }
+            data = data.replace("/./", "/");
         }
         return data;
     }
