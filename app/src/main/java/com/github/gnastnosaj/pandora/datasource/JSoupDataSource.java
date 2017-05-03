@@ -41,12 +41,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     private String currentPage;
     private String nextPage;
-    private String previousPage;
 
     public Observable<List<JSoupCatalog>> loadCatalogs() {
         return Observable.<List<JSoupCatalog>>create(subscriber -> {
             try {
-                catalogSelector.url = betterUrl(catalogSelector.url);
+                catalogSelector.url = betterData(catalogSelector.url);
                 Document document = catalogSelector.loadDocument();
 
                 List<JSoupCatalog> catalogs = new ArrayList<>();
@@ -70,7 +69,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             } else {
                                 catalogUrl = catalogSelector.urlSelector.analyzer.analyze(typeElement.select(catalogSelector.urlSelector.selector));
                             }
-                            catalog.url = betterUrl(catalogUrl);
+                            catalog.url = betterData(catalogUrl);
                         }
                         if (catalogSelector.tagSelector != null) {
                             catalog.tags = new ArrayList<>();
@@ -93,7 +92,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                                     } else {
                                         tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.urlSelector.selector));
                                     }
-                                    tag.url = betterUrl(tagUrl);
+                                    tag.url = betterData(tagUrl);
                                 }
                                 catalog.tags.add(tag);
                             }
@@ -121,7 +120,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             } else {
                                 tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.urlSelector.selector));
                             }
-                            tag.url = betterUrl(tagUrl);
+                            tag.url = betterData(tagUrl);
                         }
                         catalogs.add(tag);
                     }
@@ -138,7 +137,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public Observable<List<JSoupData>> loadData() {
-        return loadData(dataSelector.url);
+        if (nextPage != null) {
+            return loadData(nextPage);
+        } else {
+            return loadData(dataSelector.url);
+        }
     }
 
     public Observable<List<JSoupData>> loadData(String page) {
@@ -147,7 +150,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 if (page == null) {
                     subscriber.onError(new Throwable("page is empty"));
                 } else {
-                    currentPage = betterUrl(page);
+                    currentPage = betterData(page);
                     Document document = dataSelector.loadDocument(currentPage);
 
                     List<JSoupData> data = new ArrayList<>();
@@ -162,7 +165,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             } else {
                                 attr = attrSelector.analyzer.analyze(dataElement.select(attrSelector.selector));
                             }
-                            attr = betterUrl(attr);
+                            attr = betterData(attr);
                             jsoupData.attrs.put(attrSelector.label, attr);
                         }
                         data.add(jsoupData);
@@ -170,14 +173,8 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
                     if (dataSelector.nextPageSelector != null) {
                         nextPage = dataSelector.nextPageSelector.analyzer.analyze(document.select(dataSelector.nextPageSelector.selector));
-                        nextPage = betterUrl(nextPage);
+                        nextPage = betterData(nextPage);
                         Timber.d("nextPage", nextPage);
-                    }
-
-                    if (dataSelector.previousPageSelector != null) {
-                        previousPage = dataSelector.previousPageSelector.analyzer.analyze(document.select(dataSelector.previousPageSelector.selector));
-                        previousPage = betterUrl(previousPage);
-                        Timber.d("previousPage", previousPage);
                     }
 
                     subscriber.onNext(data);
@@ -219,27 +216,27 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     public static class DataSelector extends JSoupSelector {
         public JSoupSelector[] attrSelectors;
         public JSoupSelector nextPageSelector;
-        public JSoupSelector previousPageSelector;
     }
 
-    private String betterUrl(String url) {
-        if (url != null) {
+    private String betterData(String data) {
+        if (data != null) {
+            data = data.trim();
             if (baseUrl != null) {
-                url = url.replace("{baseUrl}", baseUrl);
+                data = data.replace("{baseUrl}", baseUrl);
             }
             if (!ArrayUtils.isEmpty(pages)) {
-                Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(url);
+                Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(data);
                 if (matcher.find()) {
                     int offset = Integer.parseInt(matcher.group().substring(7, 8));
                     if (pages.length > offset) {
-                        url = url.replace(matcher.group(), pages[offset]);
+                        data = data.replace(matcher.group(), pages[offset]);
                     }
                 }
             }
             if (!MapUtils.isEmpty(areas) && areas.containsKey(Boilerplate.getInstance().getString(R.string.area))) {
-                url = url.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
+                data = data.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
             }
         }
-        return url;
+        return data;
     }
 }
