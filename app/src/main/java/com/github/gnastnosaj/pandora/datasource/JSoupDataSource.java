@@ -41,8 +41,8 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     private String currentUrl;
 
-    public Observable loadCatalogs() {
-        return Observable.create(subscriber -> {
+    public Observable<List<JSoupCatalog>> loadCatalogs() {
+        return Observable.<List<JSoupCatalog>>create(subscriber -> {
             if (baseUrl != null) {
                 catalogSelector.url = catalogSelector.url.replace("{baseUrl}", baseUrl);
             }
@@ -73,8 +73,8 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 document = connection.post();
             }
 
+            List<JSoupCatalog> catalogs = new ArrayList<>();
             if (catalogSelector.selector != null) {
-                List<JSoupCatalog> catalogs = new ArrayList<>();
                 Elements typeElements = document.select(catalogSelector.selector);
                 for (Element typeElement : typeElements) {
                     JSoupCatalog catalog = new JSoupCatalog();
@@ -126,7 +126,6 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 }
                 subscriber.onNext(catalogs);
             } else if (catalogSelector.tagSelector != null) {
-                List<JSoupCatalog> tags = new ArrayList<>();
                 Elements tagElements = document.select(catalogSelector.tagSelector.selector);
                 for (Element tagElement : tagElements) {
                     JSoupCatalog tag = new JSoupCatalog();
@@ -148,9 +147,9 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         }
                         tag.url = tagUrl;
                     }
-                    tags.add(tag);
+                    catalogs.add(tag);
                 }
-                subscriber.onNext(tags);
+                subscriber.onNext(catalogs);
             } else {
                 subscriber.onError(new Throwable("both selector and tagSelector is empty"));
             }
