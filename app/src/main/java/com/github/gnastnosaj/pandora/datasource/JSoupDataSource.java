@@ -188,20 +188,22 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     private String betterUrl(String url) {
-        if (baseUrl != null) {
-            url = url.replace("{baseUrl}", baseUrl);
-        }
-        if (!ArrayUtils.isEmpty(pages)) {
-            Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(url);
-            if (matcher.find()) {
-                int offset = Integer.parseInt(matcher.group().substring(7, 8));
-                if (pages.length > offset) {
-                    url = url.replace(matcher.group(), pages[offset]);
+        if (url != null) {
+            if (baseUrl != null) {
+                url = url.replace("{baseUrl}", baseUrl);
+            }
+            if (!ArrayUtils.isEmpty(pages)) {
+                Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(url);
+                if (matcher.find()) {
+                    int offset = Integer.parseInt(matcher.group().substring(7, 8));
+                    if (pages.length > offset) {
+                        url = url.replace(matcher.group(), pages[offset]);
+                    }
                 }
             }
-        }
-        if (!MapUtils.isEmpty(areas) && areas.containsKey(Boilerplate.getInstance().getString(R.string.area))) {
-            url = url.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
+            if (!MapUtils.isEmpty(areas) && areas.containsKey(Boilerplate.getInstance().getString(R.string.area))) {
+                url = url.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
+            }
         }
         return url;
     }
