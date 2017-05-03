@@ -38,6 +38,10 @@ public class JSoupSelector {
         return analyze(call(document, element));
     }
 
+    public String parse(Document document) {
+        return analyze(call(document));
+    }
+
     public Elements call(Document document, Element element) {
         if (cssQuery != null) {
             Elements elements = global ? document.select(cssQuery) : element.select(cssQuery);
