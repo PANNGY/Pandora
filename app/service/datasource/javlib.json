@@ -1,6 +1,12 @@
 {
   "baseUrl": "http://www.j12lib.com",
   "pages": [
+    "/vl_update.php",
+    "/vl_newrelease.php",
+    "/vl_newentries.php",
+    "/vl_mostwanted.php",
+    "/vl_bestrated.php",
+    "/vl_searchbyid.php?keyword=",
     "/genres.php"
   ],
   "areas": {
@@ -10,7 +16,7 @@
     "tw": "tw"
   },
   "catalogSelector": {
-    "url": "{baseUrl}/{area}{pages[0]}",
+    "url": "{baseUrl}/{area}{pages[6]}",
     "selector": "div#rightcolumn div.textbox",
     "titleSelector": {
       "selector": "div.boxtitle",
@@ -36,5 +42,46 @@
         }
       }
     }
+  },
+  "dataSelector": {
+    "url": "{baseUrl}/{area}{pages[3]}",
+    "selector": "div.videothumblist div.video",
+    "attrSelectors": [
+      {
+        "label": "id",
+        "selector": "a div.id",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "title",
+        "selector": "a div.title",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "thumbnail",
+        "selector": "a img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "url",
+        "selector": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}/{area}/%s"
+        }
+      }
+    ]
   }
 }

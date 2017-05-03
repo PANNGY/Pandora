@@ -1,5 +1,10 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -18,6 +23,29 @@ public class JSoupSelector {
     public int method;
     public int timeout;
 
+    public String label;
     public String selector;
     public JSoupAnalyzer analyzer;
+
+    public Document loadDocument() throws IOException {
+        return loadDocument(url);
+    }
+
+    public Document loadDocument(String url) throws IOException {
+        Connection connection = Jsoup.connect(url);
+        if (headers != null) {
+            connection.headers(headers);
+        }
+        if (data != null) {
+            connection.data(data);
+        }
+        connection.timeout(timeout == 0 ? JSoupSelector.DEFAULT_TIMEOUT : timeout);
+        Document document;
+        if (method == JSoupSelector.METHOD_GET) {
+            document = connection.get();
+        } else {
+            document = connection.post();
+        }
+        return document;
+    }
 }

@@ -7,8 +7,6 @@ import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
 
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -40,26 +38,13 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     public String nextPageSelecttor;
     public String previousPageSelector;
 
-    private String currentUrl;
+    private String currentPage;
 
     public Observable<List<JSoupCatalog>> loadCatalogs() {
         return Observable.<List<JSoupCatalog>>create(subscriber -> {
             try {
                 catalogSelector.url = betterUrl(catalogSelector.url);
-                Connection connection = Jsoup.connect(catalogSelector.url);
-                if (catalogSelector.headers != null) {
-                    connection.headers(catalogSelector.headers);
-                }
-                if (catalogSelector.data != null) {
-                    connection.data(catalogSelector.data);
-                }
-                connection.timeout(catalogSelector.timeout == 0 ? JSoupSelector.DEFAULT_TIMEOUT : catalogSelector.timeout);
-                Document document = null;
-                if (catalogSelector.method == JSoupSelector.METHOD_GET) {
-                    document = connection.get();
-                } else {
-                    document = connection.post();
-                }
+                Document document = catalogSelector.loadDocument();
 
                 List<JSoupCatalog> catalogs = new ArrayList<>();
                 if (catalogSelector.selector != null) {
@@ -150,8 +135,40 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public Observable<List<JSoupData>> loadData() {
-        return Observable.<List<JSoupData>>create(subscriber -> {
+        return loadData(dataSelector.url);
+    }
 
+    public Observable<List<JSoupData>> loadData(String page) {
+        return Observable.<List<JSoupData>>create(subscriber -> {
+            try {
+                if (page == null) {
+                    subscriber.onError(new Throwable("page is empty"));
+                } else {
+                    currentPage = betterUrl(page);
+                    Document document = dataSelector.loadDocument(currentPage);
+
+                    List<JSoupData> data = new ArrayList<>();
+                    Elements dataElements = document.select(dataSelector.selector);
+                    for (Element dataElement : dataElements) {
+                        JSoupData jsoupData = new JSoupData();
+                        for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                            String attr = null;
+                            if (attrSelector.selector == null) {
+                                attr = attrSelector.analyzer.analyze(dataElement);
+                            } else {
+                                attr = attrSelector.analyzer.analyze(dataElement.select(attrSelector.selector));
+                            }
+                            jsoupData.attrs.put(attrSelector.label, attr);
+                        }
+                        data.add(jsoupData);
+                    }
+                    subscriber.onNext(data);
+                }
+            } catch (Exception e) {
+                Timber.e(e, "loadData exception");
+                subscriber.onError(e);
+            }
+            subscriber.onComplete();
         }).subscribeOn(Schedulers.newThread());
     }
 
@@ -182,9 +199,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public static class DataSelector extends JSoupSelector {
-        public JSoupSelector titleSelector;
-        public JSoupSelector urlSelector;
-        public JSoupSelector thumbnailSelector;
+        public JSoupSelector[] attrSelectors;
     }
 
     private String betterUrl(String url) {
