@@ -171,11 +171,13 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     if (dataSelector.nextPageSelector != null) {
                         nextPage = dataSelector.nextPageSelector.analyzer.analyze(document.select(dataSelector.nextPageSelector.selector));
                         nextPage = betterUrl(nextPage);
+                        Timber.d("nextPage", nextPage);
                     }
 
                     if (dataSelector.previousPageSelector != null) {
                         previousPage = dataSelector.previousPageSelector.analyzer.analyze(document.select(dataSelector.previousPageSelector.selector));
                         previousPage = betterUrl(previousPage);
+                        Timber.d("previousPage", previousPage);
                     }
 
                     subscriber.onNext(data);

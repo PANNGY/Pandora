@@ -90,7 +90,7 @@
         "args": [
           "href"
         ],
-        "format": "{baseUrl}/{area}/%s"
+        "format": "{baseUrl}%s"
       }
     }
   }
