@@ -35,22 +35,30 @@ public class JSoupSelector {
     public JSoupAnalyzer analyzer;
 
     public String parse(Document document, Element element) {
-        if (global) {
-            return analyze(call(document));
-        } else {
-            return analyze(call(element));
-        }
+        return analyze(call(document, element));
     }
 
-    public Elements call(Element element) {
+    public Elements call(Document document, Element element) {
         if (cssQuery != null) {
-            Elements elements = element.select(cssQuery);
+            Elements elements = global ? document.select(cssQuery) : element.select(cssQuery);
             if (filter != null) {
                 elements = filter.filter(elements);
             }
             return elements;
         } else {
             return new Elements(element);
+        }
+    }
+
+    public Elements call(Document document) {
+        if (cssQuery != null) {
+            Elements elements = document.select(cssQuery);
+            if (filter != null) {
+                elements = filter.filter(elements);
+            }
+            return elements;
+        } else {
+            return new Elements(document);
         }
     }
 

@@ -65,7 +65,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         }
                         if (catalogSelector.tagSelector != null) {
                             catalog.tags = new ArrayList<>();
-                            Elements tagElements = catalogSelector.tagSelector.call(typeElement);
+                            Elements tagElements = catalogSelector.tagSelector.call(document, typeElement);
                             for (Element tagElement : tagElements) {
                                 JSoupCatalog tag = new JSoupCatalog();
                                 if (catalogSelector.tagSelector.titleSelector != null) {
@@ -166,7 +166,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         }
                         if (dataSelector.tagSelector != null) {
                             jsoupData.tags = new ArrayList<>();
-                            Elements tagElements = dataSelector.tagSelector.call(dataElement);
+                            Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
                             for (Element tagElement : tagElements) {
                                 JSoupCatalog tag = new JSoupCatalog();
                                 if (dataSelector.tagSelector.titleSelector != null) {

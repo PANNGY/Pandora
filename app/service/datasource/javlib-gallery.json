@@ -72,7 +72,7 @@
   },
   "dataSelector": {
     "url": "http://www.j12lib.com/en/?v=javlikjn54",
-    "cssQuery": "div.previewthumbs",
+    "cssQuery": "div.previewthumbs img",
     "attrSelectors": [
       {
         "label": "cover",
@@ -87,7 +87,6 @@
       },
       {
         "label": "thumbnail",
-        "cssQuery": "img",
         "analyzer": {
           "method": 1,
           "args": [
