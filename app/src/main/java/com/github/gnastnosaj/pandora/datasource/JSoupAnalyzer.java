@@ -18,7 +18,7 @@ public class JSoupAnalyzer {
     public String format;
 
     public String analyze(Elements elements) {
-        if (elements.isEmpty()) {
+        if (elements == null || elements.isEmpty()) {
             return null;
         } else {
             return analyze(elements.first());

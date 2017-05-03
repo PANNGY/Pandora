@@ -3,6 +3,8 @@ package com.github.gnastnosaj.pandora.datasource;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.Map;
@@ -25,7 +27,32 @@ public class JSoupSelector {
 
     public String label;
     public String selector;
+    public JSoupFilter filter;
     public JSoupAnalyzer analyzer;
+
+    public String parse(Element element) {
+        return analyze(call(element));
+    }
+
+    public Elements call(Element element) {
+        if (selector != null) {
+            Elements elements = element.select(selector);
+            if (filter != null) {
+                elements = filter.filter(elements);
+            }
+            return elements;
+        } else {
+            return null;
+        }
+    }
+
+    public String analyze(Elements elements) {
+        if (analyzer != null) {
+            return analyzer.analyze(elements);
+        } else {
+            return null;
+        }
+    }
 
     public Document loadDocument() throws IOException {
         return loadDocument(url);

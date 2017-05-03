@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.model;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,4 +9,5 @@ import java.util.Map;
 
 public class JSoupData {
     public Map<String, String> attrs;
+    public List<JSoupCatalog> tags;
 }

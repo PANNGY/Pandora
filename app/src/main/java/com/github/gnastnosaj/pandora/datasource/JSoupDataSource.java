@@ -6,6 +6,7 @@ import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupCatalog;
+import com.github.gnastnosaj.pandora.model.JSoupTab;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
 
@@ -30,12 +31,13 @@ import timber.log.Timber;
  * Created by jasontsang on 5/2/17.
  */
 
-public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
 
     public String baseUrl;
     public String[] pages;
     public Map<String, String> areas;
 
+    public TabSelector tabSelector;
     public CatalogSelector catalogSelector;
     public DataSelector dataSelector;
 
@@ -50,48 +52,28 @@ public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataC
 
                 List<JSoupCatalog> catalogs = new ArrayList<>();
                 if (catalogSelector.selector != null) {
-                    Elements typeElements = document.select(catalogSelector.selector);
+                    Elements typeElements = catalogSelector.call(document);
                     for (Element typeElement : typeElements) {
                         JSoupCatalog catalog = new JSoupCatalog();
                         if (catalogSelector.titleSelector != null) {
-                            String catalogTitle = null;
-                            if (catalogSelector.titleSelector.selector == null) {
-                                catalogTitle = catalogSelector.titleSelector.analyzer.analyze(typeElement);
-                            } else {
-                                catalogTitle = catalogSelector.titleSelector.analyzer.analyze(typeElement.select(catalogSelector.titleSelector.selector));
-                            }
+                            String catalogTitle = catalogSelector.titleSelector.parse(typeElement);
                             catalog.title = catalogTitle;
                         }
                         if (catalogSelector.urlSelector != null) {
-                            String catalogUrl = null;
-                            if (catalogSelector.urlSelector.selector == null) {
-                                catalogUrl = catalogSelector.urlSelector.analyzer.analyze(typeElement);
-                            } else {
-                                catalogUrl = catalogSelector.urlSelector.analyzer.analyze(typeElement.select(catalogSelector.urlSelector.selector));
-                            }
+                            String catalogUrl = catalogSelector.urlSelector.parse(typeElement);
                             catalog.url = betterData(catalogUrl);
                         }
                         if (catalogSelector.tagSelector != null) {
                             catalog.tags = new ArrayList<>();
-                            Elements tagElements = document.select(catalogSelector.tagSelector.selector);
+                            Elements tagElements = catalogSelector.tagSelector.call(typeElement);
                             for (Element tagElement : tagElements) {
                                 JSoupCatalog tag = new JSoupCatalog();
                                 if (catalogSelector.tagSelector.titleSelector != null) {
-                                    String tagTitle = null;
-                                    if (catalogSelector.tagSelector.titleSelector.selector == null) {
-                                        tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement);
-                                    } else {
-                                        tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.titleSelector.selector));
-                                    }
+                                    String tagTitle = catalogSelector.tagSelector.titleSelector.parse(tagElement);
                                     tag.title = tagTitle;
                                 }
                                 if (catalogSelector.tagSelector.urlSelector != null) {
-                                    String tagUrl = null;
-                                    if (catalogSelector.tagSelector.urlSelector.selector == null) {
-                                        tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement);
-                                    } else {
-                                        tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.urlSelector.selector));
-                                    }
+                                    String tagUrl = catalogSelector.tagSelector.urlSelector.parse(tagElement);
                                     tag.url = betterData(tagUrl);
                                 }
                                 catalog.tags.add(tag);
@@ -101,25 +83,15 @@ public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataC
                     }
                     subscriber.onNext(catalogs);
                 } else if (catalogSelector.tagSelector != null) {
-                    Elements tagElements = document.select(catalogSelector.tagSelector.selector);
+                    Elements tagElements = catalogSelector.tagSelector.call(document);
                     for (Element tagElement : tagElements) {
                         JSoupCatalog tag = new JSoupCatalog();
                         if (catalogSelector.tagSelector.titleSelector != null) {
-                            String tagTitle = null;
-                            if (catalogSelector.tagSelector.titleSelector.selector == null) {
-                                tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement);
-                            } else {
-                                tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.titleSelector.selector));
-                            }
+                            String tagTitle = catalogSelector.tagSelector.titleSelector.parse(tagElement);
                             tag.title = tagTitle;
                         }
                         if (catalogSelector.tagSelector.urlSelector != null) {
-                            String tagUrl = null;
-                            if (catalogSelector.tagSelector.urlSelector.selector == null) {
-                                tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement);
-                            } else {
-                                tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.urlSelector.selector));
-                            }
+                            String tagUrl = catalogSelector.tagSelector.urlSelector.parse(tagElement);
                             tag.url = betterData(tagUrl);
                         }
                         catalogs.add(tag);
@@ -130,6 +102,35 @@ public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataC
                 }
             } catch (Exception e) {
                 Timber.e(e, "loadCatalogs exception");
+                subscriber.onError(e);
+            }
+            subscriber.onComplete();
+        }).subscribeOn(Schedulers.newThread());
+    }
+
+    public Observable<List<JSoupTab>> loadTabs() {
+        return Observable.<List<JSoupTab>>create(subscriber -> {
+            try {
+                tabSelector.url = betterData(tabSelector.url);
+                Document document = tabSelector.loadDocument();
+
+                List<JSoupTab> tabs = new ArrayList<>();
+                Elements tabElements = tabSelector.call(document);
+                for (Element tabElement : tabElements) {
+                    JSoupTab tab = new JSoupTab();
+                    if (tabSelector.titleSelector != null) {
+                        String catalogTitle = tabSelector.titleSelector.parse(tabElement);
+                        tab.title = catalogTitle;
+                    }
+                    if (tabSelector.urlSelector != null) {
+                        String catalogUrl = tabSelector.urlSelector.parse(tabElement);
+                        tab.url = betterData(catalogUrl);
+                    }
+                    tabs.add(tab);
+                }
+                subscriber.onNext(tabs);
+            } catch (Exception e) {
+                Timber.e(e, "loadTabs exception");
                 subscriber.onError(e);
             }
             subscriber.onComplete();
@@ -154,17 +155,12 @@ public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataC
                     Document document = dataSelector.loadDocument(currentPage);
 
                     List<JSoupData> data = new ArrayList<>();
-                    Elements dataElements = document.select(dataSelector.selector);
+                    Elements dataElements = dataSelector.call(document);
                     for (Element dataElement : dataElements) {
                         JSoupData jsoupData = new JSoupData();
                         jsoupData.attrs = new HashMap<>();
                         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                            String attr = null;
-                            if (attrSelector.selector == null) {
-                                attr = attrSelector.analyzer.analyze(dataElement);
-                            } else {
-                                attr = attrSelector.analyzer.analyze(dataElement.select(attrSelector.selector));
-                            }
+                            String attr = attrSelector.parse(dataElement);
                             attr = betterData(attr);
                             jsoupData.attrs.put(attrSelector.label, attr);
                         }
@@ -172,7 +168,7 @@ public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataC
                     }
 
                     if (dataSelector.nextPageSelector != null) {
-                        nextPage = dataSelector.nextPageSelector.analyzer.analyze(document.select(dataSelector.nextPageSelector.selector));
+                        nextPage = dataSelector.nextPageSelector.parse(document);
                         nextPage = betterData(nextPage);
                         Timber.d("nextPage", nextPage);
                     }
@@ -207,9 +203,12 @@ public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataC
         return !TextUtils.isEmpty(nextPage);
     }
 
-    public static class CatalogSelector extends JSoupSelector {
+    public static class TabSelector extends JSoupSelector {
         public JSoupSelector titleSelector;
         public JSoupSelector urlSelector;
+    }
+
+    public static class CatalogSelector extends TabSelector {
         public CatalogSelector tagSelector;
     }
 

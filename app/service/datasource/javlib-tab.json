@@ -9,11 +9,40 @@
     "/vl_searchbyid.php?keyword=",
     "/genres.php"
   ],
+  "tabs": {
+  },
   "areas": {
     "en": "en",
     "ja": "ja",
     "cn": "cn",
     "tw": "tw"
+  },
+  "tabSelector": {
+    "url": "{baseUrl}/{area}{pages[3]}",
+    "selector": "div#leftmenu div.menul1 ul li a",
+    "filter": {
+      "indexes": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "titleSelector": {
+      "analyzer": {
+        "method": 0
+      }
+    },
+    "urlSelector": {
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}/{area}/%s"
+      }
+    }
   },
   "catalogSelector": {
     "url": "{baseUrl}/{area}{pages[6]}",
