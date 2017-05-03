@@ -51,16 +51,16 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 Document document = catalogSelector.loadDocument();
 
                 List<JSoupCatalog> catalogs = new ArrayList<>();
-                if (catalogSelector.selector != null) {
+                if (catalogSelector.cssQuery != null) {
                     Elements typeElements = catalogSelector.call(document);
                     for (Element typeElement : typeElements) {
                         JSoupCatalog catalog = new JSoupCatalog();
                         if (catalogSelector.titleSelector != null) {
-                            String catalogTitle = catalogSelector.titleSelector.parse(typeElement);
+                            String catalogTitle = catalogSelector.titleSelector.parse(document, typeElement);
                             catalog.title = catalogTitle;
                         }
                         if (catalogSelector.urlSelector != null) {
-                            String catalogUrl = catalogSelector.urlSelector.parse(typeElement);
+                            String catalogUrl = catalogSelector.urlSelector.parse(document, typeElement);
                             catalog.url = betterData(catalogUrl);
                         }
                         if (catalogSelector.tagSelector != null) {
@@ -69,11 +69,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             for (Element tagElement : tagElements) {
                                 JSoupCatalog tag = new JSoupCatalog();
                                 if (catalogSelector.tagSelector.titleSelector != null) {
-                                    String tagTitle = catalogSelector.tagSelector.titleSelector.parse(tagElement);
+                                    String tagTitle = catalogSelector.tagSelector.titleSelector.parse(document, tagElement);
                                     tag.title = tagTitle;
                                 }
                                 if (catalogSelector.tagSelector.urlSelector != null) {
-                                    String tagUrl = catalogSelector.tagSelector.urlSelector.parse(tagElement);
+                                    String tagUrl = catalogSelector.tagSelector.urlSelector.parse(document, tagElement);
                                     tag.url = betterData(tagUrl);
                                 }
                                 catalog.tags.add(tag);
@@ -87,18 +87,18 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     for (Element tagElement : tagElements) {
                         JSoupCatalog tag = new JSoupCatalog();
                         if (catalogSelector.tagSelector.titleSelector != null) {
-                            String tagTitle = catalogSelector.tagSelector.titleSelector.parse(tagElement);
+                            String tagTitle = catalogSelector.tagSelector.titleSelector.parse(document, tagElement);
                             tag.title = tagTitle;
                         }
                         if (catalogSelector.tagSelector.urlSelector != null) {
-                            String tagUrl = catalogSelector.tagSelector.urlSelector.parse(tagElement);
+                            String tagUrl = catalogSelector.tagSelector.urlSelector.parse(document, tagElement);
                             tag.url = betterData(tagUrl);
                         }
                         catalogs.add(tag);
                     }
                     subscriber.onNext(catalogs);
                 } else {
-                    subscriber.onError(new Throwable("both selector and tagSelector is empty"));
+                    subscriber.onError(new Throwable("both cssQuery and tagSelector is empty"));
                 }
             } catch (Exception e) {
                 Timber.e(e, "loadCatalogs exception");
@@ -119,11 +119,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 for (Element tabElement : tabElements) {
                     JSoupTab tab = new JSoupTab();
                     if (tabSelector.titleSelector != null) {
-                        String tabTitle = tabSelector.titleSelector.parse(tabElement);
+                        String tabTitle = tabSelector.titleSelector.parse(document, tabElement);
                         tab.title = tabTitle;
                     }
                     if (tabSelector.urlSelector != null) {
-                        String tabUrl = tabSelector.urlSelector.parse(tabElement);
+                        String tabUrl = tabSelector.urlSelector.parse(document, tabElement);
                         tab.url = betterData(tabUrl);
                     }
                     tabs.add(tab);
@@ -160,21 +160,21 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         JSoupData jsoupData = new JSoupData();
                         jsoupData.attrs = new HashMap<>();
                         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                            String attr = attrSelector.parse(dataElement);
+                            String attr = attrSelector.parse(document, dataElement);
                             attr = betterData(attr);
                             jsoupData.attrs.put(attrSelector.label, attr);
                         }
                         if (dataSelector.tagSelector != null) {
                             jsoupData.tags = new ArrayList<>();
-                            Elements tagElements = dataSelector.tagSelector.call(document);
+                            Elements tagElements = dataSelector.tagSelector.call(dataElement);
                             for (Element tagElement : tagElements) {
                                 JSoupCatalog tag = new JSoupCatalog();
                                 if (dataSelector.tagSelector.titleSelector != null) {
-                                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(tagElement);
+                                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
                                     tag.title = tagTitle;
                                 }
                                 if (dataSelector.tagSelector.urlSelector != null) {
-                                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(tagElement);
+                                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
                                     tag.url = betterData(tagUrl);
                                 }
                                 jsoupData.tags.add(tag);
@@ -184,7 +184,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     }
 
                     if (dataSelector.nextPageSelector != null) {
-                        nextPage = dataSelector.nextPageSelector.parse(document);
+                        nextPage = dataSelector.nextPageSelector.parse(document, document);
                         nextPage = betterData(nextPage);
                         Timber.d("nextPage", nextPage);
                     }

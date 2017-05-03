@@ -17,6 +17,9 @@ public class JSoupSelector {
     public final static int METHOD_GET = 0;
     public final static int METHOD_POST = 1;
 
+    public final static int BASE_ELEMENT = 0;
+    public final static int BASE_DOCUMENT = 1;
+
     public final static int DEFAULT_TIMEOUT = 10000;
 
     public String url;
@@ -26,17 +29,22 @@ public class JSoupSelector {
     public int timeout;
 
     public String label;
-    public String selector;
+    public boolean global;
+    public String cssQuery;
     public JSoupFilter filter;
     public JSoupAnalyzer analyzer;
 
-    public String parse(Element element) {
-        return analyze(call(element));
+    public String parse(Document document, Element element) {
+        if (global) {
+            return analyze(call(document));
+        } else {
+            return analyze(call(element));
+        }
     }
 
     public Elements call(Element element) {
-        if (selector != null) {
-            Elements elements = element.select(selector);
+        if (cssQuery != null) {
+            Elements elements = element.select(cssQuery);
             if (filter != null) {
                 elements = filter.filter(elements);
             }

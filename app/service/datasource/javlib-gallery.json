@@ -71,26 +71,13 @@
     }
   },
   "dataSelector": {
-    "url": "{baseUrl}/{area}{pages[3]}",
-    "cssQuery": "div.videothumblist div.video",
+    "url": "http://www.j12lib.com/en/?v=javlikjn54",
+    "cssQuery": "div.previewthumbs",
     "attrSelectors": [
       {
-        "label": "id",
-        "cssQuery": "a div.id",
-        "analyzer": {
-          "method": 0
-        }
-      },
-      {
-        "label": "title",
-        "cssQuery": "a div.title",
-        "analyzer": {
-          "method": 0
-        }
-      },
-      {
-        "label": "thumbnail",
-        "cssQuery": "a img",
+        "label": "cover",
+        "global": true,
+        "cssQuery": "img#video_jacket_img",
         "analyzer": {
           "method": 1,
           "args": [
@@ -99,8 +86,25 @@
         }
       },
       {
-        "label": "url",
-        "cssQuery": "a",
+        "label": "thumbnail",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      }
+    ],
+    "tagSelector": {
+      "global": true,
+      "cssQuery": "div[id^=video_] span a",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
         "analyzer": {
           "method": 1,
           "args": [
@@ -108,16 +112,6 @@
           ],
           "format": "{baseUrl}/{area}/%s"
         }
-      }
-    ],
-    "nextPageSelector": {
-      "cssQuery": "div.page_selector a.next",
-      "analyzer": {
-        "method": 1,
-        "args": [
-          "href"
-        ],
-        "format": "{baseUrl}%s"
       }
     }
   }
