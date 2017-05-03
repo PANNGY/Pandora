@@ -9,7 +9,7 @@
     "cn": "cn",
     "tw": "tw"
   },
-  "typeSelector": {
+  "catalogSelector": {
     "url": "{baseUrl}/{area}{pages[0]}",
     "selector": "div#rightcolumn div.textbox",
     "titleSelector": {

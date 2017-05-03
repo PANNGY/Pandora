@@ -3,8 +3,7 @@ package com.github.gnastnosaj.pandora.datasource;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupData;
-import com.github.gnastnosaj.pandora.model.JSoupTag;
-import com.github.gnastnosaj.pandora.model.JSoupType;
+import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
 
@@ -35,121 +34,121 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     public String[] pages;
     public Map<String, String> areas;
 
-    public TypeSelector typeSelector;
+    public CatalogSelector catalogSelector;
     public String firstPageSelector;
     public String nextPageSelecttor;
     public String previousPageSelector;
 
     private String currentUrl;
 
-    public Observable loadType() {
+    public Observable loadCatalogs() {
         return Observable.create(subscriber -> {
             if (baseUrl != null) {
-                typeSelector.url = typeSelector.url.replace("{baseUrl}", baseUrl);
+                catalogSelector.url = catalogSelector.url.replace("{baseUrl}", baseUrl);
             }
             if (!ArrayUtils.isEmpty(pages)) {
-                Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(typeSelector.url);
+                Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(catalogSelector.url);
                 if (matcher.find()) {
                     int offset = Integer.parseInt(matcher.group().substring(7, 8));
                     if (pages.length > offset) {
-                        typeSelector.url = typeSelector.url.replace(matcher.group(), pages[offset]);
+                        catalogSelector.url = catalogSelector.url.replace(matcher.group(), pages[offset]);
                     }
                 }
             }
             if (!MapUtils.isEmpty(areas) && areas.containsKey(Boilerplate.getInstance().getString(R.string.area))) {
-                typeSelector.url = typeSelector.url.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
+                catalogSelector.url = catalogSelector.url.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
             }
-            Connection connection = Jsoup.connect(typeSelector.url);
-            if (typeSelector.headers != null) {
-                connection.headers(typeSelector.headers);
+            Connection connection = Jsoup.connect(catalogSelector.url);
+            if (catalogSelector.headers != null) {
+                connection.headers(catalogSelector.headers);
             }
-            if (typeSelector.data != null) {
-                connection.data(typeSelector.data);
+            if (catalogSelector.data != null) {
+                connection.data(catalogSelector.data);
             }
-            connection.timeout(typeSelector.timeout == 0 ? JSoupSelector.DEFAULT_TIMEOUT : typeSelector.timeout);
+            connection.timeout(catalogSelector.timeout == 0 ? JSoupSelector.DEFAULT_TIMEOUT : catalogSelector.timeout);
             Document document = null;
-            if (typeSelector.method == JSoupSelector.METHOD_GET) {
+            if (catalogSelector.method == JSoupSelector.METHOD_GET) {
                 document = connection.get();
             } else {
                 document = connection.post();
             }
 
-            if (typeSelector.selector != null) {
-                List<JSoupType> types = new ArrayList<>();
-                Elements typeElements = document.select(typeSelector.selector);
+            if (catalogSelector.selector != null) {
+                List<JSoupCatalog> catalogs = new ArrayList<>();
+                Elements typeElements = document.select(catalogSelector.selector);
                 for (Element typeElement : typeElements) {
-                    JSoupType jsoupType = new JSoupType();
-                    if (typeSelector.titleSelector != null) {
-                        String typeTitle = null;
-                        if (typeSelector.titleSelector.selector == null) {
-                            typeTitle = typeSelector.titleSelector.analyzer.analyze(typeElement);
+                    JSoupCatalog catalog = new JSoupCatalog();
+                    if (catalogSelector.titleSelector != null) {
+                        String catalogTitle = null;
+                        if (catalogSelector.titleSelector.selector == null) {
+                            catalogTitle = catalogSelector.titleSelector.analyzer.analyze(typeElement);
                         } else {
-                            typeTitle = typeSelector.titleSelector.analyzer.analyze(typeElement.select(typeSelector.titleSelector.selector));
+                            catalogTitle = catalogSelector.titleSelector.analyzer.analyze(typeElement.select(catalogSelector.titleSelector.selector));
                         }
-                        jsoupType.title = typeTitle;
+                        catalog.title = catalogTitle;
                     }
-                    if (typeSelector.urlSelector != null) {
-                        String typeUrl = null;
-                        if (typeSelector.urlSelector.selector == null) {
-                            typeUrl = typeSelector.urlSelector.analyzer.analyze(typeElement);
+                    if (catalogSelector.urlSelector != null) {
+                        String catalogUrl = null;
+                        if (catalogSelector.urlSelector.selector == null) {
+                            catalogUrl = catalogSelector.urlSelector.analyzer.analyze(typeElement);
                         } else {
-                            typeUrl = typeSelector.urlSelector.analyzer.analyze(typeElement.select(typeSelector.urlSelector.selector));
+                            catalogUrl = catalogSelector.urlSelector.analyzer.analyze(typeElement.select(catalogSelector.urlSelector.selector));
                         }
-                        jsoupType.url = typeUrl;
+                        catalog.url = catalogUrl;
                     }
-                    if (typeSelector.tagSelector != null) {
-                        jsoupType.tags = new ArrayList<>();
-                        Elements tagElements = document.select(typeSelector.tagSelector.selector);
+                    if (catalogSelector.tagSelector != null) {
+                        catalog.tags = new ArrayList<>();
+                        Elements tagElements = document.select(catalogSelector.tagSelector.selector);
                         for (Element tagElement : tagElements) {
-                            JSoupTag jsoupTag = new JSoupTag();
-                            if (typeSelector.tagSelector.titleSelector != null) {
+                            JSoupCatalog tag = new JSoupCatalog();
+                            if (catalogSelector.tagSelector.titleSelector != null) {
                                 String tagTitle = null;
-                                if (typeSelector.tagSelector.titleSelector.selector == null) {
-                                    tagTitle = typeSelector.tagSelector.titleSelector.analyzer.analyze(tagElement);
+                                if (catalogSelector.tagSelector.titleSelector.selector == null) {
+                                    tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement);
                                 } else {
-                                    tagTitle = typeSelector.tagSelector.titleSelector.analyzer.analyze(tagElement.select(typeSelector.tagSelector.titleSelector.selector));
+                                    tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.titleSelector.selector));
                                 }
-                                jsoupTag.title = tagTitle;
+                                tag.title = tagTitle;
                             }
-                            if (typeSelector.tagSelector.urlSelector != null) {
+                            if (catalogSelector.tagSelector.urlSelector != null) {
                                 String tagUrl = null;
-                                if (typeSelector.tagSelector.urlSelector.selector == null) {
-                                    tagUrl = typeSelector.tagSelector.urlSelector.analyzer.analyze(tagElement);
+                                if (catalogSelector.tagSelector.urlSelector.selector == null) {
+                                    tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement);
                                 } else {
-                                    tagUrl = typeSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(typeSelector.tagSelector.urlSelector.selector));
+                                    tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.urlSelector.selector));
                                 }
-                                jsoupTag.url = tagUrl;
+                                tag.url = tagUrl;
                             }
-                            jsoupType.tags.add(jsoupTag);
+                            catalog.tags.add(tag);
                         }
                     }
-                    types.add(jsoupType);
+                    catalogs.add(catalog);
                 }
-                subscriber.onNext(types);
-            } else if (typeSelector.tagSelector != null) {
-                List<JSoupTag> tags = new ArrayList<>();
-                Elements tagElements = document.select(typeSelector.tagSelector.selector);
+                subscriber.onNext(catalogs);
+            } else if (catalogSelector.tagSelector != null) {
+                List<JSoupCatalog> tags = new ArrayList<>();
+                Elements tagElements = document.select(catalogSelector.tagSelector.selector);
                 for (Element tagElement : tagElements) {
-                    JSoupTag jsoupTag = new JSoupTag();
-                    if (typeSelector.tagSelector.titleSelector != null) {
+                    JSoupCatalog tag = new JSoupCatalog();
+                    if (catalogSelector.tagSelector.titleSelector != null) {
                         String tagTitle = null;
-                        if (typeSelector.tagSelector.titleSelector.selector == null) {
-                            tagTitle = typeSelector.tagSelector.titleSelector.analyzer.analyze(tagElement);
+                        if (catalogSelector.tagSelector.titleSelector.selector == null) {
+                            tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement);
                         } else {
-                            tagTitle = typeSelector.tagSelector.titleSelector.analyzer.analyze(tagElement.select(typeSelector.tagSelector.titleSelector.selector));
+                            tagTitle = catalogSelector.tagSelector.titleSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.titleSelector.selector));
                         }
-                        jsoupTag.title = tagTitle;
+                        tag.title = tagTitle;
                     }
-                    if (typeSelector.tagSelector.urlSelector != null) {
+                    if (catalogSelector.tagSelector.urlSelector != null) {
                         String tagUrl = null;
-                        if (typeSelector.tagSelector.urlSelector.selector == null) {
-                            tagUrl = typeSelector.tagSelector.urlSelector.analyzer.analyze(tagElement);
+                        if (catalogSelector.tagSelector.urlSelector.selector == null) {
+                            tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement);
                         } else {
-                            tagUrl = typeSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(typeSelector.tagSelector.urlSelector.selector));
+                            tagUrl = catalogSelector.tagSelector.urlSelector.analyzer.analyze(tagElement.select(catalogSelector.tagSelector.urlSelector.selector));
                         }
-                        jsoupTag.url = tagUrl;
+                        tag.url = tagUrl;
                     }
-                    tags.add(jsoupTag);
+                    tags.add(tag);
                 }
                 subscriber.onNext(tags);
             } else {
@@ -180,14 +179,9 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return false;
     }
 
-    public static class TagSelector extends JSoupSelector {
+    public static class CatalogSelector extends JSoupSelector {
         public JSoupSelector titleSelector;
         public JSoupSelector urlSelector;
-    }
-
-    public static class TypeSelector extends JSoupSelector {
-        public JSoupSelector titleSelector;
-        public JSoupSelector urlSelector;
-        public TagSelector tagSelector;
+        public CatalogSelector tagSelector;
     }
 }

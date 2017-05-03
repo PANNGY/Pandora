@@ -23,8 +23,6 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
@@ -72,7 +70,7 @@ public class PandoraActivity extends BaseActivity {
                 .flatMap(labels -> Observable.fromIterable(labels))
                 .flatMap(label -> githubService.getDataSource(label))
                 .subscribeOn(Schedulers.newThread())
-                .flatMap(jSoupDataSource -> jSoupDataSource.loadType()).subscribe(o -> {
+                .flatMap(jSoupDataSource -> jSoupDataSource.loadCatalogs()).subscribe(o -> {
             int i = 0;
             int j = 1;
         });
