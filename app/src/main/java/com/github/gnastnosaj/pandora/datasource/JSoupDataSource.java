@@ -182,6 +182,32 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         }
                         data.add(jsoupData);
                     }
+                    if (data.isEmpty()) {
+                        JSoupData jsoupData = new JSoupData();
+                        for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                            if (attrSelector.global) {
+                                String attr = attrSelector.parse(document, null);
+                                jsoupData.attrs.put(attrSelector.label, attr);
+                            }
+                        }
+                        if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
+                            jsoupData.tags = new ArrayList<>();
+                            Elements tagElements = dataSelector.tagSelector.call(document, null);
+                            for (Element tagElement : tagElements) {
+                                JSoupCatalog tag = new JSoupCatalog();
+                                if (dataSelector.tagSelector.titleSelector != null) {
+                                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                                    tag.title = tagTitle;
+                                }
+                                if (dataSelector.tagSelector.urlSelector != null) {
+                                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                                    tag.url = betterData(tagUrl);
+                                }
+                                jsoupData.tags.add(tag);
+                            }
+                        }
+                        data.add(jsoupData);
+                    }
 
                     if (dataSelector.nextPageSelector != null) {
                         nextPage = dataSelector.nextPageSelector.parse(document, document);
