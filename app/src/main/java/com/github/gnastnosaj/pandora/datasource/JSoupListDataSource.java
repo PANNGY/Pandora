@@ -30,7 +30,7 @@ import timber.log.Timber;
  * Created by jasontsang on 5/2/17.
  */
 
-public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+public class JSoupListDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
 
     public String baseUrl;
     public String[] pages;
