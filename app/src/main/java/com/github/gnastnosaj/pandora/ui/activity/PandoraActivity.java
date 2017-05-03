@@ -23,6 +23,8 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
@@ -66,10 +68,8 @@ public class PandoraActivity extends BaseActivity {
         checkForUpdate();
 
         GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-
         githubService.getDataSources()
-                .flatMap(labels -> Observable.fromArray(labels))
-                .cast(String.class)
+                .flatMap(labels -> Observable.fromIterable(labels))
                 .flatMap(label -> githubService.getDataSource(label))
                 .subscribeOn(Schedulers.newThread())
                 .flatMap(jSoupDataSource -> jSoupDataSource.loadType()).subscribe(o -> {

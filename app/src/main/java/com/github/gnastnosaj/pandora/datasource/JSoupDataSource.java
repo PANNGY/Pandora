@@ -1,5 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import com.github.gnastnosaj.boilerplate.Boilerplate;
+import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupTag;
 import com.github.gnastnosaj.pandora.model.JSoupType;
@@ -14,10 +16,12 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.trinea.android.common.util.ArrayUtils;
+import cn.trinea.android.common.util.MapUtils;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -29,6 +33,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     public String baseUrl;
     public String[] pages;
+    public Map<String, String> areas;
 
     public TypeSelector typeSelector;
     public String firstPageSelector;
@@ -39,13 +44,20 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     public Observable loadType() {
         return Observable.create(subscriber -> {
-            typeSelector.url = typeSelector.url.replace("{baseUrl}", baseUrl);
-            Matcher matcher = Pattern.compile("pages\\[[1-9]\\d*]").matcher(typeSelector.url);
-            if (matcher.find()) {
-                int offset = Integer.parseInt(matcher.group().substring(5, 6));
-                if (!ArrayUtils.isEmpty(pages) && pages.length > offset) {
-                    typeSelector.url.replace(matcher.group(), pages[offset]);
+            if (baseUrl != null) {
+                typeSelector.url = typeSelector.url.replace("{baseUrl}", baseUrl);
+            }
+            if (!ArrayUtils.isEmpty(pages)) {
+                Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(typeSelector.url);
+                if (matcher.find()) {
+                    int offset = Integer.parseInt(matcher.group().substring(7, 8));
+                    if (pages.length > offset) {
+                        typeSelector.url = typeSelector.url.replace(matcher.group(), pages[offset]);
+                    }
                 }
+            }
+            if (!MapUtils.isEmpty(areas) && areas.containsKey(Boilerplate.getInstance().getString(R.string.area))) {
+                typeSelector.url = typeSelector.url.replace("{area}", areas.get(Boilerplate.getInstance().getString(R.string.area)));
             }
             Connection connection = Jsoup.connect(typeSelector.url);
             if (typeSelector.headers != null) {

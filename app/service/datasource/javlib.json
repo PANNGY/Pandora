@@ -3,8 +3,14 @@
   "pages": [
     "/genres.php"
   ],
+  "areas": {
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
+  },
   "typeSelector": {
-    "url": "{baseUrl}/cn{pages[0]}",
+    "url": "{baseUrl}/{area}{pages[0]}",
     "selector": "div#rightcolumn div.textbox",
     "titleSelector": {
       "selector": "div.boxtitle",
