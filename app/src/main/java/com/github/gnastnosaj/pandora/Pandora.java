@@ -1,6 +1,8 @@
 package com.github.gnastnosaj.pandora;
 
 import android.app.Application;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 
@@ -16,10 +18,16 @@ import timber.log.Timber;
  */
 
 public class Pandora extends Application {
+    public final static String PRE_PRO_VERSION = "PRO_VERSION";
+
+    public static boolean pro;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
         Boilerplate.initialize(this);
+
         RxJavaPlugins.setErrorHandler(e -> {
             if (e instanceof UndeliverableException) {
                 e = e.getCause();
@@ -46,5 +54,8 @@ public class Pandora extends Application {
             }
             Timber.w(e, "Undeliverable exception received, not sure what to do");
         });
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        pro = sharedPreferences.getBoolean(PRE_PRO_VERSION, true);
     }
 }

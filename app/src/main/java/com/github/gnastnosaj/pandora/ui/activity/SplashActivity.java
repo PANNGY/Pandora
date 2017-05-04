@@ -17,6 +17,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
+import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.GankService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
@@ -42,7 +43,6 @@ import timber.log.Timber;
 
 public class SplashActivity extends BaseActivity {
     public final static String PRE_SPLASH_IMAGE = "SPLASH_IMAGE";
-    public final static String PRE_PRO_VERSION = "PRO_VERSION";
 
     @BindView(R.id.splash_image)
     SimpleDraweeView splashImage;
@@ -64,10 +64,8 @@ public class SplashActivity extends BaseActivity {
 
         initSystemBar();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         Single<String> splashImageSingle;
-        if (sharedPreferences.getBoolean(PRE_PRO_VERSION, false)) {
+        if (Pandora.pro) {
             GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
             splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
                     .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
@@ -84,6 +82,7 @@ public class SplashActivity extends BaseActivity {
                     .map(result -> result.url);
         }
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         splashImageSingle
                 .timeout(5, TimeUnit.SECONDS, Single.create(subscriber -> {
                     if (sharedPreferences.contains(PRE_SPLASH_IMAGE)) {
@@ -109,7 +108,7 @@ public class SplashActivity extends BaseActivity {
 
                                         @Override
                                         public void onAnimationEnd(Animation animation) {
-                                            startActivity(new Intent(SplashActivity.this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                                            start();
                                         }
 
                                         @Override
@@ -121,7 +120,7 @@ public class SplashActivity extends BaseActivity {
 
                                 @Override
                                 public void onFailure(String id, Throwable throwable) {
-                                    startActivity(new Intent(SplashActivity.this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                                    start();
                                 }
                             }).build();
                     splashImage.setController(draweeController);
@@ -130,11 +129,15 @@ public class SplashActivity extends BaseActivity {
                     editor.putString(PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
                 }, throwable -> {
-                    Timber.e(throwable, "load splash image exception");
-                    startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                    Timber.w(throwable, "load splash image exception");
+                    start();
                 });
 
         splashVersion.setText(getResources().getString(R.string.splash_version, Boilerplate.versionName));
         splashCopyright.setText(getResources().getString(R.string.splash_copyright, new SimpleDateFormat("yyyy").format(new Date())));
+    }
+
+    private void start() {
+        startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

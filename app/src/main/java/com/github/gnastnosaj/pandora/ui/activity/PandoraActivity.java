@@ -109,7 +109,7 @@ public class PandoraActivity extends BaseActivity {
                                                                     .observeOn(AndroidSchedulers.mainThread())
                                                                     .subscribe(downloadStatus -> {
                                                                             },
-                                                                            throwable -> Timber.e(throwable, "update download exception"),
+                                                                            throwable -> Timber.w(throwable, "update download exception"),
                                                                             () -> {
                                                                                 File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
                                                                                 if (files != null) {
@@ -117,10 +117,10 @@ public class PandoraActivity extends BaseActivity {
                                                                                     PackageUtils.install(Boilerplate.getInstance(), file.getPath());
                                                                                 }
                                                                             }),
-                                                            throwable -> Timber.e(throwable, "update check exception"))
+                                                            throwable -> Timber.w(throwable, "update check exception"))
                                     );
                             appUpdater.start();
                         },
-                        throwable -> Timber.e(throwable, "update permission exception"));
+                        throwable -> Timber.w(throwable, "update permission exception"));
     }
 }

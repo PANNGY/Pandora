@@ -100,7 +100,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     subscriber.onError(new Throwable("both cssQuery and tagSelector is empty"));
                 }
             } catch (Exception e) {
-                Timber.e(e, "loadCatalogs exception");
+                Timber.w(e, "loadCatalogs exception");
                 subscriber.onError(e);
             }
             subscriber.onComplete();
@@ -129,7 +129,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 }
                 subscriber.onNext(tabs);
             } catch (Exception e) {
-                Timber.e(e, "loadTabs exception");
+                Timber.w(e, "loadTabs exception");
                 subscriber.onError(e);
             }
             subscriber.onComplete();
@@ -212,13 +212,13 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     if (dataSelector.nextPageSelector != null) {
                         nextPage = dataSelector.nextPageSelector.parse(document);
                         nextPage = betterData(nextPage);
-                        Timber.d("nextPage:%s", nextPage);
+                        Timber.w("nextPage:%s", nextPage);
                     }
 
                     subscriber.onNext(data);
                 }
             } catch (Exception e) {
-                Timber.e(e, "loadData exception");
+                Timber.w(e, "loadData exception");
                 subscriber.onError(e);
             }
             subscriber.onComplete();
