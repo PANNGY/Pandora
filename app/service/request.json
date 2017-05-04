@@ -1,0 +1,6 @@
+{
+  "configs": [{
+    "host": "pic.dmm.co.jp",
+    "forceIP": true
+  }]
+}

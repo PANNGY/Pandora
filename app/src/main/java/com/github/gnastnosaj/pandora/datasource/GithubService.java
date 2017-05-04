@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import com.github.gnastnosaj.pandora.model.RequestConfig;
 import com.github.gnastnosaj.pandora.model.UpdateData;
 
 import java.util.List;
@@ -25,4 +26,8 @@ public interface GithubService {
 
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();
+
+    @GET("/gnastnosaj/Pandora/master/app/service/request.json")
+    Observable<List<RequestConfig>> getRequestConfigs();
+
 }
