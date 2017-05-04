@@ -21,9 +21,6 @@ public class JSoupSelector {
     public final static int METHOD_GET = 0;
     public final static int METHOD_POST = 1;
 
-    public final static int BASE_ELEMENT = 0;
-    public final static int BASE_DOCUMENT = 1;
-
     public final static int DEFAULT_TIMEOUT = 10000;
 
     public String url;
