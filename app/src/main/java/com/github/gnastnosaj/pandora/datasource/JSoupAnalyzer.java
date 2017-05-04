@@ -1,5 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import android.text.TextUtils;
+
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -33,7 +35,12 @@ public class JSoupAnalyzer {
                 break;
             case METHOD_ATTR:
                 if (!ArrayUtils.isEmpty(args)) {
-                    content = element.attr(args[0]);
+                    for (String arg : args) {
+                        content = element.attr(arg);
+                        if (!TextUtils.isEmpty(content)) {
+                            break;
+                        }
+                    }
                 }
                 break;
         }

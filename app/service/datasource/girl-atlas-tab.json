@@ -1,0 +1,78 @@
+{
+  "baseUrl": "https://www.girl-atlas.com",
+  "pages": [
+    "/",
+    "/index1"
+  ],
+  "catalogSelector": {
+    "url": "{baseUrl}/",
+    "cssQuery": "div.sidebar div.mb-10",
+    "titleSelector": {
+      "analyzer": {
+        "method": 0
+      }
+    },
+    "tagSelector": {
+      "cssQuery": "div.tag",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}/%s"
+        }
+      }
+    }
+  },
+  "dataSelector": {
+    "url": "{baseUrl}/",
+    "cssQuery": "div.main.col-md-9 div.album-item.row",
+    "attrSelectors": [
+      {
+        "label": "title",
+        "cssQuery": "h2 a",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.album-grid a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "photo"
+          ]
+        }
+      },
+      {
+        "label": "url",
+        "cssQuery": "div.album-grid a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}/%s"
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "ul.pagination li a",
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
+  }
+}

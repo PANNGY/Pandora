@@ -1,0 +1,57 @@
+{
+  "baseUrl": "https://www.girl-atlas.com",
+  "pages": [
+    "/",
+    "/index1"
+  ],
+  "catalogSelector": {
+    "url": "{baseUrl}/",
+    "cssQuery": "div.sidebar div.mb-10",
+    "titleSelector": {
+      "analyzer": {
+        "method": 0
+      }
+    },
+    "tagSelector": {
+      "cssQuery": "div.tag",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}/%s"
+        }
+      }
+    }
+  },
+  "dataSelector": {
+    "url": "https://www.girl-atlas.com/album/57b2ef1a92d30218bee68b8a",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36"
+    },
+    "cssQuery": "div.main.col-md-9 div.album-item.row",
+    "filter": {
+      "notQuery": ".best"
+    },
+    "attrSelectors": [
+      {
+        "label": "thumbnail",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "delay",
+            "src"
+          ]
+        }
+      }
+    ]
+  }
+}

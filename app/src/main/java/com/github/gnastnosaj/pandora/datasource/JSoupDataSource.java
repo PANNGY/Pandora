@@ -50,7 +50,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 Document document = catalogSelector.loadDocument();
 
                 List<JSoupCatalog> catalogs = new ArrayList<>();
-                if (catalogSelector.cssQuery != null) {
+                if (!TextUtils.isEmpty(catalogSelector.cssQuery)) {
                     Elements typeElements = catalogSelector.call(document);
                     for (Element typeElement : typeElements) {
                         JSoupCatalog catalog = new JSoupCatalog();
@@ -267,6 +267,9 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     private String betterData(String data) {
         if (data != null) {
             data = data.trim();
+            if (data.startsWith("javascript")) {
+                return null;
+            }
             if (baseUrl != null) {
                 data = data.replace("{baseUrl}", baseUrl);
             }

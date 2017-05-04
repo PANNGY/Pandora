@@ -1,5 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import android.text.TextUtils;
+
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -43,7 +45,7 @@ public class JSoupSelector {
     }
 
     public Elements call(Document document, Element element) {
-        if (cssQuery != null) {
+        if (!TextUtils.isEmpty(cssQuery)) {
             Elements elements = global ? document.select(cssQuery) : element.select(cssQuery);
             if (filter != null) {
                 elements = filter.filter(elements);
@@ -55,7 +57,7 @@ public class JSoupSelector {
     }
 
     public Elements call(Document document) {
-        if (cssQuery != null) {
+        if (!TextUtils.isEmpty(cssQuery)) {
             Elements elements = document.select(cssQuery);
             if (filter != null) {
                 elements = filter.filter(elements);
