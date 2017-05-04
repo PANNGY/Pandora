@@ -145,6 +145,7 @@ public class PandoraActivity extends BaseActivity {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uriString -> {
+                    Timber.d("next time splash image: %s", uriString);
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(SplashActivity.PRE_SPLASH_IMAGE, uriString);
