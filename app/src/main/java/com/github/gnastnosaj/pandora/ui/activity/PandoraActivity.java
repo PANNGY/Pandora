@@ -11,6 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.Pandora;
@@ -143,13 +145,13 @@ public class PandoraActivity extends BaseActivity {
         splashImageSingle
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(uriString -> {
                     Timber.d("next time splash image: %s", uriString);
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(SplashActivity.PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
+                    Fresco.getImagePipeline().prefetchToDiskCache(ImageRequest.fromUri(uriString), this);
                 }, throwable -> Timber.w(throwable, "prepare splash image exception"));
     }
 }
