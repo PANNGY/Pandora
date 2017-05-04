@@ -24,7 +24,7 @@ public interface GithubService {
     Observable<UpdateData> getUpdateData();
 
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/{label}.json")
-    Observable<JSoupDataSource> getDataSource(@Path("label") String label);
+    Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label);
 
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();

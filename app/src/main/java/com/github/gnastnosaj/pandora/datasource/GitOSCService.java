@@ -20,7 +20,7 @@ public interface GitOSCService {
     Observable<UpdateData> getUpdateData();
 
     @GET("/jasontsang/Pandora/raw/master/app/service/datasource/{label}.json")
-    Observable<JSoupDataSource> getDataSource(@Path("label") String label);
+    Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label);
 
     @GET("/jasontsang/Pandora/raw/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();

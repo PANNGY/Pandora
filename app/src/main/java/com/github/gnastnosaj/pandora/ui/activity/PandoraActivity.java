@@ -125,10 +125,10 @@ public class PandoraActivity extends BaseActivity {
         Single<String> splashImageSingle;
         if (Pandora.pro) {
             GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-            splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
+            splashImageSingle = githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
                     .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                     .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-                    .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                    .flatMap(url -> githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
                     .flatMap(data -> Observable.fromIterable(data))
                     .lastOrError()
                     .map(data -> data.attrs.get("cover"));
