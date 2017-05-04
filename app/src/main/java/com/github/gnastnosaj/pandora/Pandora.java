@@ -88,6 +88,6 @@ public class Pandora extends Application {
         });
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        pro = sharedPreferences.getBoolean(PRE_PRO_VERSION, true);
+        pro = sharedPreferences.getBoolean(PRE_PRO_VERSION, false);
     }
 }

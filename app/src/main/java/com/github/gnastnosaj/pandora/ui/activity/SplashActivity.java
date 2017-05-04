@@ -97,6 +97,7 @@ public class SplashActivity extends BaseActivity {
                 .subscribe(uriString -> {
                     DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                             .setUri(uriString)
+                            .setOldController(splashImage.getController())
                             .setControllerListener(new BaseControllerListener<ImageInfo>() {
                                 @Override
                                 public void onFinalImageSet(String id, @Nullable ImageInfo imageInfo, @Nullable Animatable anim) {
