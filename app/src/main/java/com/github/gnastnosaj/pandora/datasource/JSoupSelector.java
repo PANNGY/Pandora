@@ -11,6 +11,8 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.Map;
 
+import cn.trinea.android.common.util.MapUtils;
+
 /**
  * Created by jasontsang on 5/2/17.
  */
@@ -26,7 +28,7 @@ public class JSoupSelector {
 
     public String url;
     public Map<String, String> headers;
-    public String data;
+    public Map<String, String> data;
     public int method;
     public int timeout;
 
@@ -82,10 +84,10 @@ public class JSoupSelector {
 
     public Document loadDocument(String url) throws IOException {
         Connection connection = Jsoup.connect(url);
-        if (headers != null) {
+        if (!MapUtils.isEmpty(headers)) {
             connection.headers(headers);
         }
-        if (data != null) {
+        if (!MapUtils.isEmpty(data)) {
             connection.data(data);
         }
         connection.timeout(timeout == 0 ? JSoupSelector.DEFAULT_TIMEOUT : timeout);
