@@ -2,7 +2,9 @@ package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -11,7 +13,9 @@ import android.view.KeyEvent;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
+import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.GankService;
 import com.github.gnastnosaj.pandora.datasource.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
@@ -22,12 +26,15 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.trinea.android.common.util.PackageUtils;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -63,6 +70,7 @@ public class PandoraActivity extends BaseActivity {
         initSystemBar();
 
         checkForUpdate();
+        prepareSplashImage();
     }
 
     @Override
@@ -111,5 +119,36 @@ public class PandoraActivity extends BaseActivity {
                             appUpdater.start();
                         },
                         throwable -> Timber.w(throwable, "update permission exception"));
+    }
+
+    private void prepareSplashImage() {
+        Single<String> splashImageSingle;
+        if (Pandora.pro) {
+            GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+            splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
+                    .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                    .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                    .flatMap(data -> Observable.fromIterable(data))
+                    .lastOrError()
+                    .map(data -> data.attrs.get("cover"));
+        } else {
+            splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
+                    .getGankData("福利", 1, 1)
+                    .flatMap(gankData -> Observable.fromIterable(gankData.results))
+                    .lastOrError()
+                    .map(result -> result.url);
+        }
+
+        splashImageSingle
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(uriString -> {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(SplashActivity.PRE_SPLASH_IMAGE, uriString);
+                    editor.apply();
+                }, throwable -> Timber.w(throwable, "prepare splash image exception"));
     }
 }

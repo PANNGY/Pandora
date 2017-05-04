@@ -34,30 +34,27 @@ public class Pandora extends Application {
     public void onCreate() {
         super.onCreate();
 
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().build();
-        OkHttpNetworkFetcher okHttpNetworkFetcher = new OkHttpNetworkFetcher(okHttpClient) {
-            @Override
-            public void fetch(final OkHttpNetworkFetchState fetchState, final Callback callback) {
-                fetchState.submitTime = SystemClock.elapsedRealtime();
-                final Uri uri = fetchState.getUri();
-
-                try {
-                    Request request = new RequestBuilder()
-                            .cacheControl(new CacheControl.Builder().noStore().build())
-                            .url(uri.toString())
-                            .get()
-                            .build();
-
-                    fetchWithRequest(fetchState, callback, request);
-                } catch (Exception e) {
-                    callback.onFailure(e);
-                }
-            }
-        };
         ImagePipelineConfig imagePipelineConfig = ImagePipelineConfig.newBuilder(this)
-                .setNetworkFetcher(okHttpNetworkFetcher)
-                .build();
+                .setNetworkFetcher(new OkHttpNetworkFetcher(new OkHttpClient.Builder().build()) {
+                    @Override
+                    public void fetch(final OkHttpNetworkFetchState fetchState, final Callback callback) {
+                        fetchState.submitTime = SystemClock.elapsedRealtime();
+                        final Uri uri = fetchState.getUri();
 
+                        try {
+                            Request request = new RequestBuilder()
+                                    .cacheControl(new CacheControl.Builder().noStore().build())
+                                    .url(uri.toString())
+                                    .get()
+                                    .build();
+
+                            fetchWithRequest(fetchState, callback, request);
+                        } catch (Exception e) {
+                            callback.onFailure(e);
+                        }
+                    }
+                })
+                .build();
         Boilerplate.initialize(this, imagePipelineConfig);
 
         RxJavaPlugins.setErrorHandler(e -> {
