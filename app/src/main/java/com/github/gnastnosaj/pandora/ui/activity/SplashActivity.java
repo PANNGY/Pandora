@@ -67,19 +67,13 @@ public class SplashActivity extends BaseActivity {
         Single<String> splashImageSingle;
         if (Pandora.pro) {
             GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-//            splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
-//                    .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-//                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-//                    .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-//                    .flatMap(data -> Observable.fromIterable(data))
-//                    .lastOrError()
-//                    .map(data -> data.attrs.get("cover"));
-            splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+            splashImageSingle = githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
                     .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                     .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-                    .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
-                    .lastOrError();
+                    .flatMap(url -> githubService.getDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                    .flatMap(data -> Observable.fromIterable(data))
+                    .lastOrError()
+                    .map(data -> data.attrs.get("cover"));
         } else {
             splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
                     .getGankData("福利", 1, 1)
