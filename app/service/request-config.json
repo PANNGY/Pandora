@@ -1,6 +1,12 @@
 [
   {
-    "host": "pic.dmm.co.jp",
+    "host": "pics.dmm.co.jp",
     "forceIP": true
+  },
+  {
+    "host": "girlatlas",
+    "headers": {
+      "Referer": "https://www.girl-atlas.com"
+    }
   }
 ]

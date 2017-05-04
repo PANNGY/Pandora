@@ -28,7 +28,6 @@ import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.trinea.android.common.util.PackageUtils;
-import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
@@ -64,16 +63,6 @@ public class PandoraActivity extends BaseActivity {
         initSystemBar();
 
         checkForUpdate();
-
-        GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-        githubService.getDataSources()
-                .flatMap(labels -> Observable.fromIterable(labels))
-                .flatMap(label -> githubService.getDataSource(label))
-                .subscribeOn(Schedulers.newThread())
-                .flatMap(jsoupListDataSource -> jsoupListDataSource.loadData()).subscribe(data -> {
-            int i = 0;
-            int j = 1;
-        });
     }
 
     @Override

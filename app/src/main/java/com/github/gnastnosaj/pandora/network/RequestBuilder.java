@@ -44,7 +44,7 @@ public class RequestBuilder extends Request.Builder {
                 Timber.w(e);
             }
         }
-        if (ListUtils.isEmpty(requestConfigs)) {
+        if (!ListUtils.isEmpty(requestConfigs)) {
             for (RequestConfig requestConfig : requestConfigs) {
                 try {
                     if (url.contains(requestConfig.host)) {
