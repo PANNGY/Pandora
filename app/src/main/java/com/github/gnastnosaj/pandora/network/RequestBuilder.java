@@ -30,6 +30,8 @@ public class RequestBuilder extends Request.Builder {
                 .getRequestConfigs().subscribeOn(Schedulers.newThread()).subscribe(configs -> {
             RequestBuilder.requestConfigs = configs;
             countDownLatch.countDown();
+        }, throwable -> {
+            countDownLatch.countDown();
         });
     }
 
@@ -42,21 +44,23 @@ public class RequestBuilder extends Request.Builder {
                 Timber.w(e);
             }
         }
-        for (RequestConfig requestConfig : requestConfigs) {
-            try {
-                if (url.contains(requestConfig.host)) {
-                    if (requestConfig.forceIP) {
-                        String host = HttpUrl.parse(url).host();
-                        String address = InetAddress.getByName(host).toString().split("/")[1];
-                        url = url.replace(host, address);
+        if (ListUtils.isEmpty(requestConfigs)) {
+            for (RequestConfig requestConfig : requestConfigs) {
+                try {
+                    if (url.contains(requestConfig.host)) {
+                        if (requestConfig.forceIP) {
+                            String host = HttpUrl.parse(url).host();
+                            String address = InetAddress.getByName(host).toString().split("/")[1];
+                            url = url.replace(host, address);
+                        }
+                        if (!MapUtils.isEmpty(requestConfig.headers)) {
+                            headers(Headers.of(requestConfig.headers));
+                        }
+                        break;
                     }
-                    if (!MapUtils.isEmpty(requestConfig.headers)) {
-                        headers(Headers.of(requestConfig.headers));
-                    }
-                    break;
+                } catch (Exception e) {
+                    Timber.w(e, "Request Builder url exception");
                 }
-            } catch (Exception e) {
-                Timber.w(e, "Request Builder url exception");
             }
         }
         return super.url(url);
