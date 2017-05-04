@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.network;
 
+import com.github.gnastnosaj.pandora.datasource.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
 import com.github.gnastnosaj.pandora.model.RequestConfig;
@@ -7,6 +8,7 @@ import com.github.gnastnosaj.pandora.model.RequestConfig;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.MapUtils;
@@ -27,12 +29,13 @@ public class RequestBuilder extends Request.Builder {
     static {
         countDownLatch = new CountDownLatch(1);
         Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
-                .getRequestConfigs().subscribeOn(Schedulers.newThread()).subscribe(configs -> {
-            RequestBuilder.requestConfigs = configs;
-            countDownLatch.countDown();
-        }, throwable -> {
-            countDownLatch.countDown();
-        });
+                .getRequestConfigs()
+                .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getRequestConfigs())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(configs -> {
+                    RequestBuilder.requestConfigs = configs;
+                    countDownLatch.countDown();
+                }, throwable -> countDownLatch.countDown());
     }
 
     @Override
