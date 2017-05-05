@@ -1,10 +1,10 @@
 [
   {
-    "host": "pics.dmm.co.jp",
+    "filter": "pics.dmm.co.jp",
     "forceIP": true
   },
   {
-    "host": "girlatlas",
+    "filter": "girlatlas",
     "headers": {
       "Referer": "https://www.girl-atlas.com"
     }

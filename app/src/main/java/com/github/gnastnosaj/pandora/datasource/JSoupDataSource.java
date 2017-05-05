@@ -6,7 +6,7 @@ import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupCatalog;
-import com.github.gnastnosaj.pandora.model.JSoupTab;
+import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
 
@@ -45,16 +45,16 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     private String currentPage;
     private String nextPage;
 
-    public Observable<List<JSoupTab>> loadTabs() {
+    public Observable<List<JSoupLink>> loadTabs() {
         return Observable.create(subscriber -> {
             try {
                 tabSelector.url = betterData(tabSelector.url);
                 Document document = tabSelector.loadDocument();
 
-                List<JSoupTab> tabs = new ArrayList<>();
+                List<JSoupLink> tabs = new ArrayList<>();
                 Elements tabElements = tabSelector.call(document);
                 for (Element tabElement : tabElements) {
-                    JSoupTab tab = new JSoupTab();
+                    JSoupLink tab = new JSoupLink();
                     if (tabSelector.titleSelector != null) {
                         String tabTitle = tabSelector.titleSelector.parse(document, tabElement);
                         tab.title = tabTitle;
@@ -74,13 +74,13 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         });
     }
 
-    public Observable<List<JSoupCatalog>> loadCatalogs() {
+    public Observable<List<JSoupLink>> loadCatalogs() {
         return Observable.create(subscriber -> {
             try {
                 catalogSelector.url = betterData(catalogSelector.url);
                 Document document = catalogSelector.loadDocument();
 
-                List<JSoupCatalog> catalogs = new ArrayList<>();
+                List<JSoupLink> catalogs = new ArrayList<>();
                 if (!TextUtils.isEmpty(catalogSelector.cssQuery)) {
                     Elements typeElements = catalogSelector.call(document);
                     for (Element typeElement : typeElements) {
@@ -97,7 +97,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             catalog.tags = new ArrayList<>();
                             Elements tagElements = catalogSelector.tagSelector.call(document, typeElement);
                             for (Element tagElement : tagElements) {
-                                JSoupCatalog tag = new JSoupCatalog();
+                                JSoupLink tag = new JSoupLink();
                                 if (catalogSelector.tagSelector.titleSelector != null) {
                                     String tagTitle = catalogSelector.tagSelector.titleSelector.parse(document, tagElement);
                                     tag.title = tagTitle;
@@ -115,7 +115,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 } else if (catalogSelector.tagSelector != null) {
                     Elements tagElements = catalogSelector.tagSelector.call(document);
                     for (Element tagElement : tagElements) {
-                        JSoupCatalog tag = new JSoupCatalog();
+                        JSoupLink tag = new JSoupLink();
                         if (catalogSelector.tagSelector.titleSelector != null) {
                             String tagTitle = catalogSelector.tagSelector.titleSelector.parse(document, tagElement);
                             tag.title = tagTitle;
@@ -196,7 +196,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             jsoupData.tags = new ArrayList<>();
                             Elements tagElements = dataSelector.tagSelector.call(document, null);
                             for (Element tagElement : tagElements) {
-                                JSoupCatalog tag = new JSoupCatalog();
+                                JSoupLink tag = new JSoupLink();
                                 if (dataSelector.tagSelector.titleSelector != null) {
                                     String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
                                     tag.title = tagTitle;

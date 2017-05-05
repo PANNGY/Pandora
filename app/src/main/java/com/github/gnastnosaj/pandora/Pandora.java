@@ -9,7 +9,6 @@ import android.preference.PreferenceManager;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
-import com.github.gnastnosaj.pandora.network.RequestBuilder;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -42,7 +41,7 @@ public class Pandora extends Application {
                         final Uri uri = fetchState.getUri();
 
                         try {
-                            Request request = new RequestBuilder()
+                            Request request = new com.github.gnastnosaj.pandora.network.Request.Builder()
                                     .cacheControl(new CacheControl.Builder().noStore().build())
                                     .url(uri.toString())
                                     .get()

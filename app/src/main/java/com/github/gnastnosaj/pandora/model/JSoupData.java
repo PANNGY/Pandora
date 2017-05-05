@@ -9,5 +9,5 @@ import java.util.Map;
 
 public class JSoupData {
     public Map<String, String> attrs;
-    public List<JSoupCatalog> tags;
+    public List<JSoupLink> tags;
 }
