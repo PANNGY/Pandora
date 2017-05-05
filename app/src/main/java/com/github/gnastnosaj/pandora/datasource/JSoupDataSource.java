@@ -18,12 +18,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.trinea.android.common.util.ArrayUtils;
 import cn.trinea.android.common.util.MapUtils;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -42,6 +44,35 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     private String currentPage;
     private String nextPage;
+
+    public Observable<List<JSoupTab>> loadTabs() {
+        return Observable.create(subscriber -> {
+            try {
+                tabSelector.url = betterData(tabSelector.url);
+                Document document = tabSelector.loadDocument();
+
+                List<JSoupTab> tabs = new ArrayList<>();
+                Elements tabElements = tabSelector.call(document);
+                for (Element tabElement : tabElements) {
+                    JSoupTab tab = new JSoupTab();
+                    if (tabSelector.titleSelector != null) {
+                        String tabTitle = tabSelector.titleSelector.parse(document, tabElement);
+                        tab.title = tabTitle;
+                    }
+                    if (tabSelector.urlSelector != null) {
+                        String tabUrl = tabSelector.urlSelector.parse(document, tabElement);
+                        tab.url = betterData(tabUrl);
+                    }
+                    tabs.add(tab);
+                }
+                subscriber.onNext(tabs);
+            } catch (Exception e) {
+                Timber.w(e, "loadTabs exception");
+                subscriber.onError(e);
+            }
+            subscriber.onComplete();
+        });
+    }
 
     public Observable<List<JSoupCatalog>> loadCatalogs() {
         return Observable.create(subscriber -> {
@@ -101,35 +132,6 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 }
             } catch (Exception e) {
                 Timber.w(e, "loadCatalogs exception");
-                subscriber.onError(e);
-            }
-            subscriber.onComplete();
-        });
-    }
-
-    public Observable<List<JSoupTab>> loadTabs() {
-        return Observable.create(subscriber -> {
-            try {
-                tabSelector.url = betterData(tabSelector.url);
-                Document document = tabSelector.loadDocument();
-
-                List<JSoupTab> tabs = new ArrayList<>();
-                Elements tabElements = tabSelector.call(document);
-                for (Element tabElement : tabElements) {
-                    JSoupTab tab = new JSoupTab();
-                    if (tabSelector.titleSelector != null) {
-                        String tabTitle = tabSelector.titleSelector.parse(document, tabElement);
-                        tab.title = tabTitle;
-                    }
-                    if (tabSelector.urlSelector != null) {
-                        String tabUrl = tabSelector.urlSelector.parse(document, tabElement);
-                        tab.url = betterData(tabUrl);
-                    }
-                    tabs.add(tab);
-                }
-                subscriber.onNext(tabs);
-            } catch (Exception e) {
-                Timber.w(e, "loadTabs exception");
                 subscriber.onError(e);
             }
             subscriber.onComplete();
@@ -236,12 +238,19 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     @Override
     public List<JSoupData> refresh() throws Exception {
-        return null;
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        List<JSoupData> data = new ArrayList<>();
+        loadData().subscribeOn(Schedulers.newThread()).subscribe(jsoupData -> {
+            data.addAll(jsoupData);
+            countDownLatch.countDown();
+        }, throwable -> countDownLatch.countDown());
+        countDownLatch.await();
+        return data;
     }
 
     @Override
     public List<JSoupData> loadMore() throws Exception {
-        return null;
+        return refresh();
     }
 
     @Override
