@@ -31,6 +31,7 @@ public class JSoupSelector {
 
     public String label;
     public boolean global;
+    public String placeholder;
     public String cssQuery;
     public JSoupFilter filter;
     public JSoupAnalyzer analyzer;

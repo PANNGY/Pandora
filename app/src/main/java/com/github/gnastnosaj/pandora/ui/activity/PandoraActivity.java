@@ -124,7 +124,7 @@ public class PandoraActivity extends BaseActivity {
 
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK);
+        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
 
         Single<String> splashImageSingle = null;
         switch (splashImageDataSource) {
@@ -132,7 +132,7 @@ public class PandoraActivity extends BaseActivity {
                 splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
                         .getGankData("福利", 1, 1)
                         .flatMap(gankData -> Observable.fromIterable(gankData.results))
-                        .lastOrError()
+                        .firstOrError()
                         .map(result -> result.url);
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:

@@ -87,6 +87,7 @@
       },
       {
         "label": "thumbnail",
+        "placeholder": "cover",
         "analyzer": {
           "method": 1,
           "args": [

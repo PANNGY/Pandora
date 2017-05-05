@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.trinea.android.common.util.ArrayUtils;
+import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.MapUtils;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -156,16 +157,52 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     Document document = dataSelector.loadDocument(currentPage);
 
                     List<JSoupData> data = new ArrayList<>();
+
+                    JSoupData globalData = new JSoupData();
+                    globalData.attrs = new HashMap<>();
+                    for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                        if (attrSelector.global) {
+                            String attr = attrSelector.parse(document, null);
+                            globalData.attrs.put(attrSelector.label, attr);
+                        }
+                    }
+                    for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                        if (!TextUtils.isEmpty(attrSelector.placeholder)) {
+                            if (!data.contains(globalData)) {
+                                data.add(globalData);
+                            }
+                            globalData.attrs.put(attrSelector.label, globalData.attrs.get(attrSelector.placeholder));
+                        }
+                    }
+                    if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
+                        globalData.tags = new ArrayList<>();
+                        Elements tagElements = dataSelector.tagSelector.call(document, null);
+                        for (Element tagElement : tagElements) {
+                            JSoupLink tag = new JSoupLink();
+                            if (dataSelector.tagSelector.titleSelector != null) {
+                                String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                                tag.title = tagTitle;
+                            }
+                            if (dataSelector.tagSelector.urlSelector != null) {
+                                String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                                tag.url = betterData(tagUrl);
+                            }
+                            globalData.tags.add(tag);
+                        }
+                    }
+
                     Elements dataElements = dataSelector.call(document);
                     for (Element dataElement : dataElements) {
                         JSoupData jsoupData = new JSoupData();
                         jsoupData.attrs = new HashMap<>();
                         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                            String attr = attrSelector.parse(document, dataElement);
-                            attr = betterData(attr);
-                            jsoupData.attrs.put(attrSelector.label, attr);
+                            if (!attrSelector.global) {
+                                String attr = attrSelector.parse(document, dataElement);
+                                attr = betterData(attr);
+                                jsoupData.attrs.put(attrSelector.label, attr);
+                            }
                         }
-                        if (dataSelector.tagSelector != null) {
+                        if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
                             jsoupData.tags = new ArrayList<>();
                             Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
                             for (Element tagElement : tagElements) {
@@ -181,32 +218,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                                 jsoupData.tags.add(tag);
                             }
                         }
-                        data.add(jsoupData);
-                    }
-                    if (data.isEmpty()) {
-                        JSoupData jsoupData = new JSoupData();
-                        jsoupData.attrs = new HashMap<>();
-                        for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                            if (attrSelector.global) {
-                                String attr = attrSelector.parse(document, null);
-                                jsoupData.attrs.put(attrSelector.label, attr);
-                            }
+                        if (!MapUtils.isEmpty(globalData.attrs)) {
+                            jsoupData.attrs.putAll(globalData.attrs);
                         }
-                        if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
-                            jsoupData.tags = new ArrayList<>();
-                            Elements tagElements = dataSelector.tagSelector.call(document, null);
-                            for (Element tagElement : tagElements) {
-                                JSoupLink tag = new JSoupLink();
-                                if (dataSelector.tagSelector.titleSelector != null) {
-                                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
-                                    tag.title = tagTitle;
-                                }
-                                if (dataSelector.tagSelector.urlSelector != null) {
-                                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
-                                    tag.url = betterData(tagUrl);
-                                }
-                                jsoupData.tags.add(tag);
-                            }
+                        if (!ListUtils.isEmpty(globalData.tags)) {
+                            jsoupData.tags.addAll(globalData.tags);
                         }
                         data.add(jsoupData);
                     }

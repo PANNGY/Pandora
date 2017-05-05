@@ -52,6 +52,24 @@
           ]
         }
       }
-    ]
+    ],
+    "tagSelector": {
+      "global": true,
+      "cssQuery": "span.tag a",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}/%s"
+        }
+      }
+    }
   }
 }
