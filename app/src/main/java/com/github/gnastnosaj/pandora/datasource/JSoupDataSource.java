@@ -144,9 +144,9 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             List<JSoupData> data = new ArrayList<>();
             try {
                 if (nextPage != null) {
-                    data.addAll(loadData(nextPage));
+                    data.addAll(_loadData(nextPage));
                 } else {
-                    data.addAll(loadData(dataSelector.url));
+                    data.addAll(_loadData(dataSelector.url));
                 }
                 subscriber.onNext(data);
             } catch (Exception e) {
@@ -157,7 +157,12 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         });
     }
 
-    public List<JSoupData> loadData(String page) throws Exception {
+    public Observable<List<JSoupData>> loadData(String page) {
+        nextPage = page;
+        return loadData();
+    }
+
+    public List<JSoupData> _loadData(String page) throws Exception {
         if (page == null) {
             throw new Exception("page is empty");
         } else {
@@ -241,7 +246,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 Timber.w("next page: %s", nextPage);
 
                 if (dataSelector.nextPageSelector.autoLoad) {
-                    data.addAll(loadData(nextPage));
+                    try {
+                        data.addAll(_loadData(nextPage));
+                    } catch (Exception e) {
+                        Timber.w(e, "loadData exception");
+                    }
                 }
             }
 
