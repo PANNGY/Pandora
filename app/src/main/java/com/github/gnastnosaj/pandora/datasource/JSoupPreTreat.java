@@ -11,7 +11,10 @@ public class JSoupPreTreat {
 
     public Element treat(Element element) {
         if (nextElementSibling) {
-            element = element.nextElementSibling();
+            Element el = element.nextElementSibling();
+            if (el != null) {
+                element = el;
+            }
         }
         return element;
     }
