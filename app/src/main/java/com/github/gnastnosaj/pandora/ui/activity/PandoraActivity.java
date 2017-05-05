@@ -124,7 +124,7 @@ public class PandoraActivity extends BaseActivity {
 
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB);
+        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_NANRENCD);
 
         Single<String> splashImageSingle = null;
         switch (splashImageDataSource) {
@@ -141,6 +141,15 @@ public class PandoraActivity extends BaseActivity {
                         .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                         .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
                         .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
+                        .singleOrError();
+                break;
+            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_NANRENCD:
+                GithubService nanrencdService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+                splashImageSingle = nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                        .flatMap(url -> nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
                         .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
                         .singleOrError();
                 break;

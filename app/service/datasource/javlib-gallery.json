@@ -15,61 +15,6 @@
     "cn": "cn",
     "tw": "tw"
   },
-  "tabSelector": {
-    "url": "{baseUrl}/{area}{pages[3]}",
-    "cssQuery": "div#leftmenu div.menul1 ul li a",
-    "filter": {
-      "indexes": [
-        0,
-        1,
-        2,
-        3,
-        4
-      ]
-    },
-    "titleSelector": {
-      "analyzer": {
-        "method": 0
-      }
-    },
-    "urlSelector": {
-      "analyzer": {
-        "method": 1,
-        "args": [
-          "href"
-        ],
-        "format": "{baseUrl}/{area}/%s"
-      }
-    }
-  },
-  "catalogSelector": {
-    "url": "{baseUrl}/{area}{pages[6]}",
-    "cssQuery": "div#rightcolumn div.textbox",
-    "titleSelector": {
-      "cssQuery": "div.boxtitle",
-      "analyzer": {
-        "method": 0
-      }
-    },
-    "tagSelector": {
-      "cssQuery": "div.genreitem",
-      "titleSelector": {
-        "analyzer": {
-          "method": 0
-        }
-      },
-      "urlSelector": {
-        "cssQuery": "a",
-        "analyzer": {
-          "method": 1,
-          "args": [
-            "href"
-          ],
-          "format": "{baseUrl}/{area}/%s"
-        }
-      }
-    }
-  },
   "dataSelector": {
     "url": "http://www.j12lib.com/en/?v=javlikjn54",
     "cssQuery": "div.previewthumbs img",

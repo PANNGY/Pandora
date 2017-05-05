@@ -37,7 +37,8 @@ public class SplashActivity extends BaseActivity {
 
     public final static int SPLASH_IMAGE_DATA_SOURCE_GANK = 0;
     public final static int SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS = 1;
-    public final static int SPLASH_IMAGE_DATA_SOURCE_JAVLIB = 2;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_NANRENCD = 2;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_JAVLIB = 3;
 
     @BindView(R.id.splash_image)
     SimpleDraweeView splashImage;

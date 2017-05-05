@@ -18,6 +18,7 @@ public class JSoupFilter {
     public int[] indexes;
     public boolean first;
     public boolean last;
+    public String text;
 
     public Elements filter(Elements elements) {
         if (!TextUtils.isEmpty(notQuery)) {
@@ -37,6 +38,15 @@ public class JSoupFilter {
         }
         if (last) {
             elements = new Elements(elements.last());
+        }
+        if (!TextUtils.isEmpty(text)) {
+            List<Element> filtered = new ArrayList<>();
+            for (Element element : elements) {
+                if (element.text().equals(text)) {
+                    filtered.add(element);
+                }
+            }
+            elements = new Elements(filtered);
         }
         return elements;
     }

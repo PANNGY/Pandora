@@ -15,10 +15,12 @@ import retrofit2.http.Path;
 
 public interface GithubService {
     String BASE_URL = "https://raw.githubusercontent.com/";
-    String DATE_SOURCE_JAVLIB_TAB = "javlib-tab";
-    String DATE_SOURCE_JAVLIB_GALLERY = "javlib-gallery";
     String DATE_SOURCE_GIRL_ATLAS_TAB = "girl-atlas-tab";
     String DATE_SOURCE_GIRL_ATLAS_GALLERY = "girl-atlas-gallery";
+    String DATE_SOURCE_NANRENCD_TAB = "nanrencd-tab";
+    String DATE_SOURCE_NANRENCD_GALLERY = "nanrencd-gallery";
+    String DATE_SOURCE_JAVLIB_TAB = "javlib-tab";
+    String DATE_SOURCE_JAVLIB_GALLERY = "javlib-gallery";
 
     @GET("/gnastnosaj/Pandora/master/app/service/update.json")
     Observable<UpdateData> getUpdateData();

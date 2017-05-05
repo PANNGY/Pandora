@@ -1,0 +1,100 @@
+{
+  "baseUrl": "http://www.nanrencd.com",
+  "pages": [
+    "/",
+    "/tuigirls",
+    "/aiss",
+    "/ddy",
+    "/legbaby",
+    "/mm",
+    "/meinvmote",
+    "/ugirls",
+    "/tgod",
+    "/?s="
+  ],
+  "tabSelector": {
+    "url": "{baseUrl}/",
+    "cssQuery": "ul.nav-tabs li a",
+    "titleSelector": {
+      "analyzer": {
+        "method": 0
+      }
+    },
+    "urlSelector": {
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
+  },
+  "catalogSelector": {
+    "url": "{baseUrl}/",
+    "tagSelector": {
+      "cssQuery": "div#sidebar div.widget div.tagcloud a",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    }
+  },
+  "dataSelector": {
+    "url": "{baseUrl}/",
+    "cssQuery": "div.container div.mainleft ul.masonry li.post",
+    "attrSelectors": [
+      {
+        "label": "title",
+        "cssQuery": "div.thumbnail a.zoom",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "title"
+          ]
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.thumbnail a.zoom img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "url",
+        "cssQuery": "div.thumbnail a.zoom",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "div.navigation div.pagination a",
+      "filter": {
+        "text": "下一页"
+      },
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ]
+      }
+    }
+  }
+}
