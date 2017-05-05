@@ -125,6 +125,7 @@ public class PandoraActivity extends BaseActivity {
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK);
+
         Single<String> splashImageSingle = null;
         switch (splashImageDataSource) {
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK:
@@ -153,7 +154,6 @@ public class PandoraActivity extends BaseActivity {
                         .lastOrError()
                         .map(data -> data.attrs.get("cover"));
                 break;
-
         }
 
         splashImageSingle
