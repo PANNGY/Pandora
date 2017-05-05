@@ -241,7 +241,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 Timber.w("next page: %s", nextPage);
 
                 if (dataSelector.nextPageSelector.autoLoad) {
-                    loadData(nextPage);
+                    data.addAll(loadData(nextPage));
                 }
             }
 
