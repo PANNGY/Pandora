@@ -124,7 +124,7 @@ public class PandoraActivity extends BaseActivity {
 
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
+        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB);
 
         Single<String> splashImageSingle = null;
         switch (splashImageDataSource) {
