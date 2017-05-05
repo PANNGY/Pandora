@@ -33,6 +33,11 @@ import timber.log.Timber;
 
 public class SplashActivity extends BaseActivity {
     public final static String PRE_SPLASH_IMAGE = "SPLASH_IMAGE";
+    public final static String PRE_SPLASH_IMAGE_DATA_SOURCE = "SPLASH_IMAGE_DATA_SOURCE";
+
+    public final static int SPLASH_IMAGE_DATA_SOURCE_GANK = 0;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS = 1;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_JAVLIB = 2;
 
     @BindView(R.id.splash_image)
     SimpleDraweeView splashImage;

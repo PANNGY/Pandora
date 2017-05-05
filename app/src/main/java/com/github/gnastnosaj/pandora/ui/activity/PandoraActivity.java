@@ -15,7 +15,6 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
-import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.GankService;
 import com.github.gnastnosaj.pandora.datasource.GitOSCService;
@@ -124,28 +123,37 @@ public class PandoraActivity extends BaseActivity {
     }
 
     private void prepareSplashImage() {
-        Single<String> splashImageSingle;
-        if (Pandora.pro) {
-            GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-//            splashImageSingle = githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
-//                    .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-//                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-//                    .flatMap(url -> githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-//                    .flatMap(data -> Observable.fromIterable(data))
-//                    .lastOrError()
-//                    .map(data -> data.attrs.get("cover"));
-            splashImageSingle = githubService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
-                    .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-                    .flatMap(url -> githubService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
-                    .singleOrError();
-        } else {
-            splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
-                    .getGankData("福利", 1, 1)
-                    .flatMap(gankData -> Observable.fromIterable(gankData.results))
-                    .lastOrError()
-                    .map(result -> result.url);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK);
+        Single<String> splashImageSingle = null;
+        switch (splashImageDataSource) {
+            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK:
+                splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
+                        .getGankData("福利", 1, 1)
+                        .flatMap(gankData -> Observable.fromIterable(gankData.results))
+                        .lastOrError()
+                        .map(result -> result.url);
+                break;
+            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:
+                GithubService girlAtlasService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+                splashImageSingle = girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                        .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
+                        .singleOrError();
+                break;
+            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
+                GithubService javlibService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+                splashImageSingle = javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                        .flatMap(url -> javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                        .flatMap(data -> Observable.fromIterable(data))
+                        .lastOrError()
+                        .map(data -> data.attrs.get("cover"));
+                break;
+
         }
 
         splashImageSingle
@@ -153,7 +161,6 @@ public class PandoraActivity extends BaseActivity {
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(uriString -> {
                     Timber.d("next time splash image: %s", uriString);
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString(SplashActivity.PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
