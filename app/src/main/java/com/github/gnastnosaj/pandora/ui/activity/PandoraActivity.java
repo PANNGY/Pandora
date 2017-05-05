@@ -138,7 +138,7 @@ public class PandoraActivity extends BaseActivity {
                     .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                     .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
                     .flatMap(url -> githubService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
+                    .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
                     .singleOrError();
         } else {
             splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
