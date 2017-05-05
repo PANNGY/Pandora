@@ -4,6 +4,24 @@
     "/",
     "/index1"
   ],
+  "tabSelector": {
+    "url": "{baseUrl}/",
+    "cssQuery": "div.nav-tabs li a",
+    "titleSelector": {
+      "analyzer": {
+        "method": 0
+      }
+    },
+    "urlSelector": {
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
+  },
   "catalogSelector": {
     "url": "{baseUrl}/",
     "cssQuery": "div.sidebar div.mb-10",

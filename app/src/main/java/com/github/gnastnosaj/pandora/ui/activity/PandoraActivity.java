@@ -75,7 +75,7 @@ public class PandoraActivity extends BaseActivity {
 
         Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
                 .getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
                 .compose(bindToLifecycle())
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupLinks -> {

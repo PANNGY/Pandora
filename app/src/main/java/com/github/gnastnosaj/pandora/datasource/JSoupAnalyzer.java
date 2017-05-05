@@ -44,9 +44,20 @@ public class JSoupAnalyzer {
                 }
                 break;
         }
-        if (format != null && content != null) {
-            content = String.format(format, content);
-        }
+        content = betterData(content);
         return content;
+    }
+
+    private String betterData(String data) {
+        if (!TextUtils.isEmpty(data)) {
+            data = data.trim();
+            if (data.startsWith("javascript")) {
+                data = "";
+            }
+            if (!TextUtils.isEmpty(format)) {
+                data = String.format(format, data);
+            }
+        }
+        return data;
     }
 }
