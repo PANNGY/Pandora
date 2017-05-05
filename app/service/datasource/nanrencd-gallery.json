@@ -24,6 +24,17 @@
             "src"
           ]
         }
+      },
+      {
+        "label": "page-total",
+        "global": true,
+        "cssQuery": "div.pageList li.page-next a",
+        "filter": {
+          "last": true
+        },
+        "analyzer": {
+          "method": 0
+        }
       }
     ],
     "tagSelector": {

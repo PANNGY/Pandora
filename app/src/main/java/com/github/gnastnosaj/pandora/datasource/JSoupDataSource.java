@@ -43,6 +43,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     public CatalogSelector catalogSelector;
     public DataSelector dataSelector;
 
+    private List<String> history = new ArrayList<>();
     private String currentPage;
     private String nextPage;
 
@@ -166,6 +167,10 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         if (page == null) {
             throw new Exception("page is empty");
         } else {
+            if (history.contains(page)) {
+                throw new Exception("page is loaded");
+            }
+            history.add(page);
             currentPage = betterData(page);
             Document document = dataSelector.loadDocument(currentPage);
 
@@ -269,6 +274,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     @Override
     public List<JSoupData> refresh() throws Exception {
+        history.clear();
         CountDownLatch countDownLatch = new CountDownLatch(1);
         List<JSoupData> data = new ArrayList<>();
         loadData().subscribeOn(Schedulers.newThread()).subscribe(jsoupData -> {
