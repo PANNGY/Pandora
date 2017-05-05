@@ -66,6 +66,9 @@
     ],
     "nextPageSelector": {
       "cssQuery": "ul.pagination li a",
+      "filter": {
+        "last": true
+      },
       "analyzer": {
         "method": 1,
         "args": [

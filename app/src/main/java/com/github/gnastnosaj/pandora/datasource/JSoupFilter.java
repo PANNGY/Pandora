@@ -13,8 +13,11 @@ import java.util.List;
  */
 
 public class JSoupFilter {
-    public int[] indexes;
+
     public String notQuery;
+    public int[] indexes;
+    public boolean first;
+    public boolean last;
 
     public Elements filter(Elements elements) {
         if (!TextUtils.isEmpty(notQuery)) {
@@ -28,6 +31,12 @@ public class JSoupFilter {
                 }
             }
             elements = new Elements(filtered);
+        }
+        if (first) {
+            elements = new Elements(elements.first());
+        }
+        if (last) {
+            elements = new Elements(elements.last());
         }
         return elements;
     }
