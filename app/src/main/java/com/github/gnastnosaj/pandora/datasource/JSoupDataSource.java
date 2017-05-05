@@ -202,8 +202,8 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                                 jsoupData.attrs.put(attrSelector.label, attr);
                             }
                         }
+                        jsoupData.tags = new ArrayList<>();
                         if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
-                            jsoupData.tags = new ArrayList<>();
                             Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
                             for (Element tagElement : tagElements) {
                                 JSoupCatalog tag = new JSoupCatalog();
