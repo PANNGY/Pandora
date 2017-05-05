@@ -140,107 +140,113 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public Observable<List<JSoupData>> loadData() {
-        if (nextPage != null) {
-            return loadData(nextPage);
-        } else {
-            return loadData(dataSelector.url);
-        }
-    }
-
-    public Observable<List<JSoupData>> loadData(String page) {
         return Observable.create(subscriber -> {
+            List<JSoupData> data = new ArrayList<>();
             try {
-                if (page == null) {
-                    subscriber.onError(new Throwable("page is empty"));
+                if (nextPage != null) {
+                    data.addAll(loadData(nextPage));
                 } else {
-                    currentPage = betterData(page);
-                    Document document = dataSelector.loadDocument(currentPage);
-
-                    List<JSoupData> data = new ArrayList<>();
-
-                    JSoupData globalData = new JSoupData();
-                    globalData.attrs = new HashMap<>();
-                    for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                        if (attrSelector.global) {
-                            String attr = attrSelector.parse(document, null);
-                            globalData.attrs.put(attrSelector.label, attr);
-                        }
-                    }
-                    for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                        if (!TextUtils.isEmpty(attrSelector.placeholder)) {
-                            if (!data.contains(globalData)) {
-                                data.add(globalData);
-                            }
-                            globalData.attrs.put(attrSelector.label, globalData.attrs.get(attrSelector.placeholder));
-                        }
-                    }
-                    if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
-                        globalData.tags = new ArrayList<>();
-                        Elements tagElements = dataSelector.tagSelector.call(document, null);
-                        for (Element tagElement : tagElements) {
-                            JSoupLink tag = new JSoupLink();
-                            if (dataSelector.tagSelector.titleSelector != null) {
-                                String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
-                                tag.title = tagTitle;
-                            }
-                            if (dataSelector.tagSelector.urlSelector != null) {
-                                String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
-                                tag.url = betterData(tagUrl);
-                            }
-                            globalData.tags.add(tag);
-                        }
-                    }
-
-                    Elements dataElements = dataSelector.call(document);
-                    for (Element dataElement : dataElements) {
-                        JSoupData jsoupData = new JSoupData();
-                        jsoupData.attrs = new HashMap<>();
-                        for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                            if (!attrSelector.global) {
-                                String attr = attrSelector.parse(document, dataElement);
-                                attr = betterData(attr);
-                                jsoupData.attrs.put(attrSelector.label, attr);
-                            }
-                        }
-                        jsoupData.tags = new ArrayList<>();
-                        if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
-                            Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
-                            for (Element tagElement : tagElements) {
-                                JSoupCatalog tag = new JSoupCatalog();
-                                if (dataSelector.tagSelector.titleSelector != null) {
-                                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
-                                    tag.title = tagTitle;
-                                }
-                                if (dataSelector.tagSelector.urlSelector != null) {
-                                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
-                                    tag.url = betterData(tagUrl);
-                                }
-                                jsoupData.tags.add(tag);
-                            }
-                        }
-                        if (!MapUtils.isEmpty(globalData.attrs)) {
-                            jsoupData.attrs.putAll(globalData.attrs);
-                        }
-                        if (!ListUtils.isEmpty(globalData.tags)) {
-                            jsoupData.tags.addAll(globalData.tags);
-                        }
-                        data.add(jsoupData);
-                    }
-
-                    if (dataSelector.nextPageSelector != null) {
-                        nextPage = dataSelector.nextPageSelector.parse(document);
-                        nextPage = betterData(nextPage);
-                        Timber.w("next page: %s", nextPage);
-                    }
-
-                    subscriber.onNext(data);
+                    data.addAll(loadData(dataSelector.url));
                 }
+                subscriber.onNext(data);
             } catch (Exception e) {
-                Timber.w(e, "loadData exception");
+                Timber.e(e, "loadData exception");
                 subscriber.onError(e);
             }
             subscriber.onComplete();
         });
+    }
+
+    public List<JSoupData> loadData(String page) throws Exception {
+        if (page == null) {
+            throw new Exception("page is empty");
+        } else {
+            currentPage = betterData(page);
+            Document document = dataSelector.loadDocument(currentPage);
+
+            List<JSoupData> data = new ArrayList<>();
+
+            JSoupData globalData = new JSoupData();
+            globalData.attrs = new HashMap<>();
+            for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                if (attrSelector.global) {
+                    String attr = attrSelector.parse(document, null);
+                    globalData.attrs.put(attrSelector.label, attr);
+                }
+            }
+            for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                if (!TextUtils.isEmpty(attrSelector.placeholder)) {
+                    if (!data.contains(globalData)) {
+                        data.add(globalData);
+                    }
+                    globalData.attrs.put(attrSelector.label, globalData.attrs.get(attrSelector.placeholder));
+                }
+            }
+            if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
+                globalData.tags = new ArrayList<>();
+                Elements tagElements = dataSelector.tagSelector.call(document, null);
+                for (Element tagElement : tagElements) {
+                    JSoupLink tag = new JSoupLink();
+                    if (dataSelector.tagSelector.titleSelector != null) {
+                        String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                        tag.title = tagTitle;
+                    }
+                    if (dataSelector.tagSelector.urlSelector != null) {
+                        String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                        tag.url = betterData(tagUrl);
+                    }
+                    globalData.tags.add(tag);
+                }
+            }
+
+            Elements dataElements = dataSelector.call(document);
+            for (Element dataElement : dataElements) {
+                JSoupData jsoupData = new JSoupData();
+                jsoupData.attrs = new HashMap<>();
+                for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                    if (!attrSelector.global) {
+                        String attr = attrSelector.parse(document, dataElement);
+                        attr = betterData(attr);
+                        jsoupData.attrs.put(attrSelector.label, attr);
+                    }
+                }
+                jsoupData.tags = new ArrayList<>();
+                if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
+                    Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
+                    for (Element tagElement : tagElements) {
+                        JSoupCatalog tag = new JSoupCatalog();
+                        if (dataSelector.tagSelector.titleSelector != null) {
+                            String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                            tag.title = tagTitle;
+                        }
+                        if (dataSelector.tagSelector.urlSelector != null) {
+                            String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                            tag.url = betterData(tagUrl);
+                        }
+                        jsoupData.tags.add(tag);
+                    }
+                }
+                if (!MapUtils.isEmpty(globalData.attrs)) {
+                    jsoupData.attrs.putAll(globalData.attrs);
+                }
+                if (!ListUtils.isEmpty(globalData.tags)) {
+                    jsoupData.tags.addAll(globalData.tags);
+                }
+                data.add(jsoupData);
+            }
+
+            if (dataSelector.nextPageSelector != null) {
+                nextPage = dataSelector.nextPageSelector.parse(document);
+                nextPage = betterData(nextPage);
+                Timber.w("next page: %s", nextPage);
+
+                if (dataSelector.nextPageSelector.autoLoad) {
+                    loadData(nextPage);
+                }
+            }
+
+            return data;
+        }
     }
 
     public void setNextPage(String nextPage) {

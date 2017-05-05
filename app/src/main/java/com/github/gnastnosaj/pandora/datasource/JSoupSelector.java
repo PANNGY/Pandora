@@ -36,6 +36,7 @@ public class JSoupSelector {
     public String cssQuery;
     public JSoupFilter filter;
     public JSoupAnalyzer analyzer;
+    public boolean autoLoad;
 
     public String parse(Document document, Element element) {
         return analyze(call(document, element));
