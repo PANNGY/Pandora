@@ -32,6 +32,7 @@ public class JSoupSelector {
     public String label;
     public boolean global;
     public String placeholder;
+    public JSoupPreTreat preTreat;
     public String cssQuery;
     public JSoupFilter filter;
     public JSoupAnalyzer analyzer;
@@ -45,26 +46,34 @@ public class JSoupSelector {
     }
 
     public Elements call(Document document, Element element) {
+        Element el = global ? document : element;
+        if (preTreat != null) {
+            el = preTreat.treat(el);
+        }
         if (!TextUtils.isEmpty(cssQuery)) {
-            Elements elements = global ? document.select(cssQuery) : element.select(cssQuery);
+            Elements elements = el.select(cssQuery);
             if (filter != null) {
                 elements = filter.filter(elements);
             }
             return elements;
         } else {
-            return new Elements(element);
+            return new Elements(el);
         }
     }
 
     public Elements call(Document document) {
+        Element el = document;
+        if (preTreat != null) {
+            el = preTreat.treat(el);
+        }
         if (!TextUtils.isEmpty(cssQuery)) {
-            Elements elements = document.select(cssQuery);
+            Elements elements = el.select(cssQuery);
             if (filter != null) {
                 elements = filter.filter(elements);
             }
             return elements;
         } else {
-            return new Elements(document);
+            return new Elements(el);
         }
     }
 

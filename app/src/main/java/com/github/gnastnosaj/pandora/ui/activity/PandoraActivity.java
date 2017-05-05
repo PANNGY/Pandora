@@ -72,6 +72,17 @@ public class PandoraActivity extends BaseActivity {
 
         checkForUpdate();
         prepareSplashImage();
+
+        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
+                .getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
+                .compose(bindToLifecycle())
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(jsoupLinks -> {
+                    int i = 0;
+                    int j = 0;
+                });
+
     }
 
     @Override
