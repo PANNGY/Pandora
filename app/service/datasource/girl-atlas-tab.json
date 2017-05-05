@@ -6,9 +6,6 @@
   ],
   "catalogSelector": {
     "url": "{baseUrl}/",
-    "preTreat": {
-      "nextElementSibling": true
-    },
     "cssQuery": "div.sidebar div.mb-10",
     "titleSelector": {
       "analyzer": {
@@ -16,6 +13,9 @@
       }
     },
     "tagSelector": {
+      "preTreat": {
+        "nextElementSibling": true
+      },
       "cssQuery": "div.tag",
       "titleSelector": {
         "analyzer": {
