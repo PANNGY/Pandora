@@ -158,7 +158,7 @@ public class PandoraActivity extends BaseActivity {
                                                     return jsoupDataSource.loadData(nextpage);
                                                 }))
                         )
-                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
+                        .map(data -> data.get(data.size() > 1 ? new Random().nextInt(data.size() - 1) : 0).attrs.get("thumbnail"))
                         .singleOrError();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
