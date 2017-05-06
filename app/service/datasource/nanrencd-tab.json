@@ -14,7 +14,7 @@
   ],
   "tabSelector": {
     "url": "{baseUrl}/",
-    "cssQuery": "ul.nav-tabs li a",
+    "cssQuery": "div.mainmenu div.topnav a.home_none, div.mainmenu div.topnav li.menu-item",
     "titleSelector": {
       "analyzer": {
         "method": 0
@@ -25,8 +25,7 @@
         "method": 1,
         "args": [
           "href"
-        ],
-        "format": "{baseUrl}%s"
+        ]
       }
     }
   },
