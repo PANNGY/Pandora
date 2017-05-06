@@ -28,9 +28,9 @@
       {
         "label": "page-total",
         "global": true,
-        "cssQuery": "div.pageList li.page-next a",
+        "cssQuery": "div.pageList li",
         "filter": {
-          "last": true
+          "notQuery": ".page-next"
         },
         "analyzer": {
           "method": 0
