@@ -154,7 +154,7 @@ public class PandoraActivity extends BaseActivity {
                                         .flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)
                                                 .flatMap(data -> {
                                                     int pageTotal = Integer.parseInt(data.get(0).attrs.get("page-total"));
-                                                    String nextpage = url + new Random().nextInt(pageTotal);
+                                                    String nextpage = url + "/" + new Random().nextInt(pageTotal);
                                                     return jsoupDataSource.loadData(nextpage);
                                                 }))
                         ).flatMap(data -> Observable.fromIterable(data))
