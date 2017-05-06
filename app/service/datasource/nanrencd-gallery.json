@@ -61,8 +61,7 @@
         "args": [
           "href"
         ]
-      },
-      "autoLoad": true
+      }
     }
   }
 }
