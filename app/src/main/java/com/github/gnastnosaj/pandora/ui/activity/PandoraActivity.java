@@ -157,9 +157,9 @@ public class PandoraActivity extends BaseActivity {
                                                     String nextpage = url + "/" + new Random().nextInt(pageTotal);
                                                     return jsoupDataSource.loadData(nextpage);
                                                 }))
-                        ).flatMap(data -> Observable.fromIterable(data))
-                        .lastOrError()
-                        .map(data -> data.attrs.get("thumbnail"));
+                        )
+                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
+                        .singleOrError();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
                 GithubService javlibService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
@@ -168,7 +168,7 @@ public class PandoraActivity extends BaseActivity {
                         .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
                         .flatMap(url -> javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
                         .flatMap(data -> Observable.fromIterable(data))
-                        .lastOrError()
+                        .firstOrError()
                         .map(data -> data.attrs.get("cover"));
                 break;
         }
