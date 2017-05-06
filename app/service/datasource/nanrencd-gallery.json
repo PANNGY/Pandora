@@ -30,7 +30,8 @@
         "global": true,
         "cssQuery": "div.pageList li",
         "filter": {
-          "notQuery": ".page-next"
+          "notQuery": ".page-next",
+          "last": true
         },
         "analyzer": {
           "method": 0
