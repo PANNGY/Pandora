@@ -149,9 +149,17 @@ public class PandoraActivity extends BaseActivity {
                 splashImageSingle = nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
                         .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                         .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("url"))
-                        .flatMap(url -> nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).attrs.get("thumbnail"))
-                        .singleOrError();
+                        .flatMap(url ->
+                                nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_GALLERY)
+                                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)
+                                                .flatMap(data -> {
+                                                    int pageTotal = Integer.parseInt(data.get(0).attrs.get("page-total"));
+                                                    String nextpage = url + new Random().nextInt(pageTotal);
+                                                    return jsoupDataSource.loadData(nextpage);
+                                                }))
+                        ).flatMap(data -> Observable.fromIterable(data))
+                        .lastOrError()
+                        .map(data -> data.attrs.get("thumbnail"));
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
                 GithubService javlibService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
