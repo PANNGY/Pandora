@@ -8,8 +8,6 @@ import org.jsoup.select.Elements;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.RegEx;
-
 import cn.trinea.android.common.util.ArrayUtils;
 
 /**
