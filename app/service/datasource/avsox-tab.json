@@ -38,15 +38,17 @@
   },
   "catalogSelector": {
     "url": "{baseUrl}/{area}{pages[3]}",
-    "cssQuery": "div.container-fluid",
+    "cssQuery": "div.container-fluid h4",
     "titleSelector": {
-      "cssQuery": "h4",
       "analyzer": {
         "method": 0
       }
     },
     "tagSelector": {
-      "cssQuery": "div.row.genre-box a",
+      "preTreat": {
+        "nextElementSibling": true
+      },
+      "cssQuery": "a",
       "titleSelector": {
         "analyzer": {
           "method": 0
