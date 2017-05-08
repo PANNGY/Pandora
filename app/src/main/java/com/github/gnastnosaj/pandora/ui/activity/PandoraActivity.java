@@ -73,7 +73,7 @@ public class PandoraActivity extends BaseActivity {
         checkForUpdate();
         prepareSplashImage();
 
-        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_MODEL)
+        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_MODEL)
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(data -> {
