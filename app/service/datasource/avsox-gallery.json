@@ -1,0 +1,49 @@
+{
+  "baseUrl": "https://avso.pw",
+  "pages": [
+    "/",
+    "/popular",
+    "/actresses",
+    "/genre",
+    "/search/"
+  ],
+  "areas": {
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
+  },
+  "dataSelector": {
+    "url": "{baseUrl}/{area}{pages[0]}",
+    "cssQuery": "div.row.movie",
+    "attrSelectors": [
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.screencap img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      }
+    ],
+    "tagSelector": {
+      "global": true,
+      "cssQuery": "div.row.movie div.info a, div#avatar-water-fall a.avatar-box",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    }
+  }
+}
