@@ -14,8 +14,14 @@
     "tw": "tw"
   },
   "tabSelector": {
-    "url": "{baseUrl}/{area}{pages[3]}",
-    "cssQuery": "div#leftmenu div.menul1 ul li a",
+    "url": "{baseUrl}/{area}{pages[0]}",
+    "cssQuery": "div#navbar ul.nav li a",
+    "filter": {
+      "indexes": [
+        0,
+        1
+      ]
+    },
     "titleSelector": {
       "analyzer": {
         "method": 0
@@ -26,8 +32,7 @@
         "method": 1,
         "args": [
           "href"
-        ],
-        "format": "{baseUrl}/{area}/%s"
+        ]
       }
     }
   },
