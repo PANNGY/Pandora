@@ -14,7 +14,7 @@
     "tw": "tw"
   },
   "dataSelector": {
-    "url": "{baseUrl}/{area}{pages[0]}",
+    "url": "https://avso.pw/en/movie/108t",
     "cssQuery": "div.row.movie",
     "attrSelectors": [
       {
