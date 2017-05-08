@@ -1,0 +1,61 @@
+{
+  "baseUrl": "http://www.j12lib.com",
+  "pages": [
+    "/vl_update.php",
+    "/vl_newrelease.php",
+    "/vl_newentries.php",
+    "/vl_mostwanted.php",
+    "/vl_bestrated.php",
+    "/vl_searchbyid.php?keyword=",
+    "/genres.php"
+  ],
+  "areas": {
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
+  },
+  "dataSelector": {
+    "url": "{baseUrl}/{area}/star_mostfav.php",
+    "cssQuery": ".starbox .searchitem",
+    "attrSelectors": [
+      {
+        "label": "rankStr",
+        "cssQuery": "h3",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "url",
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "title"
+          ]
+        }
+      }
+    ]
+  }
+}

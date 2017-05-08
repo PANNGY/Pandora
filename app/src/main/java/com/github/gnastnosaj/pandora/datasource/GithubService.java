@@ -21,6 +21,7 @@ public interface GithubService {
     String DATE_SOURCE_NANRENCD_GALLERY = "nanrencd-gallery";
     String DATE_SOURCE_JAVLIB_TAB = "javlib-tab";
     String DATE_SOURCE_JAVLIB_GALLERY = "javlib-gallery";
+    String DATE_SOURCE_JAVLIB_MODEL = "javlib-model";
     String DATE_SOURCE_AVSOX_TAB = "avsox-tab";
     String DATE_SOURCE_AVSOX_GALLERY = "avsox-gallery";
 
