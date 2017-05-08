@@ -14,7 +14,7 @@
   ],
   "tabSelector": {
     "url": "{baseUrl}/",
-    "cssQuery": "div.mainmenu div.topnav a.home_none, div.mainmenu div.topnav li.menu-item a",
+    "cssQuery": "div.mainmenu div.topnav a[class^=home], div.mainmenu div.topnav li.menu-item a",
     "titleSelector": {
       "analyzer": {
         "method": 0
