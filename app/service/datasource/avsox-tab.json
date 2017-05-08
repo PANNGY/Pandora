@@ -46,14 +46,13 @@
       }
     },
     "tagSelector": {
-      "cssQuery": "div.row.genre-box",
+      "cssQuery": "div.row.genre-box a",
       "titleSelector": {
         "analyzer": {
           "method": 0
         }
       },
       "urlSelector": {
-        "cssQuery": "a",
         "analyzer": {
           "method": 1,
           "args": [
