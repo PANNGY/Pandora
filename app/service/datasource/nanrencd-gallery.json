@@ -13,7 +13,6 @@
     "/?s="
   ],
   "dataSelector": {
-    "url": "https://www.girl-atlas.com/album/57b2ef1a92d30218bee68b8a",
     "cssQuery": "div#post_content p img",
     "attrSelectors": [
       {

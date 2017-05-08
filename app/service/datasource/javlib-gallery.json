@@ -16,7 +16,6 @@
     "tw": "tw"
   },
   "dataSelector": {
-    "url": "http://www.j12lib.com/en/?v=javlikjn54",
     "cssQuery": "div.previewthumbs img",
     "attrSelectors": [
       {

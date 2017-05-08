@@ -5,7 +5,6 @@
     "/index1"
   ],
   "dataSelector": {
-    "url": "https://www.girl-atlas.com/album/57b2ef1a92d30218bee68b8a",
     "headers": {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36"
     },
