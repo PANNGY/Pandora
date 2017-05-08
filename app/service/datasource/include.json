@@ -5,7 +5,8 @@
   "nanrencd-gallery",
   "javlib-tab",
   "javlib-gallery",
-  "javlib-model",
+  "javlib-model-rank",
   "avsox-tab",
-  "avsox-gallery"
+  "avsox-gallery",
+  "avsox-model"
 ]

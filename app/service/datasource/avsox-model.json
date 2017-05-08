@@ -1,0 +1,57 @@
+{
+  "baseUrl": "https://avso.pw",
+  "pages": [
+    "/",
+    "/popular",
+    "/actresses",
+    "/genre",
+    "/search/"
+  ],
+  "areas": {
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
+  },
+  "dataSelector": {
+    "cssQuery": "div#waterfall div.item a.avatar-box",
+    "attrSelectors": [
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.photo-frame img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "name",
+        "cssQuery": "div.photo-info",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "url",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    ]
+  },
+  "nextPageSelector": {
+    "cssQuery": "ul.pagination li a[name^=nextpage]",
+    "analyzer": {
+      "method": 1,
+      "args": [
+        "href"
+      ],
+      "format": "{baseUrl}%s"
+    }
+  }
+}
