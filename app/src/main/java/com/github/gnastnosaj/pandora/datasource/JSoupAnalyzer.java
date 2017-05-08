@@ -5,6 +5,11 @@ import android.text.TextUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.RegEx;
+
 import cn.trinea.android.common.util.ArrayUtils;
 
 /**
@@ -18,6 +23,7 @@ public class JSoupAnalyzer {
     public int method;
     public String[] args;
     public String format;
+    public JSoupRegexp regexp;
 
     public String analyze(Elements elements) {
         if (elements == null || elements.isEmpty()) {
@@ -57,7 +63,23 @@ public class JSoupAnalyzer {
             if (!TextUtils.isEmpty(format)) {
                 data = String.format(format, data);
             }
+            if (regexp != null && !TextUtils.isEmpty(regexp.pattern)) {
+                if (regexp.replace != null) {
+                    data = data.replaceAll(regexp.pattern, regexp.replace);
+                } else {
+                    Pattern pattern = Pattern.compile(regexp.pattern);
+                    Matcher matcher = pattern.matcher(data);
+                    if (matcher.find()) {
+                        data = matcher.group().trim();
+                    }
+                }
+            }
         }
         return data;
+    }
+
+    public static class JSoupRegexp {
+        public String pattern;
+        public String replace;
     }
 }
