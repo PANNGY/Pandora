@@ -78,24 +78,26 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         });
     }
 
-    public Observable<List<JSoupLink>> loadCatalogs() {
+    public Observable loadCatalogs() {
         return Observable.create(subscriber -> {
             try {
                 catalogSelector.url = betterData(catalogSelector.url);
                 Document document = catalogSelector.loadDocument();
 
-                List<JSoupLink> catalogs = new ArrayList<>();
+
                 if (!TextUtils.isEmpty(catalogSelector.cssQuery)) {
+                    List<JSoupCatalog> catalogs = new ArrayList<>();
                     Elements typeElements = catalogSelector.call(document);
                     for (Element typeElement : typeElements) {
                         JSoupCatalog catalog = new JSoupCatalog();
+                        catalog.link = new JSoupLink();
                         if (catalogSelector.titleSelector != null) {
                             String catalogTitle = catalogSelector.titleSelector.parse(document, typeElement);
-                            catalog.title = catalogTitle;
+                            catalog.link.title = catalogTitle;
                         }
                         if (catalogSelector.urlSelector != null) {
                             String catalogUrl = catalogSelector.urlSelector.parse(document, typeElement);
-                            catalog.url = betterData(catalogUrl);
+                            catalog.link.url = betterData(catalogUrl);
                         }
                         if (catalogSelector.tagSelector != null) {
                             catalog.tags = new RealmList<>();
@@ -117,6 +119,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     }
                     subscriber.onNext(catalogs);
                 } else if (catalogSelector.tagSelector != null) {
+                    List<JSoupLink> catalogs = new ArrayList<>();
                     Elements tagElements = catalogSelector.tagSelector.call(document);
                     for (Element tagElement : tagElements) {
                         JSoupLink tag = new JSoupLink();
@@ -231,7 +234,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
                     Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
                     for (Element tagElement : tagElements) {
-                        JSoupCatalog tag = new JSoupCatalog();
+                        JSoupLink tag = new JSoupLink();
                         if (dataSelector.tagSelector.titleSelector != null) {
                             String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
                             tag.title = tagTitle;

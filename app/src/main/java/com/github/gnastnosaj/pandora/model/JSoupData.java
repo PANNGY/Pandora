@@ -10,4 +10,13 @@ import io.realm.RealmObject;
 public class JSoupData extends RealmObject {
     public RealmList<JSoupAttr> attrs;
     public RealmList<JSoupLink> tags;
+
+    public String getAttr(String label) {
+        for(JSoupAttr attr: attrs) {
+            if(attr.label.equals(label)) {
+                return attr.content;
+            }
+        }
+        return null;
+    }
 }
