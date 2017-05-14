@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
@@ -15,7 +16,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -27,6 +27,7 @@ import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.MapUtils;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.RealmList;
 import timber.log.Timber;
 
 /**
@@ -97,7 +98,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                             catalog.url = betterData(catalogUrl);
                         }
                         if (catalogSelector.tagSelector != null) {
-                            catalog.tags = new ArrayList<>();
+                            catalog.tags = new RealmList<>();
                             Elements tagElements = catalogSelector.tagSelector.call(document, typeElement);
                             for (Element tagElement : tagElements) {
                                 JSoupLink tag = new JSoupLink();
@@ -178,11 +179,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             List<JSoupData> data = new ArrayList<>();
 
             JSoupData globalData = new JSoupData();
-            globalData.attrs = new HashMap<>();
+            globalData.attrs = new RealmList<>();
             for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
                 if (attrSelector.global) {
-                    String attr = attrSelector.parse(document, null);
-                    globalData.attrs.put(attrSelector.label, attr);
+                    String attrContent = attrSelector.parse(document, null);
+                    globalData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
                 }
             }
             for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
@@ -190,11 +191,16 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                     if (!data.contains(globalData)) {
                         data.add(globalData);
                     }
-                    globalData.attrs.put(attrSelector.label, globalData.attrs.get(attrSelector.placeholder));
+                    for (JSoupAttr attr : globalData.attrs) {
+                        if (attr.label.equals(attrSelector.placeholder)) {
+                            globalData.attrs.add(new JSoupAttr(attrSelector.label, attr.content));
+                            break;
+                        }
+                    }
                 }
             }
             if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
-                globalData.tags = new ArrayList<>();
+                globalData.tags = new RealmList<>();
                 Elements tagElements = dataSelector.tagSelector.call(document, null);
                 for (Element tagElement : tagElements) {
                     JSoupLink tag = new JSoupLink();
@@ -213,15 +219,15 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             Elements dataElements = dataSelector.call(document);
             for (Element dataElement : dataElements) {
                 JSoupData jsoupData = new JSoupData();
-                jsoupData.attrs = new HashMap<>();
+                jsoupData.attrs = new RealmList<>();
                 for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
                     if (!attrSelector.global) {
-                        String attr = attrSelector.parse(document, dataElement);
-                        attr = betterData(attr);
-                        jsoupData.attrs.put(attrSelector.label, attr);
+                        String attrContent = attrSelector.parse(document, dataElement);
+                        attrContent = betterData(attrContent);
+                        jsoupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
                     }
                 }
-                jsoupData.tags = new ArrayList<>();
+                jsoupData.tags = new RealmList<>();
                 if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
                     Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
                     for (Element tagElement : tagElements) {
@@ -237,8 +243,8 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         jsoupData.tags.add(tag);
                     }
                 }
-                if (!MapUtils.isEmpty(globalData.attrs)) {
-                    jsoupData.attrs.putAll(globalData.attrs);
+                if (!ListUtils.isEmpty(globalData.attrs)) {
+                    jsoupData.attrs.addAll(globalData.attrs);
                 }
                 if (!ListUtils.isEmpty(globalData.tags)) {
                     jsoupData.tags.addAll(globalData.tags);

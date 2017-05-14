@@ -1,13 +1,13 @@
 package com.github.gnastnosaj.pandora.model;
 
-import java.util.List;
-import java.util.Map;
+import io.realm.RealmList;
+import io.realm.RealmObject;
 
 /**
  * Created by jasontsang on 5/2/17.
  */
 
-public class JSoupData {
-    public Map<String, String> attrs;
-    public List<JSoupLink> tags;
+public class JSoupData extends RealmObject {
+    public RealmList<JSoupAttr> attrs;
+    public RealmList<JSoupLink> tags;
 }
