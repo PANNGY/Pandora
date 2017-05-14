@@ -86,7 +86,7 @@
     "nextPageSelector": {
       "cssQuery": "div.navigation div.pagination a",
       "filter": {
-        "text": "下一页"
+        "regexp": "下一页"
       },
       "analyzer": {
         "method": 1,

@@ -25,6 +25,6 @@ public interface GitOSCService {
     @GET("/jasontsang/Pandora/raw/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();
 
-    @GET("/jasontsang/Pandora/raw/master/app/service/request-decoration.json")
-    Observable<List<Request.Decorator>> getRequestConfigs();
+    @GET("/jasontsang/Pandora/raw/master/app/service/request-enhancer.json")
+    Observable<List<Request.Enhancer>> getRequestConfigs();
 }

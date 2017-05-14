@@ -15,14 +15,25 @@ import java.util.List;
 public class JSoupFilter {
 
     public String notQuery;
+    public String regexp;
     public int[] indexes;
     public boolean first;
     public boolean last;
-    public String text;
 
     public Elements filter(Elements elements) {
         if (!TextUtils.isEmpty(notQuery)) {
             elements = elements.not(notQuery);
+        }
+        if (!TextUtils.isEmpty(regexp)) {
+            Pattern pattern = Pattern.compile(regexp);
+            List<Element> filtered = new ArrayList<>();
+            for (Element element : elements) {
+                Matcher matcher = pattern.matcher(element.text());
+                if (matcher.find()) {
+                    filtered.add(element);
+                }
+            }
+            elements = new Elements(filtered);
         }
         if (indexes != null && indexes.length != 0) {
             List<Element> filtered = new ArrayList<>();
@@ -38,15 +49,6 @@ public class JSoupFilter {
         }
         if (last) {
             elements = new Elements(elements.last());
-        }
-        if (!TextUtils.isEmpty(text)) {
-            List<Element> filtered = new ArrayList<>();
-            for (Element element : elements) {
-                if (element.text().equals(text)) {
-                    filtered.add(element);
-                }
-            }
-            elements = new Elements(filtered);
         }
         return elements;
     }

@@ -35,7 +35,7 @@ public interface GithubService {
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();
 
-    @GET("/gnastnosaj/Pandora/master/app/service/request-decoration.json")
-    Observable<List<Request.Decorator>> getRequestConfigs();
+    @GET("/gnastnosaj/Pandora/master/app/service/request-enhancer.json")
+    Observable<List<Request.Enhancer>> getRequestConfigs();
 
 }

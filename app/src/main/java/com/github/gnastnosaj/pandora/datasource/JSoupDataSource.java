@@ -316,7 +316,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             if (data.startsWith("javascript")) {
                 return null;
             }
-            if (baseUrl != null) {
+            if (!TextUtils.isEmpty(baseUrl)) {
                 data = data.replace("{baseUrl}", baseUrl);
             }
             if (!ArrayUtils.isEmpty(pages)) {

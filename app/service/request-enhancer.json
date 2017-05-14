@@ -1,0 +1,12 @@
+[
+  {
+    "filterRegexp": "pics.dmm.co.jp",
+    "replaceWithIP": true
+  },
+  {
+    "filterRegexp": "girlatlas",
+    "headers": {
+      "Referer": "https://www.girl-atlas.com"
+    }
+  }
+]
