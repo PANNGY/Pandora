@@ -35,6 +35,7 @@ import timber.log.Timber;
 
 public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
 
+    public String id;
     public String baseUrl;
     public String[] pages;
     public Map<String, String> areas;

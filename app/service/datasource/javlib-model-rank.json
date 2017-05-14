@@ -1,4 +1,5 @@
 {
+  "id": "javlib-model-rank",
   "baseUrl": "http://www.j12lib.com",
   "pages": [
     "/vl_update.php",
