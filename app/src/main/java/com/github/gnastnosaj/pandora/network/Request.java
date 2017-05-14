@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.MapUtils;
@@ -56,7 +58,7 @@ public class Request {
             if (!ListUtils.isEmpty(ehancers)) {
                 for (Enhancer enhancer : ehancers) {
                     try {
-                        Pattern pattern = Pattern.compile(enhancer.filter);
+                        Pattern pattern = Pattern.compile(enhancer.filterRegexp);
                         Matcher matcher = pattern.matcher(url);
                         if (matcher.find()) {
                             if (enhancer.replaceWithIP) {
