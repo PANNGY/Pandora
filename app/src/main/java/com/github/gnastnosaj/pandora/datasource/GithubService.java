@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Path;
 
 /**
@@ -26,15 +27,19 @@ public interface GithubService {
     String DATE_SOURCE_AVSOX_GALLERY = "avsox-gallery";
     String DATE_SOURCE_AVSOX_MODEL = "avsox-model";
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/update.json")
     Observable<UpdateData> getUpdateData();
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/{label}.json")
     Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label);
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/request-enhancer.json")
     Observable<List<Request.Enhancer>> getRequestConfigs();
 
