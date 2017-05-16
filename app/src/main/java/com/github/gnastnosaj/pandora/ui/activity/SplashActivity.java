@@ -22,9 +22,12 @@ import com.github.gnastnosaj.pandora.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -96,7 +99,9 @@ public class SplashActivity extends BaseActivity {
                     }).build();
             splashImage.setController(draweeController);
         } else {
-            start();
+            Observable.timer(3, TimeUnit.SECONDS).subscribeOn(Schedulers.computation()).subscribe(aLong -> {
+                start();
+            });
         }
 
         splashVersion.setText(getResources().getString(R.string.splash_version, Boilerplate.versionName));
