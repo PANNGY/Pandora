@@ -16,10 +16,10 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.datasource.GankService;
 import com.github.gnastnosaj.pandora.datasource.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
+import com.github.gnastnosaj.pandora.datasource.SplashService;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
@@ -27,14 +27,12 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.trinea.android.common.util.PackageUtils;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -122,35 +120,7 @@ public class PandoraActivity extends BaseActivity {
                         throwable -> Timber.w(throwable, "update permission exception"));
     }
 
-    private Single<String> girlAtlasSingle() {
-        GithubService girlAtlasService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-        return girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
-                .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("thumbnail"))
-                .singleOrError()
-                .onErrorResumeNext(nanrencdSingle());
-    }
 
-    private Single<String> nanrencdSingle() {
-        GithubService nanrencdService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-        return nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
-                .flatMap(url ->
-                        nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_GALLERY)
-                                .flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)
-                                        .flatMap(data -> {
-                                            int pageTotal = Integer.parseInt(data.get(0).getAttr("page-total"));
-                                            String nextpage = url + "/" + new Random().nextInt(pageTotal);
-                                            return jsoupDataSource.loadData(nextpage);
-                                        }))
-                )
-                .map(data -> data.get(data.size() > 1 ? new Random().nextInt(data.size() - 1) : 0).getAttr("thumbnail"))
-                .singleOrError()
-                .onErrorResumeNext(girlAtlasSingle());
-    }
 
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -160,27 +130,16 @@ public class PandoraActivity extends BaseActivity {
 
         switch (splashImageDataSource) {
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK:
-                splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
-                        .getGankData("福利", 1, 1)
-                        .flatMap(gankData -> Observable.fromIterable(gankData.results))
-                        .firstOrError()
-                        .map(result -> result.url);
+                splashImageSingle = SplashService.gankSingle();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:
-                splashImageSingle = girlAtlasSingle();
+                splashImageSingle = SplashService.girlAtlasSingle();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_NANRENCD:
-                splashImageSingle = nanrencdSingle();
+                splashImageSingle = SplashService.nanrencdSingle();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
-                GithubService javlibService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-                splashImageSingle = javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
-                        .flatMap(url -> javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                        .flatMap(data -> Observable.fromIterable(data))
-                        .firstOrError()
-                        .map(data -> data.getAttr("cover"));
+                splashImageSingle = SplashService.javlibSingle();
                 break;
         }
 
