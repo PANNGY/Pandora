@@ -122,26 +122,20 @@ public class PandoraActivity extends BaseActivity {
                         throwable -> Timber.w(throwable, "update permission exception"));
     }
 
-    private void prepareSplashImage() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
-
-        Single<String> splashImageSingle = null;
-
-        Single<String> girlAtlasSingle = null;
-        Single<String> nanrencdSingle = null;
-
+    private Single<String> girlAtlasSingle() {
         GithubService girlAtlasService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-        girlAtlasSingle = girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+        return girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
                 .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("thumbnail"))
                 .singleOrError()
-                .onErrorResumeNext(nanrencdSingle);
+                .onErrorResumeNext(nanrencdSingle());
+    }
 
+    private Single<String> nanrencdSingle() {
         GithubService nanrencdService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-        nanrencdSingle = nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
+        return nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
                 .flatMap(url ->
@@ -155,7 +149,14 @@ public class PandoraActivity extends BaseActivity {
                 )
                 .map(data -> data.get(data.size() > 1 ? new Random().nextInt(data.size() - 1) : 0).getAttr("thumbnail"))
                 .singleOrError()
-                .onErrorResumeNext(girlAtlasSingle);
+                .onErrorResumeNext(girlAtlasSingle());
+    }
+
+    private void prepareSplashImage() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
+
+        Single<String> splashImageSingle = null;
 
         switch (splashImageDataSource) {
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK:
@@ -166,10 +167,10 @@ public class PandoraActivity extends BaseActivity {
                         .map(result -> result.url);
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:
-                splashImageSingle = girlAtlasSingle;
+                splashImageSingle = girlAtlasSingle();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_NANRENCD:
-                splashImageSingle = nanrencdSingle;
+                splashImageSingle = nanrencdSingle();
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
                 GithubService javlibService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
