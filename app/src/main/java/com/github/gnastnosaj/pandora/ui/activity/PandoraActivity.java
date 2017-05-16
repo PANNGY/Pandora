@@ -127,6 +127,36 @@ public class PandoraActivity extends BaseActivity {
         int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
 
         Single<String> splashImageSingle = null;
+
+        Single<String> girlAtlasSingle = null;
+        Single<String> nanrencdSingle = null;
+
+        GithubService girlAtlasService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+        girlAtlasSingle = girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
+                .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
+                .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("thumbnail"))
+                .singleOrError()
+                .onErrorResumeNext(nanrencdSingle);
+
+        GithubService nanrencdService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+        nanrencdSingle = nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+                .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
+                .flatMap(url ->
+                        nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_GALLERY)
+                                .flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)
+                                        .flatMap(data -> {
+                                            int pageTotal = Integer.parseInt(data.get(0).getAttr("page-total"));
+                                            String nextpage = url + "/" + new Random().nextInt(pageTotal);
+                                            return jsoupDataSource.loadData(nextpage);
+                                        }))
+                )
+                .map(data -> data.get(data.size() > 1 ? new Random().nextInt(data.size() - 1) : 0).getAttr("thumbnail"))
+                .singleOrError()
+                .onErrorResumeNext(girlAtlasSingle);
+
         switch (splashImageDataSource) {
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK:
                 splashImageSingle = Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
@@ -136,30 +166,10 @@ public class PandoraActivity extends BaseActivity {
                         .map(result -> result.url);
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:
-                GithubService girlAtlasService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-                splashImageSingle = girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
-                        .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
-                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("thumbnail"))
-                        .singleOrError();
+                splashImageSingle = girlAtlasSingle;
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_NANRENCD:
-                GithubService nanrencdService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-                splashImageSingle = nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                        .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
-                        .flatMap(url ->
-                                nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_GALLERY)
-                                        .flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)
-                                                .flatMap(data -> {
-                                                    int pageTotal = Integer.parseInt(data.get(0).getAttr("page-total"));
-                                                    String nextpage = url + "/" + new Random().nextInt(pageTotal);
-                                                    return jsoupDataSource.loadData(nextpage);
-                                                }))
-                        )
-                        .map(data -> data.get(data.size() > 1 ? new Random().nextInt(data.size() - 1) : 0).getAttr("thumbnail"))
-                        .singleOrError();
+                splashImageSingle = nanrencdSingle;
                 break;
             case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
                 GithubService javlibService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
