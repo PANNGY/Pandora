@@ -121,24 +121,23 @@ public class PandoraActivity extends BaseActivity {
     }
 
 
-
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int splashImageDataSource = sharedPreferences.getInt(SplashActivity.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
+        int splashImageDataSource = sharedPreferences.getInt(SplashService.PRE_SPLASH_IMAGE_DATA_SOURCE, SplashService.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS);
 
         Single<String> splashImageSingle = null;
 
         switch (splashImageDataSource) {
-            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GANK:
+            case SplashService.SPLASH_IMAGE_DATA_SOURCE_GANK:
                 splashImageSingle = SplashService.gankSingle();
                 break;
-            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:
+            case SplashService.SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS:
                 splashImageSingle = SplashService.girlAtlasSingle();
                 break;
-            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_NANRENCD:
+            case SplashService.SPLASH_IMAGE_DATA_SOURCE_NANRENCD:
                 splashImageSingle = SplashService.nanrencdSingle();
                 break;
-            case SplashActivity.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
+            case SplashService.SPLASH_IMAGE_DATA_SOURCE_JAVLIB:
                 splashImageSingle = SplashService.javlibSingle();
                 break;
         }
@@ -149,7 +148,7 @@ public class PandoraActivity extends BaseActivity {
                 .subscribe(uriString -> {
                     Timber.d("next time splash image: %s", uriString);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString(SplashActivity.PRE_SPLASH_IMAGE, uriString);
+                    editor.putString(SplashService.PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
                     Fresco.getImagePipeline().prefetchToDiskCache(ImageRequest.fromUri(uriString), this);
                 }, throwable -> Timber.w(throwable, "prepare splash image exception"));

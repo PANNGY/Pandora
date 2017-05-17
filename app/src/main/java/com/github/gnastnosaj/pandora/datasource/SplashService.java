@@ -10,6 +10,14 @@ import io.reactivex.Single;
  */
 
 public class SplashService {
+    public final static String PRE_SPLASH_IMAGE = "SPLASH_IMAGE";
+    public final static String PRE_SPLASH_IMAGE_DATA_SOURCE = "SPLASH_IMAGE_DATA_SOURCE";
+
+    public final static int SPLASH_IMAGE_DATA_SOURCE_GANK = 0;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS = 1;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_NANRENCD = 2;
+    public final static int SPLASH_IMAGE_DATA_SOURCE_JAVLIB = 3;
+
     public static Single<String> gankSingle() {
         return Retrofit.newSimpleService(GankService.BASE_URL, GankService.class)
                 .getGankData("福利", 1, 1)
