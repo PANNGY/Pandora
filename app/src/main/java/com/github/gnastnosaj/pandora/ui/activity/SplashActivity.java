@@ -99,9 +99,7 @@ public class SplashActivity extends BaseActivity {
                     }).build();
             splashImage.setController(draweeController);
         } else {
-            Observable.timer(3, TimeUnit.SECONDS).subscribeOn(Schedulers.computation()).subscribe(aLong -> {
-                start();
-            });
+            Observable.timer(3, TimeUnit.SECONDS).subscribeOn(Schedulers.computation()).subscribe(aLong -> start());
         }
 
         splashVersion.setText(getResources().getString(R.string.splash_version, Boilerplate.versionName));
