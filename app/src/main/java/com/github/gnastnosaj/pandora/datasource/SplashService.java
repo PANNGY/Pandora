@@ -15,8 +15,7 @@ public class SplashService {
                 .getGankData("福利", 1, 1)
                 .flatMap(gankData -> Observable.fromIterable(gankData.results))
                 .firstOrError()
-                .map(result -> result.url)
-                .onErrorResumeNext(girlAtlasSingle());
+                .map(result -> result.url);
     }
 
     public static Single<String> girlAtlasSingle() {
@@ -27,7 +26,7 @@ public class SplashService {
                 .flatMap(url -> girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("thumbnail"))
                 .singleOrError()
-                .onErrorResumeNext(nanrencdSingle());
+                .onErrorResumeNext(gankSingle());
     }
 
     public static Single<String> nanrencdSingle() {
@@ -45,7 +44,8 @@ public class SplashService {
                                         }))
                 )
                 .map(data -> data.get(data.size() > 1 ? new Random().nextInt(data.size() - 1) : 0).getAttr("thumbnail"))
-                .singleOrError();
+                .singleOrError()
+                .onErrorResumeNext(girlAtlasSingle());
     }
 
     public static Single<String> javlibSingle() {
@@ -56,6 +56,7 @@ public class SplashService {
                 .flatMap(url -> javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_GALLERY).flatMap(jsoupDataSource -> jsoupDataSource.loadData(url)))
                 .flatMap(data -> Observable.fromIterable(data))
                 .firstOrError()
-                .map(data -> data.getAttr("cover"));
+                .map(data -> data.getAttr("cover"))
+                .onErrorResumeNext(nanrencdSingle());
     }
 }
