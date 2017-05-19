@@ -1,6 +1,6 @@
 {
   "id": "javlib-tab",
-  "baseUrl": "http://www.13vlib.com",
+  "baseUrl": "https://www.13vlib.com",
   "pages": [
     "/vl_update.php",
     "/vl_newrelease.php",
