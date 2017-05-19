@@ -121,5 +121,100 @@
         "format": "{baseUrl}%s"
       }
     }
+  },
+  "searchSelector": {
+    "url": "{baseUrl}/{area}{pages[5]}{keyword}",
+    "cssQuery": "div.videothumblist div.video",
+    "attrSelectors": [
+      {
+        "label": "id",
+        "cssQuery": "a div.id",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "a div.title",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "a img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "url",
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}/{area}/%s"
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "div.page_selector a.next",
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    },
+    "reserveSelector": {
+      "cssQuery": "div.previewthumbs img",
+      "attrSelectors": [
+        {
+          "label": "cover",
+          "global": true,
+          "cssQuery": "img#video_jacket_img",
+          "analyzer": {
+            "method": 1,
+            "args": [
+              "src"
+            ]
+          }
+        },
+        {
+          "label": "thumbnail",
+          "placeholder": "cover",
+          "analyzer": {
+            "method": 1,
+            "args": [
+              "src"
+            ]
+          }
+        }
+      ],
+      "tagSelector": {
+        "global": true,
+        "cssQuery": "div#video_info div[id^=video_] span a",
+        "titleSelector": {
+          "analyzer": {
+            "method": 0
+          }
+        },
+        "urlSelector": {
+          "analyzer": {
+            "method": 1,
+            "args": [
+              "href"
+            ],
+            "format": "{baseUrl}/{area}/%s"
+          }
+        }
+      }
+    }
   }
 }

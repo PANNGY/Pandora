@@ -44,6 +44,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     public TabSelector tabSelector;
     public CatalogSelector catalogSelector;
     public DataSelector dataSelector;
+    public DataSelector searchSelector;
 
     private List<String> history = new ArrayList<>();
     private String currentPage;
@@ -150,9 +151,9 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             List<JSoupData> data = new ArrayList<>();
             try {
                 if (nextPage != null) {
-                    data.addAll(_loadData(nextPage));
+                    data.addAll(_loadData(nextPage, dataSelector));
                 } else {
-                    data.addAll(_loadData(dataSelector.url));
+                    data.addAll(_loadData(dataSelector.url, dataSelector));
                 }
                 subscriber.onNext(data);
             } catch (Exception e) {
@@ -168,7 +169,29 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return loadData();
     }
 
-    public List<JSoupData> _loadData(String page) throws Exception {
+    public Observable<List<JSoupData>> searchData(String keyword) {
+        return Observable.create(subscriber -> {
+            List<JSoupData> data = new ArrayList<>();
+            try {
+                if (searchSelector.method == JSoupSelector.METHOD_GET) {
+                    searchSelector.url = searchSelector.url.replace("{keyword}", keyword);
+                } else if (!MapUtils.isEmpty(searchSelector.data)) {
+                    searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
+                }
+                data.addAll(_loadData(searchSelector.url, searchSelector));
+                if(ListUtils.isEmpty(data)) {
+                    data.addAll(_loadData(searchSelector.url, searchSelector.reserveSelector));
+                }
+                subscriber.onNext(data);
+            } catch (Exception e) {
+                Timber.e(e, "loadData exception");
+                subscriber.onError(e);
+            }
+            subscriber.onComplete();
+        });
+    }
+
+    public List<JSoupData> _loadData(String page, DataSelector dataSelector) throws Exception {
         if (page == null) {
             throw new Exception("page is empty");
         } else {
@@ -262,7 +285,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
                 if (dataSelector.nextPageSelector.autoLoad) {
                     try {
-                        data.addAll(_loadData(nextPage));
+                        data.addAll(_loadData(nextPage, dataSelector));
                     } catch (Exception e) {
                         Timber.w(e, "loadData exception");
                     }
@@ -318,6 +341,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         public JSoupSelector[] attrSelectors;
         public JSoupSelector nextPageSelector;
         public CatalogSelector tagSelector;
+        public DataSelector reserveSelector;
     }
 
     private String betterData(String data) {
