@@ -116,5 +116,89 @@
         "format": "{baseUrl}%s"
       }
     }
+  },
+  "searchSelector": {
+    "url": "{baseUrl}/{area}{pages[4]}{keyword}",
+    "cssQuery": "div#waterfall div.item a.movie-box",
+    "attrSelectors": [
+      {
+        "label": "id",
+        "cssQuery": "div.photo-info date",
+        "analyzer": {
+          "method": 0,
+          "regexp": {
+            "pattern": "\\S+\\s$"
+          }
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "div.photo-info span",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.photo-frame img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "url",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "ul.pagination li a[name^=nextpage]",
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    },
+    "reserveSelector": {
+      "cssQuery": "div.row.movie",
+      "attrSelectors": [
+        {
+          "label": "thumbnail",
+          "cssQuery": "div.screencap img",
+          "analyzer": {
+            "method": 1,
+            "args": [
+              "src"
+            ]
+          }
+        }
+      ],
+      "tagSelector": {
+        "global": true,
+        "cssQuery": "div.row.movie div.info a, div#avatar-water-fall a.avatar-box",
+        "titleSelector": {
+          "analyzer": {
+            "method": 0
+          }
+        },
+        "urlSelector": {
+          "analyzer": {
+            "method": 1,
+            "args": [
+              "href"
+            ]
+          }
+        }
+      }
+    }
   }
 }
