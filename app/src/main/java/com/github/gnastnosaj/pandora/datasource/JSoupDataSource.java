@@ -49,6 +49,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     private List<String> history = new ArrayList<>();
     private String currentPage;
+    private Document currentDocument;
     private String nextPage;
 
     public Observable<List<JSoupLink>> loadTabs() {
@@ -85,7 +86,6 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             try {
                 catalogSelector.url = betterData(catalogSelector.url);
                 Document document = catalogSelector.loadDocument();
-
 
                 if (!TextUtils.isEmpty(catalogSelector.cssQuery)) {
                     List<JSoupCatalog> catalogs = new ArrayList<>();
@@ -170,69 +170,82 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return loadData();
     }
 
-    public Observable<List<JSoupData>> searchData(String keyword) {
-        return Observable.create(subscriber -> {
-            List<JSoupData> data = new ArrayList<>();
-            try {
-                if (searchSelector.method == JSoupSelector.METHOD_GET) {
-                    searchSelector.url = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
-                } else if (!MapUtils.isEmpty(searchSelector.data)) {
-                    searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
-                }
-                data.addAll(_loadData(searchSelector.url, searchSelector));
-            } catch (Exception e) {
-                Timber.e(e, "loadData exception");
-            }
-            try {
-                if (ListUtils.isEmpty(data)) {
-                    data.addAll(_loadData(searchSelector.url, searchSelector.reserveSelector));
-                }
-                subscriber.onNext(data);
-            } catch (Exception e) {
-                Timber.e(e, "loadData exception");
-                subscriber.onError(e);
-            }
-            subscriber.onComplete();
-        });
+    public List<JSoupData> _loadData(String page, DataSelector dataSelector) throws Exception {
+        return _loadData(page, false, dataSelector);
     }
 
-    public List<JSoupData> _loadData(String page, DataSelector dataSelector) throws Exception {
+    public List<JSoupData> _loadData(String page, boolean allow, DataSelector dataSelector) throws Exception {
         if (page == null) {
             throw new Exception("page is empty");
         } else {
-            if (history.contains(page)) {
+            if (!allow && history.contains(page)) {
                 throw new Exception("page is loaded");
             }
             history.add(page);
             currentPage = betterData(page);
             Document document = dataSelector.loadDocument(currentPage);
+            currentDocument = document;
 
-            List<JSoupData> data = new ArrayList<>();
+            return _loadData(document, allow, dataSelector);
+        }
+    }
 
-            JSoupData globalData = new JSoupData();
-            globalData.attrs = new RealmList<>();
-            for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                if (attrSelector.global) {
-                    String attrContent = attrSelector.parse(document, null);
-                    globalData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
+    public List<JSoupData> _loadData(Document document, boolean allow, DataSelector dataSelector) throws Exception {
+
+        List<JSoupData> data = new ArrayList<>();
+
+        JSoupData globalData = new JSoupData();
+        globalData.attrs = new RealmList<>();
+        for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+            if (attrSelector.global) {
+                String attrContent = attrSelector.parse(document, null);
+                globalData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
+            }
+        }
+        for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+            if (!TextUtils.isEmpty(attrSelector.placeholder)) {
+                if (!data.contains(globalData)) {
+                    data.add(globalData);
+                }
+                for (JSoupAttr attr : globalData.attrs) {
+                    if (attr.label.equals(attrSelector.placeholder)) {
+                        globalData.attrs.add(new JSoupAttr(attrSelector.label, attr.content));
+                        break;
+                    }
                 }
             }
+        }
+        if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
+            globalData.tags = new RealmList<>();
+            Elements tagElements = dataSelector.tagSelector.call(document, null);
+            for (Element tagElement : tagElements) {
+                JSoupLink tag = new JSoupLink();
+                if (dataSelector.tagSelector.titleSelector != null) {
+                    String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                    tag.title = tagTitle;
+                }
+                if (dataSelector.tagSelector.urlSelector != null) {
+                    String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                    tag.url = betterData(tagUrl);
+                }
+                globalData.tags.add(tag);
+            }
+        }
+
+        Elements dataElements = dataSelector.call(document);
+        for (Element dataElement : dataElements) {
+            JSoupData jsoupData = new JSoupData();
+            jsoupData.attrs = new RealmList<>();
             for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                if (!TextUtils.isEmpty(attrSelector.placeholder)) {
-                    if (!data.contains(globalData)) {
-                        data.add(globalData);
-                    }
-                    for (JSoupAttr attr : globalData.attrs) {
-                        if (attr.label.equals(attrSelector.placeholder)) {
-                            globalData.attrs.add(new JSoupAttr(attrSelector.label, attr.content));
-                            break;
-                        }
-                    }
+                if (!attrSelector.global) {
+                    String attrContent = attrSelector.parse(document, dataElement);
+                    attrContent = betterData(attrContent);
+                    jsoupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
                 }
             }
-            if (dataSelector.tagSelector != null && dataSelector.tagSelector.global) {
-                globalData.tags = new RealmList<>();
-                Elements tagElements = dataSelector.tagSelector.call(document, null);
+            jsoupData.tags = new RealmList<>();
+            if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
+                Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
                 for (Element tagElement : tagElements) {
                     JSoupLink tag = new JSoupLink();
                     if (dataSelector.tagSelector.titleSelector != null) {
@@ -243,62 +256,73 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                         String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
                         tag.url = betterData(tagUrl);
                     }
-                    globalData.tags.add(tag);
+                    jsoupData.tags.add(tag);
                 }
             }
-
-            Elements dataElements = dataSelector.call(document);
-            for (Element dataElement : dataElements) {
-                JSoupData jsoupData = new JSoupData();
-                jsoupData.attrs = new RealmList<>();
-                for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                    if (!attrSelector.global) {
-                        String attrContent = attrSelector.parse(document, dataElement);
-                        attrContent = betterData(attrContent);
-                        jsoupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
-                    }
-                }
-                jsoupData.tags = new RealmList<>();
-                if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
-                    Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
-                    for (Element tagElement : tagElements) {
-                        JSoupLink tag = new JSoupLink();
-                        if (dataSelector.tagSelector.titleSelector != null) {
-                            String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
-                            tag.title = tagTitle;
-                        }
-                        if (dataSelector.tagSelector.urlSelector != null) {
-                            String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
-                            tag.url = betterData(tagUrl);
-                        }
-                        jsoupData.tags.add(tag);
-                    }
-                }
-                if (!ListUtils.isEmpty(globalData.attrs)) {
-                    jsoupData.attrs.addAll(globalData.attrs);
-                }
-                if (!ListUtils.isEmpty(globalData.tags)) {
-                    jsoupData.tags.addAll(globalData.tags);
-                }
-                data.add(jsoupData);
+            if (!ListUtils.isEmpty(globalData.attrs)) {
+                jsoupData.attrs.addAll(globalData.attrs);
             }
-
-            if (dataSelector.nextPageSelector != null) {
-                nextPage = dataSelector.nextPageSelector.parse(document);
-                nextPage = betterData(nextPage);
-                Timber.w("next page: %s", nextPage);
-
-                if (dataSelector.nextPageSelector.autoLoad) {
-                    try {
-                        data.addAll(_loadData(nextPage, dataSelector));
-                    } catch (Exception e) {
-                        Timber.w(e, "loadData exception");
-                    }
-                }
+            if (!ListUtils.isEmpty(globalData.tags)) {
+                jsoupData.tags.addAll(globalData.tags);
             }
-
-            return data;
+            data.add(jsoupData);
         }
+
+        if (dataSelector.nextPageSelector != null) {
+            nextPage = dataSelector.nextPageSelector.parse(document);
+            nextPage = betterData(nextPage);
+            Timber.w("next page: %s", nextPage);
+
+            if (dataSelector.nextPageSelector.autoLoad) {
+                try {
+                    data.addAll(_loadData(nextPage, dataSelector));
+                } catch (Exception e) {
+                    Timber.w(e, "loadData exception");
+                }
+            }
+        }
+
+        return data;
+    }
+
+    public Observable<List<JSoupData>> searchData(String keyword) {
+        return Observable.create(subscriber -> {
+            List<JSoupData> data = new ArrayList<>();
+            try {
+                data.addAll(_searchData(keyword, searchSelector));
+                subscriber.onNext(data);
+            } catch (Exception e) {
+                Timber.e(e, "loadData exception");
+                subscriber.onError(e);
+            }
+            subscriber.onComplete();
+        });
+    }
+
+    public List<JSoupData> _searchData(String keyword, DataSelector searchSelector) {
+        List<JSoupData> data = new ArrayList<>();
+        try {
+            if (searchSelector.method == JSoupSelector.METHOD_GET) {
+                searchSelector.url = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
+            } else if (!MapUtils.isEmpty(searchSelector.data)) {
+                searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
+            }
+            data.addAll(_loadData(searchSelector.url, true, searchSelector));
+        } catch (Exception e) {
+            Timber.e(e, "loadData exception");
+        }
+        try {
+            if (searchSelector.reserveSelector != null && ListUtils.isEmpty(data)) {
+                if (TextUtils.isEmpty(searchSelector.reserveSelector.url)) {
+                    data.addAll(_loadData(currentDocument, true, searchSelector.reserveSelector));
+                } else {
+                    _searchData(keyword, searchSelector.reserveSelector);
+                }
+            }
+        } catch (Exception e) {
+            Timber.e(e, "loadData exception");
+        }
+        return data;
     }
 
     public void setNextPage(String nextPage) {

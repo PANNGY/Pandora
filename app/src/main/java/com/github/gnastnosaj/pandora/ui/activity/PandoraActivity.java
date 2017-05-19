@@ -68,16 +68,8 @@ public class PandoraActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-        //checkForUpdate();
-        //prepareSplashImage();
-
-        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
-                .flatMap(jsoupDataSource -> jsoupDataSource.searchData("iene 779"))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(jSoupDatas -> {
-                    int i = 0;
-                    int j = 1;
-                });
+        checkForUpdate();
+        prepareSplashImage();
     }
 
     @Override
