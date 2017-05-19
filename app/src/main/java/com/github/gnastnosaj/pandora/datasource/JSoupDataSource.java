@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -174,12 +175,16 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             List<JSoupData> data = new ArrayList<>();
             try {
                 if (searchSelector.method == JSoupSelector.METHOD_GET) {
-                    searchSelector.url = searchSelector.url.replace("{keyword}", keyword);
+                    searchSelector.url = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
                 } else if (!MapUtils.isEmpty(searchSelector.data)) {
                     searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
                 }
                 data.addAll(_loadData(searchSelector.url, searchSelector));
-                if(ListUtils.isEmpty(data)) {
+            } catch (Exception e) {
+                Timber.e(e, "loadData exception");
+            }
+            try {
+                if (ListUtils.isEmpty(data)) {
                     data.addAll(_loadData(searchSelector.url, searchSelector.reserveSelector));
                 }
                 subscriber.onNext(data);
