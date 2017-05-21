@@ -17,6 +17,7 @@ import cn.trinea.android.common.util.ArrayUtils;
 public class JSoupAnalyzer {
     public final static int METHOD_TEXT = 0;
     public final static int METHOD_ATTR = 1;
+    public final static int METHOD_HTML = 2;
 
     public int method;
     public String[] args;
@@ -46,6 +47,9 @@ public class JSoupAnalyzer {
                         }
                     }
                 }
+                break;
+            case METHOD_HTML:
+                content = element.html();
                 break;
         }
         content = betterData(content);

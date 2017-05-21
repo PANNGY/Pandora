@@ -153,10 +153,12 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return Observable.create(subscriber -> {
             List<JSoupData> data = new ArrayList<>();
             try {
-                if (nextPage != null) {
+                if (!TextUtils.isEmpty(nextPage)) {
                     data.addAll(_loadData(nextPage, dataSelector));
-                } else {
+                } else if (!TextUtils.isEmpty(dataSelector.url)) {
                     data.addAll(_loadData(dataSelector.url, dataSelector));
+                } else {
+                    data.addAll(_loadData(baseUrl, dataSelector));
                 }
                 subscriber.onNext(data);
             } catch (Exception e) {
@@ -385,7 +387,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             if (!TextUtils.isEmpty(baseUrl)) {
                 data = data.replace("{baseUrl}", baseUrl);
             }
-            if(!TextUtils.isEmpty(keyword)) {
+            if (!TextUtils.isEmpty(keyword)) {
                 try {
                     data = data.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
                 } catch (UnsupportedEncodingException e) {

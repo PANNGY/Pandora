@@ -7,7 +7,7 @@
       {
         "label": "images",
         "analyzer": {
-          "method": 0
+          "method": 2
         }
       }
     ]
