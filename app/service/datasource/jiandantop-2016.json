@@ -1,5 +1,5 @@
 {
-  "id": "jiandantop2016",
+  "id": "jiandantop-2016",
   "baseUrl": "http://fuliba.net/jiandantop2016.html",
   "dataSelector": {
     "cssQuery": "script",
