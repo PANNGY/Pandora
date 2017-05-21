@@ -20,7 +20,6 @@ import com.github.gnastnosaj.pandora.datasource.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.GithubService;
 import com.github.gnastnosaj.pandora.datasource.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.SplashService;
-import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
@@ -72,16 +71,11 @@ public class PandoraActivity extends BaseActivity {
         //checkForUpdate();
         //prepareSplashImage();
         Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_BTDB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.searchData("abp 585"))
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(jsoupDataSource -> {
-                    jsoupDataSource.searchData("abp 585").subscribe(jSoupDatas -> {
-                        jsoupDataSource.searchData("abp 585").subscribe(jSoupDatas1 -> {
-                            jsoupDataSource.searchData("abp 585").subscribe(jSoupDatas2 -> {
-                                int i = 0;
-                                int j = 1;
-                            });
-                        });
-                    }) ;
+                .subscribe(jSoupDatas -> {
+                    int i = 0;
+                    int j = 1;
                 });
     }
 
