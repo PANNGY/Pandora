@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.trinea.android.common.util.ArrayUtils;
+
 /**
  * Created by jasontsang on 5/3/17.
  */
 
 public class JSoupFilter {
-
+    public JSoupFilter[] filters;
     public String notQuery;
     public String regexp;
     public int[] indexes;
@@ -51,6 +53,11 @@ public class JSoupFilter {
         }
         if (last) {
             elements = new Elements(elements.last());
+        }
+        if (!ArrayUtils.isEmpty(filters)) {
+            for (JSoupFilter filter : filters) {
+                elements = filter.filter(elements);
+            }
         }
         return elements;
     }
