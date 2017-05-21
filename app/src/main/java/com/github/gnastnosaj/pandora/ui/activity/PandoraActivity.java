@@ -71,13 +71,17 @@ public class PandoraActivity extends BaseActivity {
 
         //checkForUpdate();
         //prepareSplashImage();
-        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_JIANDANTOP_2016)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_BTDB)
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(jSoupDatas -> {
-                    JSoupData data = jSoupDatas.get(0);
-                    int i = 0;
-                    int j = 1;
+                .subscribe(jsoupDataSource -> {
+                    jsoupDataSource.searchData("abp 585").subscribe(jSoupDatas -> {
+                        jsoupDataSource.searchData("abp 585").subscribe(jSoupDatas1 -> {
+                            jsoupDataSource.searchData("abp 585").subscribe(jSoupDatas2 -> {
+                                int i = 0;
+                                int j = 1;
+                            });
+                        });
+                    }) ;
                 });
     }
 

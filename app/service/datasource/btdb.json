@@ -81,7 +81,7 @@
     "nextPageSelector": {
       "cssQuery": "div.nav li.button a",
       "filter": {
-        "notquery": ".disabled",
+        "notQuery": ".disabled",
         "last": true
       },
       "analyzer": {

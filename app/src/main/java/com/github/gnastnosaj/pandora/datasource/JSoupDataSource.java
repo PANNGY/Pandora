@@ -170,7 +170,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public Observable<List<JSoupData>> loadData(String page) {
-        nextPage = page;
+        setNextPage(page);
         return loadData();
     }
 
@@ -294,7 +294,13 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             this.keyword = keyword;
             List<JSoupData> data = new ArrayList<>();
             try {
-                data.addAll(_searchData(keyword, searchSelector));
+                if (!TextUtils.isEmpty(nextPage)) {
+                    data.addAll(_searchData(keyword, nextPage, searchSelector));
+                } else if (!TextUtils.isEmpty(searchSelector.url)) {
+                    data.addAll(_searchData(keyword, searchSelector));
+                } else {
+                    data.addAll(_searchData(keyword, baseUrl, searchSelector));
+                }
                 subscriber.onNext(data);
             } catch (Exception e) {
                 Timber.e(e, "loadData exception");
@@ -302,6 +308,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             }
             subscriber.onComplete();
         });
+    }
+
+    public Observable<List<JSoupData>> searchData(String keyword, String page) {
+        setNextPage(page);
+        return searchData(keyword);
     }
 
     public List<JSoupData> _searchData(String keyword, DataSelector searchSelector) {
@@ -312,7 +323,18 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             } else if (!MapUtils.isEmpty(searchSelector.data)) {
                 searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
             }
-            data.addAll(_loadData(searchSelector.url, true, searchSelector));
+            setNextPage(searchSelector.url);
+            data.addAll(_searchData(keyword, nextPage, searchSelector));
+        } catch (Exception e) {
+            Timber.e(e, "loadData exception");
+        }
+        return data;
+    }
+
+    public List<JSoupData> _searchData(String keyword, String page, DataSelector searchSelector) {
+        List<JSoupData> data = new ArrayList<>();
+        try {
+            data.addAll(_loadData(page, true, searchSelector));
         } catch (Exception e) {
             Timber.e(e, "loadData exception");
         }
