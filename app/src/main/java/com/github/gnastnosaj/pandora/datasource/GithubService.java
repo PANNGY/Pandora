@@ -45,5 +45,4 @@ public interface GithubService {
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/request-enhancer.json")
     Observable<List<Request.Enhancer>> getRequestConfigs();
-
 }
