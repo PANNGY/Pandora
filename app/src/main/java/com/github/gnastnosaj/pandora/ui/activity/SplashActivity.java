@@ -19,12 +19,16 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.SplashService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -32,14 +36,6 @@ import timber.log.Timber;
  */
 
 public class SplashActivity extends BaseActivity {
-    public final static String PRE_SPLASH_IMAGE = "SPLASH_IMAGE";
-    public final static String PRE_SPLASH_IMAGE_DATA_SOURCE = "SPLASH_IMAGE_DATA_SOURCE";
-
-    public final static int SPLASH_IMAGE_DATA_SOURCE_GANK = 0;
-    public final static int SPLASH_IMAGE_DATA_SOURCE_GIRL_ATLAS = 1;
-    public final static int SPLASH_IMAGE_DATA_SOURCE_NANRENCD = 2;
-    public final static int SPLASH_IMAGE_DATA_SOURCE_JAVLIB = 3;
-
     @BindView(R.id.splash_image)
     SimpleDraweeView splashImage;
 
@@ -61,7 +57,7 @@ public class SplashActivity extends BaseActivity {
         initSystemBar();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String uriString = sharedPreferences.getString(PRE_SPLASH_IMAGE, null);
+        String uriString = sharedPreferences.getString(SplashService.PRE_SPLASH_IMAGE, null);
 
         if (!TextUtils.isEmpty(uriString)) {
             DraweeController draweeController = Fresco.newDraweeControllerBuilder()
@@ -96,7 +92,7 @@ public class SplashActivity extends BaseActivity {
                     }).build();
             splashImage.setController(draweeController);
         } else {
-            start();
+            Observable.timer(3, TimeUnit.SECONDS).subscribeOn(Schedulers.computation()).subscribe(aLong -> start());
         }
 
         splashVersion.setText(getResources().getString(R.string.splash_version, Boilerplate.versionName));

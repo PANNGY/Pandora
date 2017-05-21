@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.Path;
 
 /**
@@ -16,15 +17,19 @@ import retrofit2.http.Path;
 public interface GitOSCService {
     String BASE_URL = "https://git.oschina.net/";
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/update.json")
     Observable<UpdateData> getUpdateData();
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/datasource/{label}.json")
     Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label);
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/datasource/include.json")
     Observable<List<String>> getDataSources();
 
+    @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/request-enhancer.json")
     Observable<List<Request.Enhancer>> getRequestConfigs();
 }

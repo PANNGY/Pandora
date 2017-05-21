@@ -1,5 +1,6 @@
 {
-  "baseUrl": "https://www.girl-atlas.com",
+  "id": "girl-atlas-gallery",
+  "baseUrl": "https://girl-atlas.com",
   "pages": [
     "/",
     "/index1"

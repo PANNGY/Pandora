@@ -2,8 +2,11 @@ package com.github.gnastnosaj.pandora.datasource;
 
 import android.support.annotation.NonNull;
 
+import com.github.gnastnosaj.boilerplate.Boilerplate;
+
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -20,8 +23,10 @@ public class Retrofit {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
+
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(timeout, TimeUnit.SECONDS)
+                .cache(new Cache(Boilerplate.getInstance().getCacheDir(), 1024 * 1024 * 128))
                 .retryOnConnectionFailure(true).addInterceptor(logging).build();
 
         retrofit2.Retrofit retrofit = new retrofit2.Retrofit.Builder()
