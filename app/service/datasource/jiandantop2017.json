@@ -1,0 +1,14 @@
+{
+  "baseUrl": "http://fuliba.net/jiandantop2017.html",
+  "dataSelector": {
+    "cssQuery": "script",
+    "attrSelectors": [
+      {
+        "label": "images",
+        "analyzer": {
+          "method": 0
+        }
+      }
+    ]
+  }
+}
