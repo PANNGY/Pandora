@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     private String currentPage;
     private Document currentDocument;
     private String nextPage;
+    private String keyword;
 
     public Observable<List<JSoupLink>> loadTabs() {
         return Observable.create(subscriber -> {
@@ -287,6 +289,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
 
     public Observable<List<JSoupData>> searchData(String keyword) {
         return Observable.create(subscriber -> {
+            this.keyword = keyword;
             List<JSoupData> data = new ArrayList<>();
             try {
                 data.addAll(_searchData(keyword, searchSelector));
@@ -381,6 +384,13 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             }
             if (!TextUtils.isEmpty(baseUrl)) {
                 data = data.replace("{baseUrl}", baseUrl);
+            }
+            if(!TextUtils.isEmpty(keyword)) {
+                try {
+                    data = data.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    Timber.e(e, "betterData exception");
+                }
             }
             if (!ArrayUtils.isEmpty(pages)) {
                 Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(data);

@@ -1,0 +1,96 @@
+{
+  "id": "btdb",
+  "baseUrl": "https://btdb.in",
+  "pages": [
+    "/",
+    "/q"
+  ],
+  "searchSelector": {
+    "url": "{baseUrl}{pages[1]}/{keyword}/",
+    "cssQuery": "li.search-ret-item",
+    "attrSelectors": [
+      {
+        "label": "title",
+        "cssQuery": "h2.item-title a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "title"
+          ]
+        }
+      },
+      {
+        "label": "magnet",
+        "cssQuery": "div.item-meta-info a.magnet",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      },
+      {
+        "label": "size",
+        "cssQuery": "span.item-meta-info-value",
+        "filter": {
+          "indexes": [
+            0
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "files",
+        "cssQuery": "span.item-meta-info-value",
+        "filter": {
+          "indexes": [
+            1
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "addTime",
+        "cssQuery": "span.item-meta-info-value",
+        "filter": {
+          "indexes": [
+            2
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "popularity",
+        "cssQuery": "span.item-meta-info-value",
+        "filter": {
+          "indexes": [
+            3
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "div.nav li.button a",
+      "filter": {
+        "notquery": ".disabled",
+        "last": true
+      },
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}{pages[1]}/{keyword}/%s"
+      }
+    }
+  }
+}
