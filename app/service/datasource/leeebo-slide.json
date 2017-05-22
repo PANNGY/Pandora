@@ -1,0 +1,46 @@
+{
+  "id": "leeebo-slide",
+  "baseUrl": "http://m.leeebo.com",
+  "pages": [
+    "/",
+    "/vod-type-id-1-pg-1.html",
+    "/vod-type-id-2-pg-1.html",
+    "/vod-type-id-3-pg-1.html",
+    "/vod-type-id-16-pg-1.html",
+    "/",
+    "/vod-type-id-20-pg-1.html",
+    "/index.php?m=vod-search"
+  ],
+  "dataSelector": {
+    "cssQuery": "section.main ul#focusCon li",
+    "attrSelectors": [
+      {
+        "label": "title",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "href",
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}%s"
+        }
+      }
+    ]
+  }
+}

@@ -371,7 +371,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
                 searchSelector.url = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
                 searchSelector.url = searchSelector.url.replace("(keyword)", keyword);
             } else if (!MapUtils.isEmpty(searchSelector.data)) {
-                searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
+                for (Map.Entry<String, String> entry : searchSelector.data.entrySet()) {
+                    if (entry.getValue().contains("{keyword}")) {
+                        entry.setValue(entry.getValue().replace("{keyword}", keyword));
+                    }
+                }
             }
             setNextPage(searchSelector.url);
             data.addAll(_searchData(keyword, nextPage, searchSelector));
