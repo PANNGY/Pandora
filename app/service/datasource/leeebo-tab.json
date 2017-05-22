@@ -58,7 +58,7 @@
       }
     ],
     "nextPageSelector": {
-      "cssQuery": "ul.pagination a.pagelink_a",
+      "cssQuery": "div.ui-pages a.pagelink_a",
       "filter": {
         "regexp": "下一页"
       },

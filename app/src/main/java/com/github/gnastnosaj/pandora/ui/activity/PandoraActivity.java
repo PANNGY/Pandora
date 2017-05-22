@@ -70,8 +70,8 @@ public class PandoraActivity extends BaseActivity {
 
 //        checkForUpdate();
 //        prepareSplashImage();
-        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_HOME)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
+        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadData("http://m.leeebo.com/vod-type-id-1-pg-1.html"))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(jSoupDatas -> {
                     int i = 0;
