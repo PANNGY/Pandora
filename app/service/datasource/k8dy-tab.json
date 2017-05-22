@@ -76,5 +76,72 @@
         "format": "{baseUrl}%s"
       }
     }
+  },
+  "searchSelector": {
+    "url": "{baseUrl}{pages[7]}{keyword}",
+    "headers": {
+      "Accept": "*/*",
+      "Accept-Encoding": "gzip, deflate, sdch",
+      "Accept-Language": "en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,ja;q=0.2",
+      "DNT": "1",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
+    },
+    "cssQuery": "div.index-area ul li a.link-hover",
+    "attrSelectors": [
+      {
+        "label": "href",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}%s"
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "data-original"
+          ]
+        }
+      },
+      {
+        "label": "hd",
+        "cssQuery": "p.other",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "span.lzbz p.name",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "des",
+        "cssQuery": "span.lzbz p.actor",
+        "analyzer": {
+          "method": 0
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "div.page.mb a",
+      "filter": {
+        "regexp": ">"
+      },
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
   }
 }

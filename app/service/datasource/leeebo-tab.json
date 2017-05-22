@@ -70,5 +70,56 @@
         "format": "{baseUrl}%s"
       }
     }
+  },
+  "searchSelector": {
+    "url": "{baseUrl}{pages[7]}",
+    "method": 1,
+    "data": {
+      "wd": "{keyword}"
+    },
+    "cssQuery": "section#search_main ul#data_list li",
+    "attrSelectors": [
+      {
+        "label": "href",
+        "cssQuery": "div.txt span.sTit a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}%s"
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.pic img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "data-src"
+          ]
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "div.txt span.sTit a",
+        "analyzer": {
+          "method": 0
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "div.ui-pages a.pagelink_a",
+      "filter": {
+        "regexp": "下一页"
+      },
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
   }
 }
