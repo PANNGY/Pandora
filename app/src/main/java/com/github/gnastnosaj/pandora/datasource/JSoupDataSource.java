@@ -236,40 +236,91 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             }
         }
 
-        Elements dataElements = dataSelector.call(document);
-        for (Element dataElement : dataElements) {
-            JSoupData jsoupData = new JSoupData();
-            jsoupData.attrs = new RealmList<>();
-            for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
-                if (!attrSelector.global) {
-                    String attrContent = attrSelector.parse(document, dataElement);
-                    attrContent = betterData(attrContent);
-                    jsoupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
+        if (dataSelector.groupSelector != null) {
+            Elements groupElements = dataSelector.call(document);
+            for (Element groupElement : groupElements) {
+                JSoupData groupData = new JSoupData();
+                groupData.attrs = new RealmList<>();
+                for (JSoupSelector attrSelector : dataSelector.groupSelector.attrSelectors) {
+                    if (!attrSelector.global) {
+                        String attrContent = attrSelector.parse(document, groupElement);
+                        attrContent = betterData(attrContent);
+                        groupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
+                    }
+                }
+                Elements dataElements = dataSelector.call(document, groupElement);
+                for (Element dataElement : dataElements) {
+                    JSoupData jsoupData = new JSoupData();
+                    jsoupData.group = groupData;
+                    jsoupData.attrs = new RealmList<>();
+                    for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                        if (!attrSelector.global) {
+                            String attrContent = attrSelector.parse(document, dataElement);
+                            attrContent = betterData(attrContent);
+                            jsoupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
+                        }
+                    }
+                    jsoupData.tags = new RealmList<>();
+                    if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
+                        Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
+                        for (Element tagElement : tagElements) {
+                            JSoupLink tag = new JSoupLink();
+                            if (dataSelector.tagSelector.titleSelector != null) {
+                                String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                                tag.title = tagTitle;
+                            }
+                            if (dataSelector.tagSelector.urlSelector != null) {
+                                String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                                tag.url = betterData(tagUrl);
+                            }
+                            jsoupData.tags.add(tag);
+                        }
+                    }
+                    if (!ListUtils.isEmpty(globalData.attrs)) {
+                        jsoupData.attrs.addAll(globalData.attrs);
+                    }
+                    if (!ListUtils.isEmpty(globalData.tags)) {
+                        jsoupData.tags.addAll(globalData.tags);
+                    }
+                    data.add(jsoupData);
                 }
             }
-            jsoupData.tags = new RealmList<>();
-            if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
-                Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
-                for (Element tagElement : tagElements) {
-                    JSoupLink tag = new JSoupLink();
-                    if (dataSelector.tagSelector.titleSelector != null) {
-                        String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
-                        tag.title = tagTitle;
+        } else {
+            Elements dataElements = dataSelector.call(document);
+            for (Element dataElement : dataElements) {
+                JSoupData jsoupData = new JSoupData();
+                jsoupData.attrs = new RealmList<>();
+                for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
+                    if (!attrSelector.global) {
+                        String attrContent = attrSelector.parse(document, dataElement);
+                        attrContent = betterData(attrContent);
+                        jsoupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
                     }
-                    if (dataSelector.tagSelector.urlSelector != null) {
-                        String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
-                        tag.url = betterData(tagUrl);
-                    }
-                    jsoupData.tags.add(tag);
                 }
+                jsoupData.tags = new RealmList<>();
+                if (dataSelector.tagSelector != null && !dataSelector.tagSelector.global) {
+                    Elements tagElements = dataSelector.tagSelector.call(document, dataElement);
+                    for (Element tagElement : tagElements) {
+                        JSoupLink tag = new JSoupLink();
+                        if (dataSelector.tagSelector.titleSelector != null) {
+                            String tagTitle = dataSelector.tagSelector.titleSelector.parse(document, tagElement);
+                            tag.title = tagTitle;
+                        }
+                        if (dataSelector.tagSelector.urlSelector != null) {
+                            String tagUrl = dataSelector.tagSelector.urlSelector.parse(document, tagElement);
+                            tag.url = betterData(tagUrl);
+                        }
+                        jsoupData.tags.add(tag);
+                    }
+                }
+                if (!ListUtils.isEmpty(globalData.attrs)) {
+                    jsoupData.attrs.addAll(globalData.attrs);
+                }
+                if (!ListUtils.isEmpty(globalData.tags)) {
+                    jsoupData.tags.addAll(globalData.tags);
+                }
+                data.add(jsoupData);
             }
-            if (!ListUtils.isEmpty(globalData.attrs)) {
-                jsoupData.attrs.addAll(globalData.attrs);
-            }
-            if (!ListUtils.isEmpty(globalData.tags)) {
-                jsoupData.tags.addAll(globalData.tags);
-            }
-            data.add(jsoupData);
         }
 
         if (dataSelector.nextPageSelector != null) {
@@ -394,6 +445,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
     }
 
     public static class DataSelector extends JSoupSelector {
+        public DataSelector groupSelector;
         public JSoupSelector[] attrSelectors;
         public JSoupSelector nextPageSelector;
         public CatalogSelector tagSelector;

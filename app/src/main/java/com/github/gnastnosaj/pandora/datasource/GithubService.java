@@ -29,6 +29,8 @@ public interface GithubService {
     String DATE_SOURCE_JIANDANTOP_2016 = "jiandantop-2016";
     String DATE_SOURCE_JIANDANTOP_2017 = "jiandantop-2017";
     String DATE_SOURCE_BTDB = "btdb";
+    String DATE_SOURCE_K8DY_HOME = "k8dy-home";
+    String DATE_SOURCE_K8DY_TAB = "k8dy-tab";
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/update.json")

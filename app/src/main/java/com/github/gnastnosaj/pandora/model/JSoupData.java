@@ -8,6 +8,7 @@ import io.realm.RealmObject;
  */
 
 public class JSoupData extends RealmObject {
+    public JSoupData group;
     public RealmList<JSoupAttr> attrs;
     public RealmList<JSoupLink> tags;
 

@@ -18,6 +18,7 @@ import cn.trinea.android.common.util.ArrayUtils;
 
 public class JSoupFilter {
     public JSoupFilter[] filters;
+    public String cssQuery;
     public String notQuery;
     public String regexp;
     public int[] indexes;
@@ -25,6 +26,9 @@ public class JSoupFilter {
     public boolean last;
 
     public Elements filter(Elements elements) {
+        if (!TextUtils.isEmpty(cssQuery)) {
+            elements = elements.select(cssQuery);
+        }
         if (!TextUtils.isEmpty(notQuery)) {
             elements = elements.not(notQuery);
         }
