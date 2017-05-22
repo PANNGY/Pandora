@@ -38,7 +38,11 @@
           "method": 1,
           "args": [
             "data-original"
-          ]
+          ],
+          "regexp": {
+            "pattern": "^/",
+            "format": "{baseUrl}%s"
+          }
         }
       },
       {

@@ -72,7 +72,11 @@ public class JSoupAnalyzer {
                     Pattern pattern = Pattern.compile(regexp.pattern);
                     Matcher matcher = pattern.matcher(data);
                     if (matcher.find()) {
-                        data = matcher.group().trim();
+                        if(TextUtils.isEmpty(regexp.format)) {
+                            data = matcher.group().trim();
+                        }else {
+                            data = String.format(regexp.format, data);
+                        }
                     }
                 }
             }
@@ -83,5 +87,6 @@ public class JSoupAnalyzer {
     public static class JSoupRegexp {
         public String pattern;
         public String replace;
+        public String format;
     }
 }
