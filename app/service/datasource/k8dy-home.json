@@ -25,6 +25,9 @@
         {
           "cssQuery": "h1.title",
           "label": "title",
+          "regexp": {
+            "pattern": "[\u4e00-\u9fa5]+$"
+          },
           "analyzer": {
             "method": 2
           }

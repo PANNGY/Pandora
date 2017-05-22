@@ -26,6 +26,9 @@ public class JSoupFilter {
     public boolean last;
 
     public Elements filter(Elements elements) {
+        if (elements == null || elements.isEmpty()) {
+            return elements;
+        }
         if (!TextUtils.isEmpty(cssQuery)) {
             elements = elements.select(cssQuery);
         }

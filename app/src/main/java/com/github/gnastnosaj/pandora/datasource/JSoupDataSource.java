@@ -237,16 +237,14 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         }
 
         if (dataSelector.groupSelector != null) {
-            Elements groupElements = dataSelector.call(document);
+            Elements groupElements = dataSelector.groupSelector.call(document);
             for (Element groupElement : groupElements) {
                 JSoupData groupData = new JSoupData();
                 groupData.attrs = new RealmList<>();
                 for (JSoupSelector attrSelector : dataSelector.groupSelector.attrSelectors) {
-                    if (!attrSelector.global) {
-                        String attrContent = attrSelector.parse(document, groupElement);
-                        attrContent = betterData(attrContent);
-                        groupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
-                    }
+                    String attrContent = attrSelector.parse(document, groupElement);
+                    attrContent = betterData(attrContent);
+                    groupData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
                 }
                 Elements dataElements = dataSelector.call(document, groupElement);
                 for (Element dataElement : dataElements) {
