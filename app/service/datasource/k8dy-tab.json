@@ -78,7 +78,7 @@
     }
   },
   "searchSelector": {
-    "url": "{baseUrl}{pages[7]}{keyword}",
+    "url": "{baseUrl}{pages[7]}(keyword)",
     "headers": {
       "Accept": "*/*",
       "Accept-Encoding": "gzip, deflate, sdch",

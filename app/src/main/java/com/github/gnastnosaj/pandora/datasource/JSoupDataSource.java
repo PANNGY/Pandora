@@ -369,6 +369,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         try {
             if (searchSelector.method == JSoupSelector.METHOD_GET) {
                 searchSelector.url = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
+                searchSelector.url = searchSelector.url.replace("(keyword)", keyword);
             } else if (!MapUtils.isEmpty(searchSelector.data)) {
                 searchSelector.data.replaceAll((k, v) -> v.replace("{keyword}", keyword));
             }
@@ -462,6 +463,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             if (!TextUtils.isEmpty(keyword)) {
                 try {
                     data = data.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
+                    data = data.replace("(keyword)", keyword);
                 } catch (UnsupportedEncodingException e) {
                     Timber.e(e, "betterData exception");
                 }
