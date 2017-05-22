@@ -1,5 +1,6 @@
-package com.github.gnastnosaj.pandora.datasource;
+package com.github.gnastnosaj.pandora.datasource.service;
 
+import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.model.UpdateData;
 import com.github.gnastnosaj.pandora.network.Request;
 

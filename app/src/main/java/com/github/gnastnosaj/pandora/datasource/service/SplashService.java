@@ -1,4 +1,4 @@
-package com.github.gnastnosaj.pandora.datasource;
+package com.github.gnastnosaj.pandora.datasource.service;
 
 import java.util.Random;
 

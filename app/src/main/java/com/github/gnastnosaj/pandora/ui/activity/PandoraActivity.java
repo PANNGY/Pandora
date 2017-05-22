@@ -16,10 +16,10 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.datasource.GitOSCService;
-import com.github.gnastnosaj.pandora.datasource.GithubService;
-import com.github.gnastnosaj.pandora.datasource.Retrofit;
-import com.github.gnastnosaj.pandora.datasource.SplashService;
+import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
+import com.github.gnastnosaj.pandora.datasource.service.GithubService;
+import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
+import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
@@ -68,15 +68,8 @@ public class PandoraActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-//        checkForUpdate();
-//        prepareSplashImage();
-        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE)
-                .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(jSoupDatas -> {
-                    int i = 0;
-                    int j = 1;
-                });
+        checkForUpdate();
+        prepareSplashImage();
     }
 
     @Override

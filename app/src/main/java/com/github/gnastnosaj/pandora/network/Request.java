@@ -1,8 +1,8 @@
 package com.github.gnastnosaj.pandora.network;
 
-import com.github.gnastnosaj.pandora.datasource.GitOSCService;
-import com.github.gnastnosaj.pandora.datasource.GithubService;
-import com.github.gnastnosaj.pandora.datasource.Retrofit;
+import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
+import com.github.gnastnosaj.pandora.datasource.service.GithubService;
+import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 
 import java.net.InetAddress;
 import java.util.List;

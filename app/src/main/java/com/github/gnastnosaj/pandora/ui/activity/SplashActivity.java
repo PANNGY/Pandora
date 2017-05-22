@@ -19,7 +19,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.datasource.SplashService;
+import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
