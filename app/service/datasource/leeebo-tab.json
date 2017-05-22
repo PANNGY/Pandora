@@ -1,28 +1,22 @@
 {
-  "id": "k8dy-tab",
-  "baseUrl": "http://www.k8dy.top",
+  "id": "leeebo-home",
+  "baseUrl": "http://m.leeebo.com",
   "pages": [
     "/",
-    "/frim/index1.html",
-    "/frim/index2.html",
-    "/frim/index3.html",
-    "/frim/index4.html",
-    "/frim/index18.html",
-    "/frim/index19.html",
-    "/search.php?searchword="
+    "/vod-type-id-1-pg-1.html",
+    "/vod-type-id-2-pg-1.html",
+    "/vod-type-id-3-pg-1.html",
+    "/vod-type-id-16-pg-1.html",
+    "/",
+    "/vod-type-id-20-pg-1.html",
+    "/index.php?m=vod-search"
   ],
   "dataSelector": {
-    "headers": {
-      "Accept": "*/*",
-      "Accept-Encoding": "gzip, deflate, sdch",
-      "Accept-Language": "en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,ja;q=0.2",
-      "DNT": "1",
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
-    },
-    "cssQuery": "div.index-area ul li a.link-hover",
+    "cssQuery": "section.main div.globalPadding li div.con",
     "attrSelectors": [
       {
         "label": "href",
+        "cssQuery": "a",
         "analyzer": {
           "method": 1,
           "args": [
@@ -37,36 +31,36 @@
         "analyzer": {
           "method": 1,
           "args": [
-            "data-original"
+            "src"
           ]
         }
       },
       {
         "label": "hd",
-        "cssQuery": "p.other",
+        "cssQuery": "span.sNum",
         "analyzer": {
           "method": 0
         }
       },
       {
         "label": "title",
-        "cssQuery": "span.lzbz p.name",
+        "cssQuery": "span.sTit",
         "analyzer": {
           "method": 0
         }
       },
       {
         "label": "des",
-        "cssQuery": "span.lzbz p.actor",
+        "cssQuery": "span.sDes",
         "analyzer": {
           "method": 0
         }
       }
     ],
     "nextPageSelector": {
-      "cssQuery": "div.page.mb a",
+      "cssQuery": "ul.pagination a.pagelink_a",
       "filter": {
-        "regexp": ">"
+        "regexp": "下一页"
       },
       "analyzer": {
         "method": 1,

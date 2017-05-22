@@ -1,0 +1,84 @@
+{
+  "id": "leeebo-home",
+  "baseUrl": "http://m.leeebo.com",
+  "pages": [
+    "/",
+    "/vod-type-id-1-pg-1.html",
+    "/vod-type-id-2-pg-1.html",
+    "/vod-type-id-3-pg-1.html",
+    "/vod-type-id-16-pg-1.html",
+    "/",
+    "/vod-type-id-20-pg-1.html",
+    "/index.php?m=vod-search"
+  ],
+  "dataSelector": {
+    "groupSelector": {
+      "cssQuery": "section.main div.mod_a.globalPadding",
+      "attrSelectors": [
+        {
+          "cssQuery": "div.th_a span.sMark",
+          "label": "title",
+          "analyzer": {
+            "method": 0
+          }
+        },
+        {
+          "label": "href",
+          "cssQuery": "div.th_a a",
+          "analyzer": {
+            "method": 1,
+            "args": [
+              "href"
+            ],
+            "format": "{baseUrl}%s"
+          }
+        }
+      ]
+    },
+    "cssQuery": "div.tb_a ul#data_list li div.con",
+    "attrSelectors": [
+      {
+        "label": "href",
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}%s"
+        }
+      },
+      {
+        "label": "thumbnail",
+        "cssQuery": "img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "hd",
+        "cssQuery": "span.sNum",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "span.sTit",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "des",
+        "cssQuery": "span.sDes",
+        "analyzer": {
+          "method": 0
+        }
+      }
+    ]
+  }
+}
