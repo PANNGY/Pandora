@@ -26,7 +26,7 @@ import io.realm.RealmResults;
 public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
-    private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+    private RealmConfiguration realmConfig;
 
     private JSoupDataSource leeeboTabDataSource;
     private JSoupDataSource k8dyTabDataSource;
@@ -38,6 +38,7 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
     private CountDownLatch loadMoreLock;
 
     public PandoraTabDataSource(int tab) {
+        realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB_" + tab).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
 
