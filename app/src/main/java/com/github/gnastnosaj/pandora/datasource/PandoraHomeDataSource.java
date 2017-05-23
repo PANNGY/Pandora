@@ -2,6 +2,7 @@ package com.github.gnastnosaj.pandora.datasource;
 
 import android.content.Context;
 
+import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
@@ -12,6 +13,7 @@ import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +48,18 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
         dataSources = new ArrayList<>();
 
-        Observable.merge(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE),
+        Observable<JSoupDataSource> init = Observable.merge(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE),
                 githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_HOME),
                 githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_HOME))
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(jSoupDataSource -> {
-                    dataSources.add(jSoupDataSource);
+                .retry();
+
+        if (context instanceof BaseActivity) {
+            init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
+        init.subscribeOn(Schedulers.newThread())
+                .subscribe(jsoupDataSource -> {
+                    dataSources.add(jsoupDataSource);
                     initLock.countDown();
                 });
     }

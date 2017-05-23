@@ -1,5 +1,8 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import android.content.Context;
+
+import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
@@ -8,6 +11,7 @@ import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +41,12 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
     private CountDownLatch refreshLock;
     private CountDownLatch loadMoreLock;
 
-    public PandoraTabDataSource(int tab) {
+    public PandoraTabDataSource(Context context, int tab) {
         realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB_" + tab).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
 
-        Observable.zip(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB),
+        Observable init = Observable.zip(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB),
                 githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_TAB),
                 (leeeboTabDataSource, k8dyTabDataSource) -> {
                     leeeboTabDataSource.setNextPage(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab]);
@@ -50,8 +54,13 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
                     this.leeeboTabDataSource = leeeboTabDataSource;
                     this.k8dyTabDataSource = k8dyTabDataSource;
                     return true;
-                })
-                .subscribeOn(Schedulers.newThread())
+                }).retry();
+
+        if (context instanceof BaseActivity) {
+            init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
+        init.subscribeOn(Schedulers.newThread())
                 .subscribe(success -> initLock.countDown());
     }
 

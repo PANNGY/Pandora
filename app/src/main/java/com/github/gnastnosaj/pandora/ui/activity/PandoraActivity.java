@@ -143,6 +143,7 @@ public class PandoraActivity extends BaseActivity {
         }
 
         splashImageSingle
+                .retry()
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(uriString -> {
@@ -151,6 +152,6 @@ public class PandoraActivity extends BaseActivity {
                     editor.putString(SplashService.PRE_SPLASH_IMAGE, uriString);
                     editor.apply();
                     Fresco.getImagePipeline().prefetchToDiskCache(ImageRequest.fromUri(uriString), this);
-                }, throwable -> Timber.w(throwable, "prepare splash image exception"));
+                });
     }
 }
