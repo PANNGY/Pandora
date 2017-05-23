@@ -15,6 +15,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
+import com.github.gnastnosaj.pandora.datasource.PandoraTabDataSource;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
@@ -33,6 +34,7 @@ import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.trinea.android.common.util.PackageUtils;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -70,6 +72,15 @@ public class PandoraActivity extends BaseActivity {
 
         checkForUpdate();
         prepareSplashImage();
+
+        Observable.create(subscriber -> {
+            subscriber.onNext(new PandoraTabDataSource(5).refresh());
+            subscriber.onComplete();
+        }).subscribeOn(Schedulers.newThread())
+                .subscribe(data -> {
+                    int i = 0;
+                    int j = 1;
+                });
     }
 
     @Override

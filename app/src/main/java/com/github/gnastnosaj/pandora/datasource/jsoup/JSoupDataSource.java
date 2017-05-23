@@ -406,6 +406,10 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return data;
     }
 
+    public String getNextPage() {
+        return nextPage;
+    }
+
     public void setNextPage(String nextPage) {
         this.nextPage = nextPage;
     }
