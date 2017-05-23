@@ -143,7 +143,7 @@ public class PandoraActivity extends BaseActivity {
         }
 
         splashImageSingle
-                .retry()
+                .retry(3)
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(uriString -> {
