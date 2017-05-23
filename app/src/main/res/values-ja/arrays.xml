@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pandora_home_groups">
+        <item>人気がある</item>
+        <item>映画</item>
+        <item>テレビドラマ</item>
+        <item>バラエティー</item>
+        <item>アニメ</item>
+        <item>マイクロ映画</item>
+        <item>福祉</item>
+    </string-array>
+    <string-array name="pandora_tabs">
+        <item>トップページ</item>
+        <item>映画</item>
+        <item>テレビドラマ</item>
+        <item>バラエティー</item>
+        <item>アニメ</item>
+        <item>マイクロ映画</item>
+        <item>福祉</item>
+    </string-array>
+</resources>

@@ -1,10 +1,14 @@
 package com.github.gnastnosaj.pandora.datasource;
 
+import android.content.Context;
+
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
+import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
+import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
@@ -13,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -27,23 +32,28 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
-    private JSoupDataSource leeeboHomeDataSource;
-    private JSoupDataSource k8dyHomeDataSource;
+    private String[] groups;
+
+    private List<JSoupDataSource> dataSources;
 
     private CountDownLatch initLock;
     private CountDownLatch refreshLock;
 
-    public PandoraHomeDataSource() {
-        initLock = new CountDownLatch(1);
+    public PandoraHomeDataSource(Context context) {
+        groups = context.getResources().getStringArray(R.array.pandora_home_groups);
 
-        githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_HOME)
-                .zipWith(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_HOME), (jsoupDataSource1, jsoupDataSource2) -> {
-                    leeeboHomeDataSource = jsoupDataSource1;
-                    k8dyHomeDataSource = jsoupDataSource2;
-                    return true;
-                })
+        initLock = new CountDownLatch(3);
+
+        dataSources = new ArrayList<>();
+
+        Observable.merge(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE),
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_HOME),
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_HOME))
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(success -> initLock.countDown());
+                .subscribe(jSoupDataSource -> {
+                    dataSources.add(jSoupDataSource);
+                    initLock.countDown();
+                });
     }
 
     @Override
@@ -66,12 +76,18 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
         initLock.await();
 
-        leeeboHomeDataSource.loadData().zipWith(k8dyHomeDataSource.loadData(), (jsoupData1, jsoupData2) -> {
-            data.addAll(jsoupData1);
-            data.addAll(jsoupData2);
-            return true;
-        }).subscribeOn(Schedulers.newThread())
-                .subscribe(success -> {
+        Observable.zip(dataSources.get(0).loadData(),
+                dataSources.get(1).loadData(),
+                dataSources.get(2).loadData(),
+                (data1, data2, data3) -> {
+                    List<JSoupData> jsoupData = new ArrayList<>();
+                    jsoupData.addAll(data1);
+                    jsoupData.addAll(data2);
+                    jsoupData.addAll(data3);
+                    return jsoupData;
+                }).subscribeOn(Schedulers.newThread())
+                .subscribe(jsoupData -> {
+                    data.addAll(jsoupData);
                     Realm realm = Realm.getInstance(realmConfig);
                     realm.executeTransactionAsync(bgRealm -> {
                         bgRealm.delete(JSoupData.class);
@@ -80,6 +96,8 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
                     realm.close();
                     refreshLock.countDown();
                 }, throwable -> refreshLock.countDown());
+
+        refreshLock.await();
 
         return fromJSoupData(data);
     }
@@ -95,16 +113,116 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
     }
 
     public static class Model {
-        public final static int TYPE_SLIDE = 0;
-        public final static int TYPE_GROUP = 1;
-        public final static int TYPE_DATA = 2;
+        public final static String TYPE_SLIDE = "slide";
+        public final static String TYPE_GROUP = "group";
+        public final static String TYPE_DATA = "data";
 
-        public int type;
+        public String type;
         public Object data;
     }
 
     private List<Model> fromJSoupData(List<JSoupData> jsoupData) {
         List<Model> models = new ArrayList<>();
+
+        Model slideModel = new Model();
+        slideModel.type = Model.TYPE_SLIDE;
+        List<JSoupData> slideData = new ArrayList<>();
+        for (JSoupData data : jsoupData) {
+            for (JSoupAttr attr : data.attrs) {
+                if (attr.label.equals("type") && attr.content.equals(Model.TYPE_SLIDE)) {
+                    slideData.add(data);
+                    break;
+                }
+            }
+        }
+        slideModel.data = slideData;
+        models.add(slideModel);
+
+        for (String group : groups) {
+            Model model = new Model();
+            model.type = Model.TYPE_GROUP;
+            model.data = group;
+            models.add(model);
+        }
+
+        for (JSoupData data : jsoupData) {
+            for (JSoupAttr attr : data.attrs) {
+                if (attr.label.equals("type") && attr.content.equals(Model.TYPE_DATA)) {
+                    for (JSoupAttr groupAttr : data.group.attrs) {
+                        if (groupAttr.label.equals("title")) {
+                            int position = -1;
+                            switch (groupAttr.content) {
+                                case "热门":
+                                case "热门推荐":
+                                case "热门影片":
+                                case "热门电影":
+                                case "推荐影片":
+                                    position = getPosition(models, groups[0]);
+                                    break;
+                                case "电影":
+                                case "影片":
+                                    position = getPosition(models, groups[1]);
+                                    break;
+                                case "电视剧":
+                                case "连续剧":
+                                    position = getPosition(models, groups[2]);
+                                    break;
+                                case "综艺":
+                                case "综艺节目":
+                                case "真人秀":
+                                    position = getPosition(models, groups[3]);
+                                    break;
+                                case "动漫":
+                                case "动画":
+                                case "动画片":
+                                    position = getPosition(models, groups[4]);
+                                    break;
+                                case "微电影":
+                                case "微影片":
+                                    position = getPosition(models, groups[5]);
+                                    break;
+                                case "福利":
+                                case "伦理":
+                                case "伦理片":
+                                    position = getPosition(models, groups[6]);
+                                    break;
+                            }
+                            if (position != -1) {
+                                Model model = new Model();
+                                model.type = Model.TYPE_DATA;
+                                model.data = data;
+                                if (position < models.size()) {
+                                    models.add(position, model);
+                                } else {
+                                    models.add(model);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         return models;
+    }
+
+    private int getPosition(List<Model> models, String group) {
+        int position = -1;
+        for (int i = 0; i < models.size(); i++) {
+            if (models.get(i).type.equals(Model.TYPE_GROUP) && models.get(i).data.equals(group)) {
+                position = i;
+                break;
+            }
+        }
+        while (position + 1 < models.size()) {
+            if (models.get(position + 1).type.equals(Model.TYPE_GROUP)) {
+                break;
+            } else {
+                position++;
+            }
+        }
+        return position + 1;
     }
 }

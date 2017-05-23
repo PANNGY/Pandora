@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pandora_home_groups">
+        <item>POPULAR</item>
+        <item>MOVIES</item>
+        <item>TELEVISION SHOWS</item>
+        <item>VARIETY SHOWS</item>
+        <item>ANIMATION</item>
+        <item>MICRO FILM</item>
+        <item>WELFARE</item>
+    </string-array>
+    <string-array name="pandora_tabs">
+        <item>HOME</item>
+        <item>MOVIES</item>
+        <item>TELEVISION SHOWS</item>
+        <item>VARIETY SHOWS</item>
+        <item>ANIMATION</item>
+        <item>MICRO FILM</item>
+        <item>WELFARE</item>
+    </string-array>
+</resources>

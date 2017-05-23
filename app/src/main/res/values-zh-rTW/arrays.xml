@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pandora_home_groups">
+        <item>熱門</item>
+        <item>電影</item>
+        <item>電視劇</item>
+        <item>綜藝</item>
+        <item>動漫</item>
+        <item>微電影</item>
+        <item>福利</item>
+    </string-array>
+    <string-array name="pandora_tabs">
+        <item>首頁</item>
+        <item>電影</item>
+        <item>電視劇</item>
+        <item>綜藝</item>
+        <item>動漫</item>
+        <item>微電影</item>
+        <item>福利</item>
+    </string-array>
+</resources>
