@@ -30,6 +30,7 @@ public class JSoupSelector {
     public int timeout;
 
     public String label;
+    public String content;
     public boolean global;
     public String placeholder;
     public JSoupPreTreat preTreat;
@@ -82,7 +83,7 @@ public class JSoupSelector {
         if (analyzer != null) {
             return analyzer.analyze(elements);
         } else {
-            return null;
+            return content;
         }
     }
 

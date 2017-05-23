@@ -15,6 +15,10 @@
     "cssQuery": "section.main ul#focusCon li",
     "attrSelectors": [
       {
+        "label": "type",
+        "content": "slide"
+      },
+      {
         "label": "title",
         "analyzer": {
           "method": 0

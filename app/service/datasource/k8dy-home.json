@@ -23,6 +23,10 @@
       "cssQuery": "div.main div.index-area",
       "attrSelectors": [
         {
+          "label": "type",
+          "content": "group"
+        },
+        {
           "cssQuery": "h1.title",
           "label": "title",
           "analyzer": {
@@ -50,6 +54,10 @@
     },
     "cssQuery": "li a.link-hover",
     "attrSelectors": [
+      {
+        "label": "type",
+        "content": "data"
+      },
       {
         "label": "href",
         "analyzer": {

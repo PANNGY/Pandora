@@ -16,6 +16,10 @@
       "cssQuery": "section.main div.mod_a.globalPadding",
       "attrSelectors": [
         {
+          "label": "type",
+          "content": "group"
+        },
+        {
           "cssQuery": "div.th_a span.sMark",
           "label": "title",
           "analyzer": {
@@ -37,6 +41,10 @@
     },
     "cssQuery": "div.tb_a ul#data_list li div.con",
     "attrSelectors": [
+      {
+        "label": "type",
+        "content": "data"
+      },
       {
         "label": "href",
         "cssQuery": "a",

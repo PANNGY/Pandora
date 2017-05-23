@@ -15,6 +15,9 @@ import java.net.SocketException;
 
 import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.plugins.RxJavaPlugins;
+import io.realm.Realm;
+import io.realm.RealmMigration;
+import io.realm.RealmSchema;
 import okhttp3.CacheControl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -28,6 +31,7 @@ public class Pandora extends Application {
     public final static String PRE_PRO_VERSION = "PRO_VERSION";
 
     public static boolean pro;
+    private static RealmMigration realmMigration;
 
     @Override
     public void onCreate() {
@@ -85,5 +89,16 @@ public class Pandora extends Application {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         pro = sharedPreferences.getBoolean(PRE_PRO_VERSION, true);
+
+        Realm.init(this);
+    }
+
+    public static RealmMigration getRealmMigration() {
+        if (realmMigration == null) {
+            realmMigration = (realm, oldVersion, newVersion) -> {
+                RealmSchema schema = realm.getSchema();
+            };
+        }
+        return realmMigration;
     }
 }
