@@ -74,7 +74,7 @@ public class PandoraActivity extends BaseActivity {
         prepareSplashImage();
 
         Observable.create(subscriber -> {
-            subscriber.onNext(new PandoraTabDataSource(5).refresh());
+            subscriber.onNext(new PandoraTabDataSource(1).refresh());
             subscriber.onComplete();
         }).subscribeOn(Schedulers.newThread())
                 .subscribe(data -> {

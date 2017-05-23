@@ -76,9 +76,9 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
         initLock.await();
 
-        Observable.zip(dataSources.get(0).loadData(),
-                dataSources.get(1).loadData(),
-                dataSources.get(2).loadData(),
+        Observable.zip(dataSources.get(0).loadData().onErrorReturn((throwable -> new ArrayList<>())),
+                dataSources.get(1).loadData().onErrorReturn((throwable -> new ArrayList<>())),
+                dataSources.get(2).loadData().onErrorReturn((throwable -> new ArrayList<>())),
                 (data1, data2, data3) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
                     jsoupData.addAll(data1);
@@ -136,7 +136,9 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
             }
         }
         slideModel.data = slideData;
-        models.add(slideModel);
+        if (!slideData.isEmpty()) {
+            models.add(slideModel);
+        }
 
         for (String group : groups) {
             Model model = new Model();

@@ -24,9 +24,9 @@ import io.realm.RealmResults;
  */
 
 public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
-    private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
-
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+
+    private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
     private JSoupDataSource leeeboTabDataSource;
     private JSoupDataSource k8dyTabDataSource;
@@ -93,8 +93,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
             });
         }
 
-        Observable<List<JSoupData>> loadData = Observable.zip(leeeboTabLoadData,
-                k8dyTabLoadData,
+        Observable<List<JSoupData>> loadData = Observable.zip(leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
+                k8dyTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
                 (leeeboTabData, k8dyTabData) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
                     jsoupData.addAll(leeeboTabData);
@@ -128,8 +128,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
         List<JSoupData> data = new ArrayList<>();
 
-        Observable.zip(leeeboTabDataSource.loadData(),
-                k8dyTabDataSource.loadData(),
+        Observable.zip(leeeboTabDataSource.loadData().onErrorReturn((throwable -> new ArrayList<>())),
+                k8dyTabDataSource.loadData().onErrorReturn((throwable -> new ArrayList<>())),
                 (leeeboTabData, k8dyTabData) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
                     jsoupData.addAll(leeeboTabData);
