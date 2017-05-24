@@ -3,14 +3,18 @@ package com.github.gnastnosaj.pandora.ui.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
@@ -30,6 +34,8 @@ import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
@@ -43,6 +49,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.PackageUtils;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -82,6 +89,34 @@ public class PandoraActivity extends BaseActivity {
         initSearchView();
         checkForUpdate();
         prepareSplashImage();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_pandora, menu);
+        menu.findItem(R.id.action_search).setIcon(new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_search)
+                .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_share)
+                .color(Color.WHITE).sizeDp(18));
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                searchView.openSearch();
+                return true;
+            case R.id.action_share:
+                return true;
+            case R.id.action_favourite:
+                return true;
+            case R.id.action_about:
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -159,6 +194,8 @@ public class PandoraActivity extends BaseActivity {
     }
 
     private void search(String keyword) {
+        Snackbar.make(searchView, "正在疯狂搜索中，请先随便逛逛吧～", Snackbar.LENGTH_LONG).show();
+
         GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
         githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB)
@@ -171,12 +208,35 @@ public class PandoraActivity extends BaseActivity {
                             data.addAll(data1);
                             data.addAll(data2);
                             return data;
-                        }).compose(bindUntilEvent(ActivityEvent.DESTROY))
-                .switchIfEmpty(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword)))
-                .switchIfEmpty(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword)))
+                        }
+                )
+                .switchMap((data -> {
+                    if (ListUtils.isEmpty(data)) {
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()));
+                    } else {
+                        return Observable.just(data);
+                    }
+                }))
+                .switchMap((data -> {
+                    if (ListUtils.isEmpty(data)) {
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()));
+                    } else {
+                        return Observable.just(data);
+                    }
+                }))
+                .switchMap((data -> {
+                    if (ListUtils.isEmpty(data)) {
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()));
+                    } else {
+                        return Observable.just(data);
+                    }
+                }))
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(data -> {
                     if (ListUtils.isEmpty(data)) {
+                        Snackbar.make(searchView, ":( 很抱歉，未找到可用的资源...", Snackbar.LENGTH_LONG).show();
+                    } else {
 
                     }
                 });

@@ -7,4 +7,18 @@
     <string name="splash_copyright">Copyright &#169; %1$s Pandora All Rights Reserved\nPower by Jason Tsang</string>
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
+
+    <string name="action_about">about</string>
+    <string name="action_play">play</string>
+    <string name="action_mosaic">mosaic</string>
+    <string name="action_search">search</string>
+    <string name="action_share">share</string>
+    <string name="action_save">save</string>
+    <string name="action_clear">clear</string>
+    <string name="action_like">like</string>
+    <string name="action_favourite">Favourite</string>
+    <string name="action_model">Stars</string>
+    <string name="action_live_wallpaper">Live Wallpaper</string>
+    <string name="action_open_with_browser">Open with Browser</string>
+    <string name="action_download_video">Download Video</string>
 </resources>
