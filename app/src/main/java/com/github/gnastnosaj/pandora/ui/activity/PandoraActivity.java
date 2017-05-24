@@ -244,10 +244,10 @@ public class PandoraActivity extends BaseActivity {
                 .subscribe(data -> {
                     progressBar.setVisibility(View.GONE);
                     if (ListUtils.isEmpty(data)) {
-                        Snackbar.make(searchView, ":( 悲剧，未找到可用的资源...", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(searchView, ":( 悲剧，未找到可用的资源，请重新试试吧...", Snackbar.LENGTH_LONG).show();
                     } else {
                         new AlertDialog.Builder(this)
-                                .setMessage("发现可用资源(" + data.size() + ")")
+                                .setMessage("嘻嘻 :)，找到" + data.size() + "项可用资源，开车注意安全哟～")
                                 .setNegativeButton("取消", (dialog, which) -> {
                                     dialog.dismiss();
                                 })
