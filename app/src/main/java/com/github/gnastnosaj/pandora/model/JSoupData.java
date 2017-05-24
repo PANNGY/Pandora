@@ -13,8 +13,8 @@ public class JSoupData extends RealmObject {
     public RealmList<JSoupLink> tags;
 
     public String getAttr(String label) {
-        for(JSoupAttr attr: attrs) {
-            if(attr.label.equals(label)) {
+        for (JSoupAttr attr : attrs) {
+            if (attr.label.equals(label)) {
                 return attr.content;
             }
         }

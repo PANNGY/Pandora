@@ -16,6 +16,7 @@ import com.shizhefei.mvc.IDataSource;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -68,8 +69,8 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
     public List<Model> loadCache(boolean isEmpty) {
         Realm realm = Realm.getInstance(realmConfig);
         RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
-        List<JSoupData> data = results.subList(0, results.size() - 1);
-        realm.close();
+        JSoupData[] data = new JSoupData[results.size()];
+        results.toArray(data);
         return fromJSoupData(data);
     }
 
@@ -84,9 +85,9 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
         initLock.await();
 
-        Observable.zip(dataSources.get(0).loadData().onErrorReturn((throwable -> new ArrayList<>())),
-                dataSources.get(1).loadData().onErrorReturn((throwable -> new ArrayList<>())),
-                dataSources.get(2).loadData().onErrorReturn((throwable -> new ArrayList<>())),
+        Observable.zip(dataSources.get(0).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
+                dataSources.get(1).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
+                dataSources.get(2).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
                 (data1, data2, data3) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
                     jsoupData.addAll(data1);
@@ -125,15 +126,23 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
         public final static String TYPE_GROUP = "group";
         public final static String TYPE_DATA = "data";
 
-        public String type;
+        public final static int TYPE_VALUE_SLIDE = 0;
+        public final static int TYPE_VALUE_GROUP = 1;
+        public final static int TYPE_VALUE_DATA = 2;
+
+        public int type;
         public Object data;
+    }
+
+    private List<Model> fromJSoupData(JSoupData[] jsoupData) {
+        return fromJSoupData(Arrays.asList(jsoupData));
     }
 
     private List<Model> fromJSoupData(List<JSoupData> jsoupData) {
         List<Model> models = new ArrayList<>();
 
         Model slideModel = new Model();
-        slideModel.type = Model.TYPE_SLIDE;
+        slideModel.type = Model.TYPE_VALUE_SLIDE;
         List<JSoupData> slideData = new ArrayList<>();
         for (JSoupData data : jsoupData) {
             for (JSoupAttr attr : data.attrs) {
@@ -150,67 +159,59 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
         for (String group : groups) {
             Model model = new Model();
-            model.type = Model.TYPE_GROUP;
+            model.type = Model.TYPE_VALUE_GROUP;
             model.data = group;
             models.add(model);
         }
 
         for (JSoupData data : jsoupData) {
-            for (JSoupAttr attr : data.attrs) {
-                if (attr.label.equals("type") && attr.content.equals(Model.TYPE_DATA)) {
-                    for (JSoupAttr groupAttr : data.group.attrs) {
-                        if (groupAttr.label.equals("title")) {
-                            int position = -1;
-                            switch (groupAttr.content) {
-                                case "热门":
-                                case "热门推荐":
-                                case "热门影片":
-                                case "热门电影":
-                                case "推荐影片":
-                                    position = getPosition(models, groups[0]);
-                                    break;
-                                case "电影":
-                                case "影片":
-                                    position = getPosition(models, groups[1]);
-                                    break;
-                                case "电视剧":
-                                case "连续剧":
-                                    position = getPosition(models, groups[2]);
-                                    break;
-                                case "综艺":
-                                case "综艺节目":
-                                case "真人秀":
-                                    position = getPosition(models, groups[3]);
-                                    break;
-                                case "动漫":
-                                case "动画":
-                                case "动画片":
-                                    position = getPosition(models, groups[4]);
-                                    break;
-                                case "微电影":
-                                case "微影片":
-                                    position = getPosition(models, groups[5]);
-                                    break;
-                                case "福利":
-                                case "伦理":
-                                case "伦理片":
-                                    position = getPosition(models, groups[6]);
-                                    break;
-                            }
-                            if (position != -1) {
-                                Model model = new Model();
-                                model.type = Model.TYPE_DATA;
-                                model.data = data;
-                                if (position < models.size()) {
-                                    models.add(position, model);
-                                } else {
-                                    models.add(model);
-                                }
-                            }
-                            break;
-                        }
+            if (data.getAttr("type").equals(Model.TYPE_DATA)) {
+                int position = -1;
+                switch (data.group.getAttr("title")) {
+                    case "热门":
+                    case "热门推荐":
+                    case "热门影片":
+                    case "热门电影":
+                    case "推荐影片":
+                        position = getPosition(models, groups[0]);
+                        break;
+                    case "电影":
+                    case "影片":
+                        position = getPosition(models, groups[1]);
+                        break;
+                    case "电视剧":
+                    case "连续剧":
+                        position = getPosition(models, groups[2]);
+                        break;
+                    case "综艺":
+                    case "综艺节目":
+                    case "真人秀":
+                        position = getPosition(models, groups[3]);
+                        break;
+                    case "动漫":
+                    case "动画":
+                    case "动画片":
+                        position = getPosition(models, groups[4]);
+                        break;
+                    case "微电影":
+                    case "微影片":
+                        position = getPosition(models, groups[5]);
+                        break;
+                    case "福利":
+                    case "伦理":
+                    case "伦理片":
+                        position = getPosition(models, groups[6]);
+                        break;
+                }
+                if (position != -1) {
+                    Model model = new Model();
+                    model.type = Model.TYPE_VALUE_DATA;
+                    model.data = data;
+                    if (position < models.size()) {
+                        models.add(position, model);
+                    } else {
+                        models.add(model);
                     }
-                    break;
                 }
             }
         }
@@ -221,13 +222,13 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
     private int getPosition(List<Model> models, String group) {
         int position = -1;
         for (int i = 0; i < models.size(); i++) {
-            if (models.get(i).type.equals(Model.TYPE_GROUP) && models.get(i).data.equals(group)) {
+            if (models.get(i).type == Model.TYPE_VALUE_GROUP && models.get(i).data.equals(group)) {
                 position = i;
                 break;
             }
         }
         while (position + 1 < models.size()) {
-            if (models.get(position + 1).type.equals(Model.TYPE_GROUP)) {
+            if (models.get(position + 1).type == Model.TYPE_VALUE_GROUP) {
                 break;
             } else {
                 position++;

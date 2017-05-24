@@ -14,6 +14,7 @@ import com.shizhefei.mvc.IDataSource;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -68,9 +69,9 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
     public List<JSoupData> loadCache(boolean isEmpty) {
         Realm realm = Realm.getInstance(realmConfig);
         RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
-        List<JSoupData> data = results.subList(0, results.size() - 1);
-        realm.close();
-        return data;
+        JSoupData[] data = new JSoupData[results.size()];
+        results.toArray(data);
+        return Arrays.asList(data);
     }
 
     @Override
@@ -84,8 +85,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
         initLock.await();
 
-        Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData();
-        Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData();
+        Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData(true);
+        Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData(true);
 
         if (leeeboTabDataSource.getNextPage().equals(leeeboTabDataSource.baseUrl)) {
             leeeboTabDataSource.setNextPage(null);
@@ -138,20 +139,37 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
         List<JSoupData> data = new ArrayList<>();
 
-        Observable.zip(leeeboTabDataSource.loadData().onErrorReturn((throwable -> new ArrayList<>())),
-                k8dyTabDataSource.loadData().onErrorReturn((throwable -> new ArrayList<>())),
+        Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData();
+        Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData();
+
+        if (!leeeboTabDataSource.hasMore()) {
+            leeeboTabLoadData = Observable.create(subscriber -> {
+                subscriber.onNext(new ArrayList<>());
+                subscriber.onComplete();
+            });
+        }
+
+        if (!k8dyTabDataSource.hasMore()) {
+            k8dyTabLoadData = Observable.create(subscriber -> {
+                subscriber.onNext(new ArrayList<>());
+                subscriber.onComplete();
+            });
+        }
+
+        Observable<List<JSoupData>> loadData = Observable.zip(leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
+                k8dyTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
                 (leeeboTabData, k8dyTabData) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
                     jsoupData.addAll(leeeboTabData);
                     jsoupData.addAll(k8dyTabData);
                     return jsoupData;
-                }).subscribeOn(Schedulers.newThread())
+                });
+
+        loadData.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
                     Realm realm = Realm.getInstance(realmConfig);
-                    realm.executeTransactionAsync(bgRealm -> {
-                        bgRealm.insertOrUpdate(data);
-                    });
+                    realm.executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(data));
                     realm.close();
                     loadMoreLock.countDown();
                 }, throwable -> loadMoreLock.countDown());

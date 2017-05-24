@@ -9,6 +9,8 @@ import android.preference.PreferenceManager;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
+import com.github.gnastnosaj.boilerplate.mvchelper.LoadViewFactory;
+import com.shizhefei.mvc.MVCHelper;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -91,6 +93,8 @@ public class Pandora extends Application {
         pro = sharedPreferences.getBoolean(PRE_PRO_VERSION, true);
 
         Realm.init(this);
+
+        MVCHelper.setLoadViewFractory(new LoadViewFactory());
     }
 
     public static RealmMigration getRealmMigration() {

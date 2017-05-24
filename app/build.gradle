@@ -36,5 +36,9 @@ dependencies {
     compile 'com.github.javiersantos:AppUpdater:+'
     compile 'cn.trinea.android.common:trinea-android-common:+'
     compile 'br.com.mauker.materialsearchview:materialsearchview:+'
+    compile 'com.yqritc:recyclerview-flexibledivider:+'
+    compile 'net.qiujuer.genius:graphics:+'
+    compile 'com.daimajia.slider:library:+'
+    compile 'com.mikepenz:fontawesome-typeface:+@aar'
     compile 'org.jsoup:jsoup:+'
 }

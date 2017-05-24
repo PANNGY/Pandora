@@ -174,6 +174,17 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return loadData();
     }
 
+    public Observable<List<JSoupData>> loadData(boolean clear) {
+        history.clear();
+        return loadData();
+    }
+
+    public Observable<List<JSoupData>> loadData(boolean clear, String page) {
+        history.clear();
+        setNextPage(page);
+        return loadData();
+    }
+
     public List<JSoupData> _loadData(String page, DataSelector dataSelector) throws Exception {
         return _loadData(page, false, dataSelector);
     }

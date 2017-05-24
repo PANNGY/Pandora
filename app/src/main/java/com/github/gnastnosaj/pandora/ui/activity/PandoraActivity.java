@@ -16,6 +16,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
 import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
@@ -67,6 +68,10 @@ public class PandoraActivity extends BaseActivity {
 
         setSupportActionBar(toolbar);
         initSystemBar();
+
+        PandoraAdapter pandoraAdapter = new PandoraAdapter(this, getSupportFragmentManager());
+        viewPager.setAdapter(pandoraAdapter);
+        tabLayout.setupWithViewPager(viewPager);
 
         checkForUpdate();
         prepareSplashImage();

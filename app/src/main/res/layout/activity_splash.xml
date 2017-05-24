@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    tools:context=".ui.activity.SplashActivity">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/splash_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        fresco:actualImageScaleType="focusCrop"
+        fresco:actualImageScaleType="centerCrop"
         fresco:placeholderImage="@color/colorPrimary"
         tools:ignore="ContentDescription" />
 
