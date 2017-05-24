@@ -201,7 +201,7 @@ public class PandoraActivity extends BaseActivity {
     private void search(String keyword) {
         progressBar.setVisibility(View.VISIBLE);
 
-        Snackbar.make(searchView, "正在疯狂搜索中，请先随便逛逛吧～", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(searchView, "╭ (′▽`)╭(′▽`)╭(′▽`)╯正在疯狂搜索中，请先随便逛逛吧～", Snackbar.LENGTH_LONG).show();
 
         GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
