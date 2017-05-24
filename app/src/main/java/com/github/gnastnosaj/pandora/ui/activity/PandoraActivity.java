@@ -251,7 +251,7 @@ public class PandoraActivity extends BaseActivity {
                                 .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
                                 .setPositiveButton(R.string.action_check, (dialog, which) -> {
                                     dialog.dismiss();
-                                }).show();
+                                }).setCancelable(false).show();
                     }
                 });
     }
