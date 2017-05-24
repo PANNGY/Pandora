@@ -1,6 +1,7 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -243,9 +244,16 @@ public class PandoraActivity extends BaseActivity {
                 .subscribe(data -> {
                     progressBar.setVisibility(View.GONE);
                     if (ListUtils.isEmpty(data)) {
-                        Snackbar.make(searchView, ":( 很抱歉，未找到可用的资源...", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(searchView, ":( 悲剧，未找到可用的资源...", Snackbar.LENGTH_LONG).show();
                     } else {
-
+                        new AlertDialog.Builder(this)
+                                .setMessage("发现可用资源(" + data.size() + ")")
+                                .setNegativeButton("取消", (dialog, which) -> {
+                                    dialog.dismiss();
+                                })
+                                .setPositiveButton("查看", (dialog, which) -> {
+                                    dialog.dismiss();
+                                }).show();
                     }
                 });
     }
