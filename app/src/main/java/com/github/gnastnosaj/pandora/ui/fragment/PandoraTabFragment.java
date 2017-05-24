@@ -12,13 +12,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.daimajia.slider.library.SliderLayout;
+import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraHomeAdapter;
 import com.github.gnastnosaj.pandora.adapter.PandoraTabAdapter;
 import com.github.gnastnosaj.pandora.datasource.PandoraHomeDataSource;
 import com.github.gnastnosaj.pandora.datasource.PandoraHomeDataSource.Model;
 import com.github.gnastnosaj.pandora.datasource.PandoraTabDataSource;
+import com.github.gnastnosaj.pandora.event.TabEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.ui.widget.PinnedHeaderDecoration;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 
@@ -73,6 +77,10 @@ public class PandoraTabFragment extends Fragment {
         staggeredGridLayoutManager.setItemPrefetchEnabled(false);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
+        PinnedHeaderDecoration decoration = new PinnedHeaderDecoration();
+        decoration.registerTypePinnedHeader(1, (parent, adapterPosition) -> true);
+        recyclerView.addItemDecoration(decoration);
+
         gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
@@ -94,11 +102,22 @@ public class PandoraTabFragment extends Fragment {
                         int childPosition = rv.getChildAdapterPosition(childView);
                         Model model = pandoraHomeAdapter.getData().get(childPosition);
                         if (model.type == Model.TYPE_VALUE_SLIDE) {
-
+                            Bundle bundle = ((SliderLayout) childView).getCurrentSlider().getBundle();
+                            String title = bundle.getString(PandoraHomeAdapter.SLIDE_BUNDLE_TITILE);
+                            String href = bundle.getString(PandoraHomeAdapter.SLIDE_BUNDLE_HREF);
                         } else if (model.type == Model.TYPE_VALUE_GROUP) {
-
+                            String[] groups = pandoraHomeDataSource.getGroups();
+                            for (int i = 0; i < groups.length; i++) {
+                                String group = groups[i];
+                                if (group.equals(model.data)) {
+                                    RxBus.getInstance().post(TabEvent.class, new TabEvent(i));
+                                    break;
+                                }
+                            }
                         } else if (model.type == Model.TYPE_VALUE_DATA) {
-
+                            JSoupData data = (JSoupData) model.data;
+                            String title = data.getAttr("title");
+                            String href = data.getAttr("href");
                         }
                     } catch (Exception exception) {
                         Timber.e(exception, "recyclerView touch exception");

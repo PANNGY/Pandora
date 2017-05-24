@@ -9,11 +9,15 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.KeyEvent;
+import android.view.View;
+import android.widget.ListView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
+import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
@@ -21,6 +25,8 @@ import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
+import com.github.gnastnosaj.pandora.event.TabEvent;
+import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
@@ -28,11 +34,14 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.PackageUtils;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -69,10 +78,8 @@ public class PandoraActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-        PandoraAdapter pandoraAdapter = new PandoraAdapter(this, getSupportFragmentManager());
-        viewPager.setAdapter(pandoraAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-
+        initViewPager();
+        initSearchView();
         checkForUpdate();
         prepareSplashImage();
     }
@@ -87,6 +94,92 @@ public class PandoraActivity extends BaseActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void initViewPager() {
+        PandoraAdapter pandoraAdapter = new PandoraAdapter(this, getSupportFragmentManager());
+        viewPager.setAdapter(pandoraAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+        RxBus.getInstance().register(TabEvent.class, TabEvent.class)
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(tabEvent -> viewPager.setCurrentItem(tabEvent.tab));
+    }
+
+    private void initSearchView() {
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                try {
+                    search(query);
+                } catch (Exception e) {
+                    Timber.e(e, "searchView onQueryText exception");
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchView.setOnItemClickListener((adapterView, view, i, l) -> {
+            try {
+                ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+                if (suggestionsListView.getHeaderViewsCount() > 0) {
+                    if (i == 0) {
+                        searchView.clearAll();
+                    } else {
+                        String keyword = searchView.getSuggestionAtPosition(i - 1);
+                        if (!TextUtils.isEmpty(keyword)) {
+                            search(keyword);
+                        }
+                    }
+                } else {
+                    String keyword = searchView.getSuggestionAtPosition(i);
+                    if (!TextUtils.isEmpty(keyword)) {
+                        search(keyword);
+                    }
+                }
+            } catch (Exception e) {
+                Timber.e(e, "searchView onItemClick exception");
+            } finally {
+                searchView.closeSearch();
+            }
+        });
+        try {
+            ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+            if (suggestionsListView.getHeaderViewsCount() == 0) {
+                View deleteIconView = getLayoutInflater().inflate(R.layout.view_search_delete, null);
+                suggestionsListView.addHeaderView(deleteIconView);
+            }
+        } catch (Exception e) {
+            Timber.e(e, "initSearchView exception");
+        }
+    }
+
+    private void search(String keyword) {
+        GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+
+        githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB)
+                .flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()))
+                .zipWith(
+                        githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_TAB)
+                                .flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>())),
+                        (data1, data2) -> {
+                            List<JSoupData> data = new ArrayList<>();
+                            data.addAll(data1);
+                            data.addAll(data2);
+                            return data;
+                        }).compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .switchIfEmpty(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword)))
+                .switchIfEmpty(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword)))
+                .subscribeOn(Schedulers.newThread())
+                .subscribe(data -> {
+                    if (ListUtils.isEmpty(data)) {
+
+                    }
+                });
     }
 
     private void checkForUpdate() {
@@ -124,7 +217,6 @@ public class PandoraActivity extends BaseActivity {
                         },
                         throwable -> Timber.w(throwable, "update permission exception"));
     }
-
 
     private void prepareSplashImage() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

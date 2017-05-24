@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -39,6 +40,9 @@ import butterknife.ButterKnife;
  * Created by Jason on 7/17/2015.
  */
 public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAdapter<List<Model>> {
+    public final static String SLIDE_BUNDLE_TITILE = "title";
+    public final static String SLIDE_BUNDLE_THUMBNAIL = "thumbnail";
+    public final static String SLIDE_BUNDLE_HREF = "href";
 
     private Context context;
 
@@ -54,7 +58,7 @@ public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAda
         if (viewType == 0) {
             v = new SliderLayout(context);
         } else if (viewType == 1) {
-            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_pandora_home_group, parent, false);
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_pandora_home_group, parent, false);
         } else if (viewType == 2) {
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_contains_simple_drawee, parent, false);
         }
@@ -78,8 +82,13 @@ public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAda
                 String thumbnail = data.getAttr("thumbnail");
                 String href = data.getAttr("href");
 
+                Bundle bundle = new Bundle();
+                bundle.putString(SLIDE_BUNDLE_TITILE, title);
+                bundle.putString(SLIDE_BUNDLE_THUMBNAIL, thumbnail);
+                bundle.putString(SLIDE_BUNDLE_HREF, href);
+
                 TextSliderView textSliderView = new TextSliderView(context);
-                textSliderView.description(title).image(thumbnail)
+                textSliderView.description(title).image(thumbnail).bundle(bundle)
                         .setScaleType(BaseSliderView.ScaleType.Fit);
                 sliderLayout.addSlider(textSliderView);
             }

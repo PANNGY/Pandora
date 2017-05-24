@@ -40,5 +40,6 @@ dependencies {
     compile 'net.qiujuer.genius:graphics:+'
     compile 'com.daimajia.slider:library:+'
     compile 'com.mikepenz:fontawesome-typeface:+@aar'
+    compile 'com.mikepenz:google-material-typeface:+@aar'
     compile 'org.jsoup:jsoup:+'
 }

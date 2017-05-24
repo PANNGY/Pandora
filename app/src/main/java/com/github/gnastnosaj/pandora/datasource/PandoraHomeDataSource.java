@@ -134,6 +134,10 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
         public Object data;
     }
 
+    public String[] getGroups() {
+        return groups;
+    }
+
     private List<Model> fromJSoupData(JSoupData[] jsoupData) {
         return fromJSoupData(Arrays.asList(jsoupData));
     }
