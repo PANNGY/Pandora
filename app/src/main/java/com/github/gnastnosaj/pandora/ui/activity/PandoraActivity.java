@@ -201,7 +201,7 @@ public class PandoraActivity extends BaseActivity {
     private void search(String keyword) {
         progressBar.setVisibility(View.VISIBLE);
 
-        Snackbar.make(searchView, "╭ (′▽`)╭(′▽`)╭(′▽`)╯正在疯狂搜索中，请先随便逛逛吧～", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();
 
         GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
@@ -244,14 +244,12 @@ public class PandoraActivity extends BaseActivity {
                 .subscribe(data -> {
                     progressBar.setVisibility(View.GONE);
                     if (ListUtils.isEmpty(data)) {
-                        Snackbar.make(searchView, "⊙﹏⊙‖∣° 悲剧，未找到可用的资源，请重新试试吧...", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(searchView, R.string.search_result_not_found, Snackbar.LENGTH_LONG).show();
                     } else {
                         new AlertDialog.Builder(this)
-                                .setMessage("＾(￣）￣)《(￣）￣)＾嘿嘿，发现可用资源，开车注意安全哟～")
-                                .setNegativeButton("取消", (dialog, which) -> {
-                                    dialog.dismiss();
-                                })
-                                .setPositiveButton("查看", (dialog, which) -> {
+                                .setMessage(R.string.search_result_found)
+                                .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
+                                .setPositiveButton(R.string.action_check, (dialog, which) -> {
                                     dialog.dismiss();
                                 }).show();
                     }

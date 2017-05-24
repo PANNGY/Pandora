@@ -8,14 +8,20 @@
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
 
-    <string name="action_about">about</string>
-    <string name="action_play">play</string>
-    <string name="action_mosaic">mosaic</string>
-    <string name="action_search">search</string>
-    <string name="action_share">share</string>
-    <string name="action_save">save</string>
-    <string name="action_clear">clear</string>
-    <string name="action_like">like</string>
+    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯正在瘋狂蒐索中，請先隨便逛逛吧～</string>
+    <string name="search_result_not_found">⊙﹏⊙‖∣° 悲劇，未找到可用的資源，請重新試試吧...</string>
+    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾嘿嘿，發現可用資源，開車注意安全喲～</string>
+
+    <string name="action_cancel">取消</string>
+    <string name="action_check">查看</string>
+    <string name="action_about">關於</string>
+    <string name="action_play">播放</string>
+    <string name="action_mosaic">馬賽克</string>
+    <string name="action_search">蒐索</string>
+    <string name="action_share">分享</string>
+    <string name="action_save">保存</string>
+    <string name="action_clear">清除</string>
+    <string name="action_like">喜歡</string>
     <string name="action_favourite">我的最愛</string>
     <string name="action_model">演員</string>
     <string name="action_live_wallpaper">動態桌面</string>

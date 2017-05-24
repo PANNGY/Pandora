@@ -8,14 +8,20 @@
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
 
-    <string name="action_about">about</string>
-    <string name="action_play">play</string>
-    <string name="action_mosaic">mosaic</string>
-    <string name="action_search">search</string>
-    <string name="action_share">share</string>
-    <string name="action_save">save</string>
-    <string name="action_clear">clear</string>
-    <string name="action_like">like</string>
+    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯狂っている中で、先にぶらぶらしてください～</string>
+    <string name="search_result_not_found">⊙﹏⊙‖∣° 悲劇、未利用の資源を探し当てて、再試して下さい...</string>
+    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾へへへ、資源、車で安全に注意を注意することを発見することを発見します～</string>
+
+    <string name="action_cancel">キャンセル</string>
+    <string name="action_check">査看</string>
+    <string name="action_about">について</string>
+    <string name="action_play">放送</string>
+    <string name="action_mosaic">モザイクタイル</string>
+    <string name="action_search">検索</string>
+    <string name="action_share">分かち合う</string>
+    <string name="action_save">保存</string>
+    <string name="action_clear">クリア</string>
+    <string name="action_like">好きです</string>
     <string name="action_favourite">私の一番好きなのは</string>
     <string name="action_model">俳優</string>
     <string name="action_live_wallpaper">ライブ壁紙</string>

@@ -8,14 +8,20 @@
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
 
-    <string name="action_about">about</string>
-    <string name="action_play">play</string>
-    <string name="action_mosaic">mosaic</string>
-    <string name="action_search">search</string>
-    <string name="action_share">share</string>
-    <string name="action_save">save</string>
-    <string name="action_clear">clear</string>
-    <string name="action_like">like</string>
+    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯In the crazy search, please go for a stroll first～</string>
+    <string name="search_result_not_found">⊙﹏⊙‖∣°Tragedy, no resources available. Please try again...</string>
+    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾Hey, found that available resources, driving safety attention yo～</string>
+
+    <string name="action_cancel">Cancel</string>
+    <string name="action_check">Check</string>
+    <string name="action_about">About</string>
+    <string name="action_play">Play</string>
+    <string name="action_mosaic">Mosaic</string>
+    <string name="action_search">Search</string>
+    <string name="action_share">Share</string>
+    <string name="action_save">Save</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_like">Like</string>
     <string name="action_favourite">Favourite</string>
     <string name="action_model">Stars</string>
     <string name="action_live_wallpaper">Live Wallpaper</string>
