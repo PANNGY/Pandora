@@ -41,5 +41,6 @@ dependencies {
     compile 'com.daimajia.slider:library:+'
     compile 'com.mikepenz:fontawesome-typeface:+@aar'
     compile 'com.mikepenz:google-material-typeface:+@aar'
+    compile 'me.zhanghai.android.materialprogressbar:library:+'
     compile 'org.jsoup:jsoup:+'
 }

@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
@@ -66,6 +67,9 @@ public class PandoraActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     @BindView(R.id.tab)
     TabLayout tabLayout;
@@ -194,6 +198,8 @@ public class PandoraActivity extends BaseActivity {
     }
 
     private void search(String keyword) {
+        progressBar.setVisibility(View.VISIBLE);
+
         Snackbar.make(searchView, "正在疯狂搜索中，请先随便逛逛吧～", Snackbar.LENGTH_LONG).show();
 
         GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
@@ -233,7 +239,9 @@ public class PandoraActivity extends BaseActivity {
                 }))
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(data -> {
+                    progressBar.setVisibility(View.GONE);
                     if (ListUtils.isEmpty(data)) {
                         Snackbar.make(searchView, ":( 很抱歉，未找到可用的资源...", Snackbar.LENGTH_LONG).show();
                     } else {
