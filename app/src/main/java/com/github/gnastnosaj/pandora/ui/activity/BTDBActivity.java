@@ -129,40 +129,43 @@ public class BTDBActivity extends BaseActivity {
             }
 
             @Override
-            public void onLongPress(MotionEvent e) {
-                super.onLongPress(e);
-                View childView = recyclerView.findChildViewUnder(e.getX(), e.getY());
-                int childPosition = recyclerView.getChildAdapterPosition(childView);
-                JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
-                ClipData clipData = ClipData.newPlainText("Magnet Link", jsoupData.getAttr("magnet"));
-                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                clipboardManager.setPrimaryClip(clipData);
-                Snackbar.make(recyclerView, R.string.copy_magnet_success, Snackbar.LENGTH_SHORT).show();
+            public void onLongPress(MotionEvent event) {
+                super.onLongPress(event);
+                try {
+                    View childView = recyclerView.findChildViewUnder(event.getX(), event.getY());
+                    int childPosition = recyclerView.getChildAdapterPosition(childView);
+                    JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
+                    ClipData clipData = ClipData.newPlainText("Magnet Link", jsoupData.getAttr("magnet"));
+                    ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboardManager.setPrimaryClip(clipData);
+                    Snackbar.make(recyclerView, R.string.copy_magnet_success, Snackbar.LENGTH_SHORT).show();
+                } catch (Exception e) {
+                    Timber.e(e, "onLongPress exception");
+                }
             }
         });
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
                 if (gestureDetector.onTouchEvent(event)) {
-                    try {
-                        View childView = rv.findChildViewUnder(event.getX(), event.getY());
-                        int childPosition = rv.getChildAdapterPosition(childView);
+                    View childView = rv.findChildViewUnder(event.getX(), event.getY());
+                    int childPosition = rv.getChildAdapterPosition(childView);
+                    if(-1 < childPosition && childPosition < btdbAdapter.getData().size()) {
                         JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
                         Uri uri = Uri.parse(jsoupData.getAttr("magnet"));
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                         intent.putExtra(WebVideoViewActivity.EXTRA_ID, keyword);
                         intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, jsoupData.getAttr("title"));
                         startActivity(intent);
-                    } catch (Exception e) {
-                        Timber.e(e, "BTDBActivity recyclerView onInterceptTouchEvent exception");
                     }
+                    return true;
+                } else {
+                    return false;
                 }
-                return false;
             }
 
             @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
+            public void onTouchEvent(RecyclerView rv, MotionEvent event) {
             }
 
             @Override

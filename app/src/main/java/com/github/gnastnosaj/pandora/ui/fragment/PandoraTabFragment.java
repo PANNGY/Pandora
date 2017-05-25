@@ -28,7 +28,6 @@ import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 /**
  * Created by jasontsang on 5/24/17.
@@ -86,20 +85,15 @@ public class PandoraTabFragment extends Fragment {
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
             }
-
-            @Override
-            public void onLongPress(MotionEvent e) {
-                super.onLongPress(e);
-            }
         });
 
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                if (gestureDetector.onTouchEvent(e)) {
-                    try {
-                        View childView = rv.findChildViewUnder(e.getX(), e.getY());
-                        int childPosition = rv.getChildAdapterPosition(childView);
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
+                if (gestureDetector.onTouchEvent(event)) {
+                    View childView = rv.findChildViewUnder(event.getX(), event.getY());
+                    int childPosition = rv.getChildAdapterPosition(childView);
+                    if(-1 < childPosition && childPosition < pandoraHomeAdapter.getData().size()) {
                         Model model = pandoraHomeAdapter.getData().get(childPosition);
                         if (model.type == Model.TYPE_VALUE_SLIDE) {
                             Bundle bundle = ((SliderLayout) childView).getCurrentSlider().getBundle();
@@ -119,11 +113,11 @@ public class PandoraTabFragment extends Fragment {
                             String title = data.getAttr("title");
                             String href = data.getAttr("href");
                         }
-                    } catch (Exception exception) {
-                        Timber.e(exception, "recyclerView touch exception");
                     }
+                    return true;
+                }else {
+                    return false;
                 }
-                return false;
             }
 
             @Override
@@ -165,15 +159,14 @@ public class PandoraTabFragment extends Fragment {
 
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                if (gestureDetector.onTouchEvent(e)) {
-                    try {
-                        View childView = rv.findChildViewUnder(e.getX(), e.getY());
-                        int childPosition = rv.getChildAdapterPosition(childView);
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
+                if (gestureDetector.onTouchEvent(event)) {
+                    View childView = rv.findChildViewUnder(event.getX(), event.getY());
+                    int childPosition = rv.getChildAdapterPosition(childView);
+                    if(-1 < childPosition && childPosition < pandoraTabAdapter.getData().size()) {
                         JSoupData data = pandoraTabAdapter.getData().get(childPosition);
-                    } catch (Exception exception) {
-                        Timber.e(exception, "recyclerView touch exception");
                     }
+                    return true;
                 }
                 return false;
             }

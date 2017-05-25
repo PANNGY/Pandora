@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -98,10 +99,11 @@ public class WebVideoViewActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_video_view);
+        ButterKnife.bind(this);
 
         realmConfig = new RealmConfiguration.Builder().name("WEB_VIDEO").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
-        dynamicBox = createDynamicBox(findViewById(R.id.swipe_refresh_layout));
+        dynamicBox = createDynamicBox(swipeRefreshLayout);
 
         setSupportActionBar(toolbar);
         initSystemBar();
