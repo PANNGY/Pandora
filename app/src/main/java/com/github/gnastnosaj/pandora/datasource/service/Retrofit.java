@@ -20,14 +20,19 @@ public class Retrofit {
     public final static long DEFAULT_TIMEOUT = 30;
 
     public static <T> T newSimpleService(@NonNull String baseUrl, @NonNull Class<T> baseService, long timeout) {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-
-        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .connectTimeout(timeout, TimeUnit.SECONDS)
                 .cache(new Cache(Boilerplate.getInstance().getCacheDir(), 1024 * 1024 * 128))
-                .retryOnConnectionFailure(true).addInterceptor(logging).build();
+                .retryOnConnectionFailure(true);
+
+        if (Boilerplate.DEBUG) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            builder.addInterceptor(logging);
+        }
+
+        OkHttpClient okHttpClient = builder.build();
 
         retrofit2.Retrofit retrofit = new retrofit2.Retrofit.Builder()
                 .client(okHttpClient)

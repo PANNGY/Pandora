@@ -121,7 +121,7 @@ public class BTDBActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
+        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).size(1).build());
         gestureDetector = new GestureDetector(BTDBActivity.this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
@@ -144,13 +144,13 @@ public class BTDBActivity extends BaseActivity {
                 }
             }
         });
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+        recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
                 if (gestureDetector.onTouchEvent(event)) {
                     View childView = rv.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = rv.getChildAdapterPosition(childView);
-                    if(-1 < childPosition && childPosition < btdbAdapter.getData().size()) {
+                    if (-1 < childPosition && childPosition < btdbAdapter.getData().size()) {
                         JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
                         Uri uri = Uri.parse(jsoupData.getAttr("magnet"));
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
@@ -162,15 +162,6 @@ public class BTDBActivity extends BaseActivity {
                 } else {
                     return false;
                 }
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent event) {
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
             }
         });
 

@@ -87,13 +87,13 @@ public class PandoraTabFragment extends Fragment {
             }
         });
 
-        recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+        recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
                 if (gestureDetector.onTouchEvent(event)) {
                     View childView = rv.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = rv.getChildAdapterPosition(childView);
-                    if(-1 < childPosition && childPosition < pandoraHomeAdapter.getData().size()) {
+                    if (-1 < childPosition && childPosition < pandoraHomeAdapter.getData().size()) {
                         Model model = pandoraHomeAdapter.getData().get(childPosition);
                         if (model.type == Model.TYPE_VALUE_SLIDE) {
                             Bundle bundle = ((SliderLayout) childView).getCurrentSlider().getBundle();
@@ -115,17 +115,9 @@ public class PandoraTabFragment extends Fragment {
                         }
                     }
                     return true;
-                }else {
+                } else {
                     return false;
                 }
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
             }
         });
 
@@ -163,7 +155,7 @@ public class PandoraTabFragment extends Fragment {
                 if (gestureDetector.onTouchEvent(event)) {
                     View childView = rv.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = rv.getChildAdapterPosition(childView);
-                    if(-1 < childPosition && childPosition < pandoraTabAdapter.getData().size()) {
+                    if (-1 < childPosition && childPosition < pandoraTabAdapter.getData().size()) {
                         JSoupData data = pandoraTabAdapter.getData().get(childPosition);
                     }
                     return true;
