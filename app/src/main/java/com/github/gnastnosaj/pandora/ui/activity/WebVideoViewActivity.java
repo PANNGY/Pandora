@@ -27,6 +27,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
+import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
@@ -34,6 +35,7 @@ import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -265,6 +267,7 @@ public class WebVideoViewActivity extends BaseActivity {
                 onBackPressed();
                 return true;
             case R.id.action_share:
+                ShareHelper.share(this, new ShareParamText(title, href));
                 return true;
             case R.id.action_open_with_browser:
                 if (!TextUtils.isEmpty(href)) {
