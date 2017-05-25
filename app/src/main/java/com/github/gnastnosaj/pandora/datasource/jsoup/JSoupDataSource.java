@@ -385,8 +385,8 @@ public class JSoupDataSource {
         List<JSoupData> data = new ArrayList<>();
         try {
             if (searchSelector.method == JSoupSelector.METHOD_GET) {
-                searchSelector.url = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
-                searchSelector.url = searchSelector.url.replace("(keyword)", keyword);
+                String nextPage = searchSelector.url.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8")).replace("(keyword)", keyword);
+                setNextPage(nextPage);
             } else if (!MapUtils.isEmpty(searchSelector.data)) {
                 for (Map.Entry<String, String> entry : searchSelector.data.entrySet()) {
                     if (entry.getValue().contains("{keyword}")) {
@@ -394,7 +394,6 @@ public class JSoupDataSource {
                     }
                 }
             }
-            setNextPage(searchSelector.url);
             data.addAll(_searchData(keyword, nextPage, searchSelector));
         } catch (Exception e) {
             Timber.e(e, "loadData exception");
@@ -463,8 +462,7 @@ public class JSoupDataSource {
             }
             if (!TextUtils.isEmpty(keyword)) {
                 try {
-                    data = data.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8"));
-                    data = data.replace("(keyword)", keyword);
+                    data = data.replace("{keyword}", URLEncoder.encode(keyword, "UTF-8")).replace("(keyword)", keyword);
                 } catch (UnsupportedEncodingException e) {
                     Timber.e(e, "betterData exception");
                 }

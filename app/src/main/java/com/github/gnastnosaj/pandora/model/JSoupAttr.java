@@ -13,6 +13,14 @@ public class JSoupAttr extends RealmObject {
     public JSoupAttr() {
     }
 
+    @Override
+    protected JSoupAttr clone() {
+        JSoupAttr attr = new JSoupAttr();
+        attr.label = label;
+        attr.content = content;
+        return attr;
+    }
+
     public JSoupAttr(String label, String content) {
         this.label = label;
         this.content = content;

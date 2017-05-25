@@ -13,6 +13,14 @@ public class JSoupLink extends RealmObject {
     public JSoupLink() {
     }
 
+    @Override
+    protected JSoupLink clone() {
+        JSoupLink link = new JSoupLink();
+        link.title = title;
+        link.url = url;
+        return link;
+    }
+
     public JSoupLink(String title, String url) {
         this.title = title;
         this.url = url;

@@ -73,8 +73,8 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
     public List<Model> loadCache(boolean isEmpty) {
         Realm realm = Realm.getInstance(realmConfig);
         RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
-        JSoupData[] data = new JSoupData[results.size()];
-        results.toArray(data);
+        List<JSoupData> data = JSoupData.from(results);
+        realm.close();
         return fromJSoupData(data);
     }
 

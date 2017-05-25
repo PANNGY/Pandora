@@ -15,7 +15,6 @@ import com.shizhefei.mvc.IDataSource;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -69,9 +68,9 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
     public List<JSoupData> loadCache(boolean isEmpty) {
         Realm realm = Realm.getInstance(realmConfig);
         RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
-        JSoupData[] data = new JSoupData[results.size()];
-        results.toArray(data);
-        return Arrays.asList(data);
+        List<JSoupData> data = JSoupData.from(results);
+        realm.close();
+        return data;
     }
 
     @Override
@@ -81,6 +80,9 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
         }
         if (refreshLock != null) {
             refreshLock.await();
+        }
+        if (loadMoreLock != null) {
+            loadMoreLock.await();
         }
         refreshLock = new CountDownLatch(1);
 
@@ -109,6 +111,9 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
 
     @Override
     public List<JSoupData> loadMore() throws Exception {
+        if (refreshLock != null) {
+            refreshLock.await();
+        }
         if (loadMoreLock != null) {
             loadMoreLock.await();
         }
