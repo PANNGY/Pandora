@@ -6,13 +6,11 @@ import android.net.Uri;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 
-import com.bilibili.socialize.share.core.BiliShare;
-import com.bilibili.socialize.share.core.BiliShareConfiguration;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.mvchelper.LoadViewFactory;
-import com.github.gnastnosaj.pandora.ui.widget.ShareFrescoImageDownloader;
+import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.shizhefei.mvc.MVCHelper;
 
 import java.io.IOException;
@@ -99,10 +97,7 @@ public class Pandora extends Application {
 
         MVCHelper.setLoadViewFractory(new LoadViewFactory());
 
-        BiliShareConfiguration configuration = new BiliShareConfiguration.Builder(this)
-                .imageDownloader(new ShareFrescoImageDownloader())
-                .build();
-        BiliShare.global().config(configuration);
+        ShareHelper.initialize(this);
     }
 
     public static RealmMigration getRealmMigration() {
