@@ -6,7 +6,7 @@
     "/q"
   ],
   "searchSelector": {
-    "url": "{baseUrl}{pages[1]}/{keyword}/",
+    "url": "{baseUrl}{pages[1]}/(keyword)/",
     "cssQuery": "li.search-ret-item",
     "attrSelectors": [
       {
@@ -95,7 +95,7 @@
         "args": [
           "href"
         ],
-        "format": "{baseUrl}{pages[1]}/{keyword}/%s"
+        "format": "{baseUrl}{pages[1]}/(keyword)/%s"
       }
     }
   }

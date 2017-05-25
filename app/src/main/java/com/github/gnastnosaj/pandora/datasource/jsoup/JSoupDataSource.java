@@ -215,12 +215,12 @@ public class JSoupDataSource {
         }
         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
             if (!TextUtils.isEmpty(attrSelector.placeholder)) {
-                if (!data.contains(globalData)) {
-                    data.add(globalData);
-                }
                 for (JSoupAttr attr : globalData.attrs) {
-                    if (attr.label.equals(attrSelector.placeholder)) {
+                    if (attr.label.equals(attrSelector.placeholder) && !TextUtils.isEmpty(attr.content)) {
                         globalData.attrs.add(new JSoupAttr(attrSelector.label, attr.content));
+                        if (!data.contains(globalData)) {
+                            data.add(globalData);
+                        }
                         break;
                     }
                 }
