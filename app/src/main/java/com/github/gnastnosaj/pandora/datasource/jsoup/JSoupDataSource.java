@@ -8,8 +8,6 @@ import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
-import com.shizhefei.mvc.IDataCacheLoader;
-import com.shizhefei.mvc.IDataSource;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +18,6 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +25,6 @@ import cn.trinea.android.common.util.ArrayUtils;
 import cn.trinea.android.common.util.ListUtils;
 import cn.trinea.android.common.util.MapUtils;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.RealmList;
 import timber.log.Timber;
 
@@ -36,7 +32,7 @@ import timber.log.Timber;
  * Created by jasontsang on 5/2/17.
  */
 
-public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+public class JSoupDataSource {
 
     public String id;
     public String baseUrl;
@@ -179,7 +175,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         return loadData();
     }
 
-    public Observable<List<JSoupData>> loadData(boolean clear, String page) {
+    public Observable<List<JSoupData>> loadData(String page, boolean clear) {
         history.clear();
         setNextPage(page);
         return loadData();
@@ -201,11 +197,11 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
             Document document = dataSelector.loadDocument(currentPage);
             currentDocument = document;
 
-            return _loadData(document, allow, dataSelector);
+            return _loadData(document, dataSelector);
         }
     }
 
-    public List<JSoupData> _loadData(Document document, boolean allow, DataSelector dataSelector) throws Exception {
+    public List<JSoupData> _loadData(Document document, DataSelector dataSelector) throws Exception {
 
         List<JSoupData> data = new ArrayList<>();
 
@@ -406,7 +402,7 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         try {
             if (searchSelector.reserveSelector != null && ListUtils.isEmpty(data)) {
                 if (TextUtils.isEmpty(searchSelector.reserveSelector.url)) {
-                    data.addAll(_loadData(currentDocument, true, searchSelector.reserveSelector));
+                    data.addAll(_loadData(currentDocument, searchSelector.reserveSelector));
                 } else {
                     _searchData(keyword, searchSelector.reserveSelector);
                 }
@@ -425,30 +421,6 @@ public class JSoupDataSource implements IDataSource<List<JSoupData>>, IDataCache
         this.nextPage = nextPage;
     }
 
-    @Override
-    public List<JSoupData> loadCache(boolean isEmpty) {
-        return null;
-    }
-
-    @Override
-    public List<JSoupData> refresh() throws Exception {
-        history.clear();
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-        List<JSoupData> data = new ArrayList<>();
-        loadData().subscribeOn(Schedulers.newThread()).subscribe(jsoupData -> {
-            data.addAll(jsoupData);
-            countDownLatch.countDown();
-        }, throwable -> countDownLatch.countDown());
-        countDownLatch.await();
-        return data;
-    }
-
-    @Override
-    public List<JSoupData> loadMore() throws Exception {
-        return refresh();
-    }
-
-    @Override
     public boolean hasMore() {
         return !TextUtils.isEmpty(nextPage);
     }
