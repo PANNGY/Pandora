@@ -37,8 +37,6 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
     private JSoupDataSource leeeboTabDataSource;
     private JSoupDataSource k8dyTabDataSource;
-    private String leeeboTabPage;
-    private String k8dyTabPage;
 
     private CountDownLatch initLock;
     private CountDownLatch refreshLock;
