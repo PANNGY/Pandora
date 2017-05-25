@@ -102,7 +102,7 @@ public class Pandora extends Application {
         BiliShareConfiguration configuration = new BiliShareConfiguration.Builder(this)
                 .imageDownloader(new ShareFrescoImageDownloader())
                 .build();
-        BiliShare.init(configuration);
+        BiliShare.global().config(configuration);
     }
 
     public static RealmMigration getRealmMigration() {
