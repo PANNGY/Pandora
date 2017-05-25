@@ -20,6 +20,11 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.bilibili.socialize.share.core.BiliShare;
+import com.bilibili.socialize.share.core.SocializeListeners;
+import com.bilibili.socialize.share.core.SocializeMedia;
+import com.bilibili.socialize.share.core.shareparam.ShareImage;
+import com.bilibili.socialize.share.core.shareparam.ShareParamImage;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
@@ -115,6 +120,34 @@ public class PandoraActivity extends BaseActivity {
                 searchView.openSearch();
                 return true;
             case R.id.action_share:
+                ShareParamImage shareParamImage = new ShareParamImage("哔哩哔哩2016拜年祭", "【哔哩哔哩2016拜年祭】 UP主: 哔哩哔哩弹幕网 #哔哩哔哩动画# ", "http://www.bilibili.com/video/av3521416");
+                shareParamImage.setImage(new ShareImage("http://i2.hdslb.com/320_200/video/85/85ae2b17b223a0cd649a49c38c32dd10.jpg"));
+                BiliShare.share(this, SocializeMedia.GENERIC, shareParamImage, new SocializeListeners.ShareListener() {
+                    @Override
+                    public void onStart(SocializeMedia type) {
+
+                    }
+
+                    @Override
+                    public void onProgress(SocializeMedia type, String progressDesc) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(SocializeMedia type, int code) {
+
+                    }
+
+                    @Override
+                    public void onError(SocializeMedia type, int code, Throwable error) {
+
+                    }
+
+                    @Override
+                    public void onCancel(SocializeMedia type) {
+
+                    }
+                });
                 return true;
             case R.id.action_favourite:
                 return true;
