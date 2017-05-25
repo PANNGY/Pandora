@@ -29,13 +29,13 @@ import io.realm.RealmResults;
  * Created by jasontsang on 5/25/17.
  */
 
-public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
     private RealmConfiguration realmConfig;
 
-    private JSoupDataSource btdbDataSource;
+    private JSoupDataSource searchDataSource;
 
     private String keyword;
     private List<JSoupData> cache;
@@ -44,12 +44,12 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
     private CountDownLatch refreshLock;
     private CountDownLatch loadMoreLock;
 
-    public BTDBDataSource(Context context) {
-        realmConfig = new RealmConfiguration.Builder().name("BTDB").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+    public SearchDataSource(Context context, String dataSource) {
+        realmConfig = new RealmConfiguration.Builder().name(dataSource).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
 
-        Observable<JSoupDataSource> init = githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB);
+        Observable<JSoupDataSource> init = githubService.getJSoupDataSource(dataSource);
 
         if (context instanceof BaseActivity) {
             init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
@@ -57,7 +57,7 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
 
         init.subscribeOn(Schedulers.newThread())
                 .subscribe(datasource -> {
-                    btdbDataSource = datasource;
+                    searchDataSource = datasource;
                     initLock.countDown();
                 });
     }
@@ -102,7 +102,7 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
 
         initLock.await();
 
-        Observable<List<JSoupData>> refresh = btdbDataSource.searchData(keyword, null, true);
+        Observable<List<JSoupData>> refresh = searchDataSource.searchData(keyword, null, true);
 
         refresh.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
@@ -133,7 +133,7 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
 
         List<JSoupData> data = new ArrayList<>();
 
-        Observable<List<JSoupData>> loadMore = btdbDataSource.searchData(keyword);
+        Observable<List<JSoupData>> loadMore = searchDataSource.searchData(keyword);
 
         loadMore.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
@@ -151,6 +151,6 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
 
     @Override
     public boolean hasMore() {
-        return btdbDataSource.hasMore();
+        return searchDataSource.hasMore();
     }
 }

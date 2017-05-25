@@ -24,7 +24,8 @@ import android.widget.ListView;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.BTDBAdapter;
-import com.github.gnastnosaj.pandora.datasource.BTDBDataSource;
+import com.github.gnastnosaj.pandora.datasource.SearchDataSource;
+import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -58,7 +59,7 @@ public class BTDBActivity extends BaseActivity {
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
 
-    private BTDBDataSource btdbDataSource;
+    private SearchDataSource btdbDataSource;
     private BTDBAdapter btdbAdapter;
     private MVCHelper<List<JSoupData>> mvcHelper;
 
@@ -80,7 +81,7 @@ public class BTDBActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_btdb);
+        setContentView(R.layout.layout_coordinator_with_recycler_view);
         ButterKnife.bind(this);
 
         setSupportActionBar(toolbar);
@@ -101,7 +102,7 @@ public class BTDBActivity extends BaseActivity {
         initContentView();
 
         btdbAdapter = new BTDBAdapter();
-        btdbDataSource = new BTDBDataSource(this);
+        btdbDataSource = new SearchDataSource(this, GithubService.DATE_SOURCE_BTDB);
         btdbDataSource.setKeyword(keyword);
         btdbDataSource.setCache(cache);
 
