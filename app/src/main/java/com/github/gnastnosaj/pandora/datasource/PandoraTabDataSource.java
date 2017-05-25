@@ -33,6 +33,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
     private RealmConfiguration realmConfig;
 
+    private int tab;
+
     private JSoupDataSource leeeboTabDataSource;
     private JSoupDataSource k8dyTabDataSource;
     private String leeeboTabPage;
@@ -45,13 +47,13 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
     public PandoraTabDataSource(Context context, int tab) {
         realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB_" + tab).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
+        this.tab = tab;
+
         initLock = new CountDownLatch(1);
 
         Observable init = Observable.zip(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB),
                 githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_TAB),
                 (leeeboTabDataSource, k8dyTabDataSource) -> {
-                    leeeboTabDataSource.setNextPage(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab]);
-                    k8dyTabDataSource.setNextPage(k8dyTabDataSource.baseUrl + k8dyTabDataSource.pages[tab]);
                     this.leeeboTabDataSource = leeeboTabDataSource;
                     this.k8dyTabDataSource = k8dyTabDataSource;
                     return true;
@@ -84,6 +86,9 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
         List<JSoupData> data = new ArrayList<>();
 
         initLock.await();
+
+        leeeboTabDataSource.setNextPage(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab]);
+        k8dyTabDataSource.setNextPage(k8dyTabDataSource.baseUrl + k8dyTabDataSource.pages[tab]);
 
         Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData(true);
         Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData(true);
