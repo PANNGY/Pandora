@@ -371,6 +371,16 @@ public class JSoupDataSource {
         return searchData(keyword);
     }
 
+    public Observable<List<JSoupData>> searchData(String keyword, boolean clear) {
+        history.clear();
+        return searchData(keyword);
+    }
+
+    public Observable<List<JSoupData>> searchData(String keyword, String page, boolean clear) {
+        history.clear();
+        return searchData(keyword, page);
+    }
+
     public List<JSoupData> _searchData(String keyword, DataSelector searchSelector) {
         List<JSoupData> data = new ArrayList<>();
         try {

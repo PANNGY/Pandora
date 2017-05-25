@@ -8,12 +8,6 @@
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
 
-    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯In the crazy search, please go for a stroll first～</string>
-    <string name="search_result_not_found">⊙﹏⊙‖∣°Tragedy, no resources available. Please try again...</string>
-    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾Hey, found that available resources, driving safety attention yo～</string>
-
-    <string name="share_pandora">Found a welfare App "Pandora", free to watch popular movies, more hidden benefits and so you come to dig, recommendation ~:http://fir.im/vrbx is great!</string>
-
     <string name="action_cancel">Cancel</string>
     <string name="action_check">Check</string>
     <string name="action_about">About</string>
@@ -29,4 +23,12 @@
     <string name="action_live_wallpaper">Live Wallpaper</string>
     <string name="action_open_with_browser">Open with Browser</string>
     <string name="action_download_video">Download Video</string>
+
+    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯In the crazy search, please go for a stroll first～</string>
+    <string name="search_result_not_found">⊙﹏⊙‖∣°Tragedy, no resources available. Please try again...</string>
+    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾Hey, found that available resources, driving safety attention yo～</string>
+
+    <string name="share_pandora">Found a welfare App "Pandora", free to watch popular movies, more hidden benefits and so you come to dig, recommendation ~:http://fir.im/vrbx is great!</string>
+
+    <string name="copy_magnet_success">The Magnet Link has been copied to clipboard</string>
 </resources>

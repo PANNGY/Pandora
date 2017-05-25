@@ -35,6 +35,8 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
+    private Context context;
+
     private String[] groups;
 
     private List<JSoupDataSource> dataSources;
@@ -43,6 +45,8 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
     private CountDownLatch refreshLock;
 
     public PandoraHomeDataSource(Context context) {
+        this.context = context;
+
         groups = context.getResources().getStringArray(R.array.pandora_home_groups);
 
         initLock = new CountDownLatch(3);
@@ -85,7 +89,7 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
 
         initLock.await();
 
-        Observable.zip(dataSources.get(0).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
+        Observable<List<JSoupData>> refresh = Observable.zip(dataSources.get(0).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
                 dataSources.get(1).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
                 dataSources.get(2).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
                 (data1, data2, data3) -> {
@@ -94,7 +98,13 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
                     jsoupData.addAll(data2);
                     jsoupData.addAll(data3);
                     return jsoupData;
-                }).subscribeOn(Schedulers.newThread())
+                });
+
+        if (context instanceof BaseActivity) {
+            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
+        refresh.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
                     Realm realm = Realm.getInstance(realmConfig);

@@ -33,6 +33,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
     private RealmConfiguration realmConfig;
 
+    private Context context;
+
     private int tab;
 
     private JSoupDataSource leeeboTabDataSource;
@@ -43,6 +45,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
     private CountDownLatch loadMoreLock;
 
     public PandoraTabDataSource(Context context, int tab) {
+        this.context = context;
+
         realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB_" + tab).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         this.tab = tab;
@@ -85,11 +89,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
         initLock.await();
 
-        leeeboTabDataSource.setNextPage(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab]);
-        k8dyTabDataSource.setNextPage(k8dyTabDataSource.baseUrl + k8dyTabDataSource.pages[tab]);
-
-        Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData(true);
-        Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData(true);
+        Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab], true);
+        Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData(k8dyTabDataSource.baseUrl + k8dyTabDataSource.pages[tab], true);
 
         if (leeeboTabDataSource.getNextPage().equals(leeeboTabDataSource.baseUrl)) {
             leeeboTabDataSource.setNextPage(null);
@@ -107,7 +108,7 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
             });
         }
 
-        Observable<List<JSoupData>> loadData = Observable.zip(leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
+        Observable<List<JSoupData>> refresh = Observable.zip(leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
                 k8dyTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
                 (leeeboTabData, k8dyTabData) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
@@ -116,7 +117,11 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
                     return jsoupData;
                 });
 
-        loadData.subscribeOn(Schedulers.newThread())
+        if (context instanceof BaseActivity) {
+            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
+        refresh.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
                     Realm realm = Realm.getInstance(realmConfig);
@@ -159,7 +164,7 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
             });
         }
 
-        Observable<List<JSoupData>> loadData = Observable.zip(leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
+        Observable<List<JSoupData>> loadMore = Observable.zip(leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
                 k8dyTabLoadData.onErrorReturn((throwable -> new ArrayList<>())),
                 (leeeboTabData, k8dyTabData) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
@@ -168,7 +173,11 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
                     return jsoupData;
                 });
 
-        loadData.subscribeOn(Schedulers.newThread())
+        if (context instanceof BaseActivity) {
+            loadMore = loadMore.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
+        loadMore.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
                     Realm realm = Realm.getInstance(realmConfig);

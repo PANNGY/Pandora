@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -65,9 +64,6 @@ import zlc.season.rxdownload2.RxDownload;
  */
 
 public class PandoraActivity extends BaseActivity {
-    @BindView(R.id.app_bar)
-    AppBarLayout appBar;
-
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -82,6 +78,15 @@ public class PandoraActivity extends BaseActivity {
 
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
+
+    @Override
+    public void onBackPressed() {
+        if (searchView.isOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,6 +207,12 @@ public class PandoraActivity extends BaseActivity {
     }
 
     private void search(String keyword) {
+
+        Intent i = new Intent(this, BTDBActivity.class);
+        i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
+        i.putExtra(BTDBActivity.EXTRA_TITLE, keyword);
+        startActivity(i);
+
         progressBar.setVisibility(View.VISIBLE);
 
         Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();

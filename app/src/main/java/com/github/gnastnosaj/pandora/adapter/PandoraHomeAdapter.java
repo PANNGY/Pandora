@@ -35,6 +35,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.trinea.android.common.util.ListUtils;
 
 /**
  * Created by Jason on 7/17/2015.
@@ -150,7 +151,7 @@ public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAda
 
     @Override
     public boolean isEmpty() {
-        return models.isEmpty();
+        return ListUtils.isEmpty(models);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -8,12 +8,6 @@
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
 
-    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯正在疯狂搜索中，请先随便逛逛吧～</string>
-    <string name="search_result_not_found">⊙﹏⊙‖∣° 悲剧，未找到可用的资源，请重新试试吧...</string>
-    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾嘿嘿，发现可用资源，开车注意安全哟～</string>
-
-    <string name="share_pandora">发现了一款福利App「Pandora」，免费观看热门影片，更有隐藏福利等你来挖掘，太赞了! 推荐~：http://fir.im/vrbx</string>
-
     <string name="action_cancel">取消</string>
     <string name="action_check">查看</string>
     <string name="action_about">关于</string>
@@ -29,4 +23,12 @@
     <string name="action_live_wallpaper">动态壁纸</string>
     <string name="action_open_with_browser">使用外部浏览器打开</string>
     <string name="action_download_video">下载视频</string>
+
+    <string name="searching">╭ (′▽`)╭(′▽`)╭(′▽`)╯正在疯狂搜索中，请先随便逛逛吧～</string>
+    <string name="search_result_not_found">⊙﹏⊙‖∣° 悲剧，未找到可用的资源，请重新试试吧...</string>
+    <string name="search_result_found">＾(￣）￣)《(￣）￣)＾嘿嘿，发现可用资源，开车注意安全哟～</string>
+
+    <string name="share_pandora">发现了一款福利App「Pandora」，免费观看热门影片，更有隐藏福利等你来挖掘，太赞了! 推荐~：http://fir.im/vrbx</string>
+
+    <string name="copy_magnet_success">磁铁链接已复制到剪贴板</string>
 </resources>

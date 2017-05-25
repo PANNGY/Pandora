@@ -23,6 +23,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.trinea.android.common.util.ListUtils;
 
 /**
  * Created by Jason on 7/17/2015.
@@ -86,7 +87,7 @@ public class PandoraTabAdapter extends RecyclerView.Adapter implements IDataAdap
 
     @Override
     public boolean isEmpty() {
-        return data.isEmpty();
+        return ListUtils.isEmpty(data);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
