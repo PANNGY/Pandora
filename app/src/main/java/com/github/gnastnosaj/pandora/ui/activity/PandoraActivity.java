@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -208,11 +209,6 @@ public class PandoraActivity extends BaseActivity {
 
     private void search(String keyword) {
 
-        Intent i = new Intent(this, BTDBActivity.class);
-        i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
-        i.putExtra(BTDBActivity.EXTRA_TITLE, keyword);
-        startActivity(i);
-
         progressBar.setVisibility(View.VISIBLE);
 
         Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();
@@ -264,6 +260,16 @@ public class PandoraActivity extends BaseActivity {
                                 .setMessage(R.string.search_result_found)
                                 .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
                                 .setPositiveButton(R.string.action_check, (dialog, which) -> {
+                                    JSoupData jsoupData = data.get(0);
+                                    if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
+
+                                    } else if (!TextUtils.isEmpty(jsoupData.getAttr("magnet"))) {
+                                        Intent i = new Intent(this, BTDBActivity.class);
+                                        i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
+                                        i.putExtra(BTDBActivity.EXTRA_TITLE, keyword);
+                                        i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                        startActivity(i);
+                                    }
                                     dialog.dismiss();
                                 }).setCancelable(false).show();
                     }

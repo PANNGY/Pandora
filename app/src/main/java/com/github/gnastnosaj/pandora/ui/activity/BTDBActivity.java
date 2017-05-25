@@ -13,11 +13,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ListView;
 
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
@@ -42,6 +44,7 @@ public class BTDBActivity extends BaseActivity {
 
     public static final String EXTRA_KEYWORD = "keyword";
     public static final String EXTRA_TITLE = "title";
+    public static final String EXTRA_CACHE = "cache";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -63,6 +66,7 @@ public class BTDBActivity extends BaseActivity {
 
     private String keyword;
     private String title;
+    private List<JSoupData> cache;
 
     @Override
     public void onBackPressed() {
@@ -84,6 +88,7 @@ public class BTDBActivity extends BaseActivity {
 
         keyword = getIntent().getStringExtra(EXTRA_KEYWORD);
         title = getIntent().getStringExtra(EXTRA_TITLE);
+        cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
 
         setTitle(title);
         ActionBar actionBar = getSupportActionBar();
@@ -91,12 +96,30 @@ public class BTDBActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        initSearchView();
+
+        initContentView();
+
+        btdbAdapter = new BTDBAdapter();
+        btdbDataSource = new BTDBDataSource(this);
+        btdbDataSource.setKeyword(keyword);
+        btdbDataSource.setCache(cache);
+
+        mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
+        mvcHelper.setDataSource(btdbDataSource);
+        mvcHelper.setAdapter(btdbAdapter);
+        mvcHelper.refresh();
+    }
+
+    private void initSearchView() {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                setTitle(query);
-                btdbDataSource.setKeyword(query);
-                mvcHelper.refresh();
+                try {
+                    search(query);
+                } catch (Exception e) {
+                    Timber.e(e, "searchView onQueryText exception");
+                }
                 return false;
             }
 
@@ -105,23 +128,53 @@ public class BTDBActivity extends BaseActivity {
                 return false;
             }
         });
-
         searchView.setOnItemClickListener((adapterView, view, i, l) -> {
             try {
-                keyword = searchView.getSuggestionAtPosition(i);
-                setTitle(keyword);
-                btdbDataSource.setKeyword(keyword);
-                mvcHelper.refresh();
-                searchView.closeSearch();
+                ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+                if (suggestionsListView.getHeaderViewsCount() > 0) {
+                    if (i == 0) {
+                        searchView.clearAll();
+                    } else {
+                        String keyword = searchView.getSuggestionAtPosition(i - 1);
+                        if (!TextUtils.isEmpty(keyword)) {
+                            search(keyword);
+                        }
+                    }
+                } else {
+                    String keyword = searchView.getSuggestionAtPosition(i);
+                    if (!TextUtils.isEmpty(keyword)) {
+                        search(keyword);
+                    }
+                }
             } catch (Exception e) {
-                Timber.e(e, "BTDBActivity searchView OnItemClick exception");
+                Timber.e(e, "searchView onItemClick exception");
+            } finally {
+                searchView.closeSearch();
             }
         });
+        try {
+            ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+            if (suggestionsListView.getHeaderViewsCount() == 0) {
+                View deleteIconView = getLayoutInflater().inflate(R.layout.view_search_delete, null);
+                suggestionsListView.addHeaderView(deleteIconView);
+            }
+        } catch (Exception e) {
+            Timber.e(e, "initSearchView exception");
+        }
+    }
 
+    private void search(String keyword) {
+        setTitle(keyword);
+        btdbDataSource.setKeyword(keyword);
+        mvcHelper.refresh();
+    }
+
+    private void initContentView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).size(1).build());
+
         gestureDetector = new GestureDetector(BTDBActivity.this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
@@ -144,6 +197,7 @@ public class BTDBActivity extends BaseActivity {
                 }
             }
         });
+
         recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
             @Override
             public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
@@ -164,16 +218,6 @@ public class BTDBActivity extends BaseActivity {
                 }
             }
         });
-
-        btdbAdapter = new BTDBAdapter();
-        btdbDataSource = new BTDBDataSource(this);
-        btdbDataSource.setKeyword(keyword);
-
-        mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
-        mvcHelper.setDataSource(btdbDataSource);
-        mvcHelper.setAdapter(btdbAdapter);
-        mvcHelper.refresh();
-
     }
 
     @Override

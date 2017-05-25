@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
+import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
@@ -37,6 +38,7 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
     private JSoupDataSource btdbDataSource;
 
     private String keyword;
+    private List<JSoupData> cache;
 
     private CountDownLatch initLock;
     private CountDownLatch refreshLock;
@@ -64,13 +66,23 @@ public class BTDBDataSource implements IDataSource<List<JSoupData>>, IDataCacheL
         this.keyword = keyword;
     }
 
+    public void setCache(List<JSoupData> cache) {
+        if (!ListUtils.isEmpty(cache)) {
+            this.cache = new ArrayList<>(cache);
+        }
+    }
+
     @Override
     public List<JSoupData> loadCache(boolean isEmpty) {
-        Realm realm = Realm.getInstance(realmConfig);
-        RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
-        List<JSoupData> data = JSoupData.from(results);
-        realm.close();
-        return data;
+        if (!ListUtils.isEmpty(cache)) {
+            return cache;
+        } else {
+            Realm realm = Realm.getInstance(realmConfig);
+            RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
+            List<JSoupData> data = JSoupData.from(results);
+            realm.close();
+            return data;
+        }
     }
 
     @Override
