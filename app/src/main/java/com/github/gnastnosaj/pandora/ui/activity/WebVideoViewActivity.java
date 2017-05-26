@@ -36,9 +36,8 @@ import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.InputStream;
@@ -253,10 +252,10 @@ public class WebVideoViewActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_web_video_view, menu);
 
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_share)
+                .icon(MaterialDesignIconic.Icon.gmi_share)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_open_with_browser).setIcon(new IconicsDrawable(this)
-                .icon(FontAwesome.Icon.faw_chrome)
+                .icon(MaterialDesignIconic.Icon.gmi_open_in_browser)
                 .color(Color.WHITE).sizeDp(18));
 
         return true;

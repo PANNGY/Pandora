@@ -20,12 +20,14 @@ import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
+import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.event.ToolbarEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.util.FileTypeUtil;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.shizhefei.mvc.IDataAdapter;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -80,6 +82,8 @@ public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JS
         JSoupData jsoupData = data.get(position);
 
         PhotoDraweeView draweeView = new PhotoDraweeView(context);
+        draweeView.getHierarchy().setPlaceholderImage(R.drawable.ic_source_pandora_light);
+
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setUri(jsoupData.getAttr("thumbnail"))
                 .setOldController(draweeView.getController())
@@ -95,7 +99,9 @@ public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JS
                     }
                 }).build();
         draweeView.setController(draweeController);
+
         draweeView.setOnViewTapListener((view, v, v1) -> RxBus.getInstance().post(ToolbarEvent.class, new ToolbarEvent()));
+
         draweeView.setOnLongClickListener((v) -> {
             new AlertDialog.Builder(context)
                     .setMessage(R.string.save_to_phone)
@@ -109,7 +115,7 @@ public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JS
 
                                 @Override
                                 public void onSuccess(final String filePath) {
-                                    Observable.<String>create(subscriber -> {
+                                    Observable<String> save = Observable.create(subscriber -> {
                                         String extension = FileTypeUtil.getFileType(filePath);
                                         if (!TextUtils.isEmpty(extension)) {
                                             File origin = new File(filePath);
@@ -120,9 +126,15 @@ public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JS
                                             subscriber.onNext(filePath);
                                         }
                                         subscriber.onComplete();
-                                    }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(newPath -> {
+                                    });
+
+                                    if (context instanceof BaseActivity) {
+                                        save = save.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+                                    }
+
+                                    save.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(newPath -> {
                                         Snackbar.make(draweeView, context.getResources().getString(R.string.save_picture_success, newPath), Snackbar.LENGTH_SHORT).show();
-                                        Intent scannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse(newPath));
+                                        Intent scannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(newPath)));
                                         context.sendBroadcast(scannerIntent);
                                     });
                                 }

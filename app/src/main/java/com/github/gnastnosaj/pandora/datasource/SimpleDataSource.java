@@ -36,6 +36,8 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
     private RealmConfiguration realmConfig;
 
+    private Context context;
+
     private JSoupDataSource simpleDataSource;
 
     private String href;
@@ -50,6 +52,8 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
     }
 
     public SimpleDataSource(Context context, String dataSource, String href) {
+        this.context = context;
+
         this.href = href;
 
         realmConfig = new RealmConfiguration.Builder().name(dataSource).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
@@ -108,6 +112,10 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
         Observable<List<JSoupData>> refresh = simpleDataSource.loadData(href, true);
 
+        if (context instanceof BaseActivity) {
+            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
         refresh.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
@@ -141,6 +149,10 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
         List<JSoupData> data = new ArrayList<>();
 
         Observable<List<JSoupData>> loadMore = simpleDataSource.loadData();
+
+        if (context instanceof BaseActivity) {
+            loadMore = loadMore.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
 
         loadMore.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {

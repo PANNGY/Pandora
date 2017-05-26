@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
@@ -12,19 +13,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.bilibili.socialize.share.core.shareparam.ShareImage;
+import com.bilibili.socialize.share.core.shareparam.ShareParamImage;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.GalleryAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.shizhefei.mvc.ILoadViewFactory;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCNormalHelper;
 import com.shizhefei.mvc.viewhandler.ViewHandler;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,6 +49,13 @@ public class GalleryActivity extends BaseActivity {
     @BindView(R.id.view_pager)
     ViewPager viewPager;
 
+    private String datasource;
+    private String title;
+    private String href;
+    private List<JSoupData> cache;
+
+    private GalleryAdapter galleryAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +64,12 @@ public class GalleryActivity extends BaseActivity {
 
         setSupportActionBar(toolbar);
         initSystemBar();
-        String title = getIntent().getStringExtra(EXTRA_TITLE);
+
+        datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
+        title = getIntent().getStringExtra(EXTRA_TITLE);
+        href = getIntent().getStringExtra(EXTRA_HREF);
+        cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
+
         if (TextUtils.isEmpty(title)) {
             setTitle("");
         } else {
@@ -70,14 +86,14 @@ public class GalleryActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_gallery, menu);
-        menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_star_border)
-                .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_share)
+                .icon(MaterialDesignIconic.Icon.gmi_share)
+                .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
+                .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_mosaic).setIcon(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_edit)
+                .icon(MaterialDesignIconic.Icon.gmi_blur_linear)
                 .color(Color.WHITE).sizeDp(18));
         return true;
     }
@@ -88,18 +104,26 @@ public class GalleryActivity extends BaseActivity {
             case android.R.id.home:
                 onBackPressed();
                 return true;
+            case R.id.action_share:
+                String cover = galleryAdapter.getData().get(0).getAttr("cover");
+                ShareParamImage shareParamImage = new ShareParamImage(title, cover, href);
+                shareParamImage.setImage(new ShareImage(cover));
+                ShareHelper.share(this, shareParamImage);
+                return true;
+            case R.id.action_mosaic:
+                Intent i = new Intent(this, MosaicActivity.class);
+                i.putExtra(MosaicActivity.EXTRA_IMAGE_TITLE, title);
+                i.putExtra(MosaicActivity.EXTRA_IMAGE_URL, galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail"));
+                startActivity(i);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void initViewPager() {
-        String datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
-        String href = getIntent().getStringExtra(EXTRA_HREF);
-        ArrayList<JSoupData> cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
-
         SimpleDataSource galleryDataSource = new SimpleDataSource(this, datasource, href);
         galleryDataSource.setCache(cache);
-        GalleryAdapter galleryAdapter = new GalleryAdapter(this);
+        galleryAdapter = new GalleryAdapter(this);
 
         MVCHelper mvcHelper = new MVCNormalHelper(viewPager);
 

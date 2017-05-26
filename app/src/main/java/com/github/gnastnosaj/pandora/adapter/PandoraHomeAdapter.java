@@ -26,8 +26,8 @@ import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.PandoraHomeDataSource.Model;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.ui.widget.RatioImageView;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.shizhefei.mvc.IDataAdapter;
 
 import java.util.ArrayList;
@@ -103,7 +103,7 @@ public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAda
             holder.itemView.setLayoutParams(itemViewParams);
             holder.groupName.setText((String) model.data);
             holder.iconMore.setImageDrawable(new IconicsDrawable(context)
-                    .icon(FontAwesome.Icon.faw_angle_right)
+                    .icon(MaterialDesignIconic.Icon.gmi_chevron_right)
                     .color(Color.BLACK).sizeDp(18));
         } else if (model.type == Model.TYPE_VALUE_DATA) {
             DraweeController draweeController = Fresco.newDraweeControllerBuilder()

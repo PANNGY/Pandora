@@ -39,8 +39,8 @@ import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
@@ -111,10 +111,10 @@ public class PandoraActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_pandora, menu);
         menu.findItem(R.id.action_search).setIcon(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_search)
+                .icon(MaterialDesignIconic.Icon.gmi_search)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
-                .icon(GoogleMaterial.Icon.gmd_share)
+                .icon(MaterialDesignIconic.Icon.gmi_share)
                 .color(Color.WHITE).sizeDp(18));
         return true;
     }

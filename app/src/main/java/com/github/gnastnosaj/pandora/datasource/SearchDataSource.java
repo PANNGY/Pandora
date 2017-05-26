@@ -35,6 +35,8 @@ public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
     private RealmConfiguration realmConfig;
 
+    private Context context;
+
     private JSoupDataSource searchDataSource;
 
     private String keyword;
@@ -45,6 +47,8 @@ public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCach
     private CountDownLatch loadMoreLock;
 
     public SearchDataSource(Context context, String dataSource) {
+        this.context = context;
+
         realmConfig = new RealmConfiguration.Builder().name(dataSource).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
@@ -104,6 +108,10 @@ public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
         Observable<List<JSoupData>> refresh = searchDataSource.searchData(keyword, null, true);
 
+        if (context instanceof BaseActivity) {
+            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
+
         refresh.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
@@ -134,6 +142,10 @@ public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCach
         List<JSoupData> data = new ArrayList<>();
 
         Observable<List<JSoupData>> loadMore = searchDataSource.searchData(keyword);
+
+        if (context instanceof BaseActivity) {
+            loadMore = loadMore.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
+        }
 
         loadMore.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
