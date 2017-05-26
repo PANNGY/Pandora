@@ -9,6 +9,7 @@ import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -55,6 +56,7 @@ import timber.log.Timber;
  */
 
 public class SimpleTabActivity extends BaseActivity {
+    public final static String EXTRA_TITLE = "title";
     public final static String EXTRA_DATASOURCE = "datasource";
 
     @BindView(R.id.toolbar)
@@ -72,10 +74,12 @@ public class SimpleTabActivity extends BaseActivity {
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
 
+    private String title;
+    private String datasource;
+
     private static List<JSoupLink> tabs;
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
-    private String datasource;
     private RealmConfiguration tabCacheRealmConfig;
     private JSoupDataSource searchDataSource;
 
@@ -97,8 +101,14 @@ public class SimpleTabActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
+        title = getIntent().getStringExtra(EXTRA_TITLE);
         datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
-        tabCacheRealmConfig = new RealmConfiguration.Builder().name(datasource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
 
         initViewPager();
         initSearchView();
@@ -119,6 +129,9 @@ public class SimpleTabActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
             case R.id.action_search:
                 searchView.openSearch();
                 return true;
@@ -158,6 +171,8 @@ public class SimpleTabActivity extends BaseActivity {
 
     private Observable<List<JSoupLink>> initTabs() {
         if (ListUtils.isEmpty(tabs)) {
+            tabCacheRealmConfig = new RealmConfiguration.Builder().name(datasource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+
             Realm realm = Realm.getInstance(tabCacheRealmConfig);
             RealmResults<JSoupLink> results = realm.where(JSoupLink.class).findAll();
             tabs = JSoupLink.from(results);
@@ -249,7 +264,6 @@ public class SimpleTabActivity extends BaseActivity {
     }
 
     private void search(String keyword) {
-
         progressBar.setVisibility(View.VISIBLE);
 
         Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();

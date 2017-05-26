@@ -94,11 +94,7 @@ public class GalleryActivity extends BaseActivity {
         href = getIntent().getStringExtra(EXTRA_HREF);
         cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
 
-        if (TextUtils.isEmpty(title)) {
-            setTitle("");
-        } else {
-            setTitle(title);
-        }
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);

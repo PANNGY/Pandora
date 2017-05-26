@@ -19,6 +19,7 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 
 import java.text.SimpleDateFormat;
@@ -100,6 +101,6 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void start() {
-        startActivity(new Intent(this, JAVLibActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+        startActivity(new Intent(this, SimpleTabActivity.class).putExtra(SimpleTabActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }
