@@ -19,12 +19,12 @@ public class SimplePagerAdapter extends FragmentPagerAdapter {
     private List<JSoupLink> tabs;
     private List<Fragment> fragments;
 
-    public SimplePagerAdapter(Context context, FragmentManager fm, List<JSoupLink> tabs) {
+    public SimplePagerAdapter(Context context, FragmentManager fm, List<JSoupLink> tabs, String datasource) {
         super(fm);
         this.tabs = new ArrayList<>(tabs);
         fragments = new ArrayList<>();
         for (JSoupLink tab : this.tabs) {
-            fragments.add(SimpleTabFragment.newInstance(tab.url));
+            fragments.add(SimpleTabFragment.newInstance(datasource, tab.url));
         }
     }
 

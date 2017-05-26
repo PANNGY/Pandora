@@ -3,6 +3,9 @@ package com.github.gnastnosaj.pandora.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.realm.RealmObject;
 
 /**
@@ -27,6 +30,14 @@ public class JSoupLink extends RealmObject implements Parcelable {
     public JSoupLink(String title, String url) {
         this.title = title;
         this.url = url;
+    }
+
+    public static List<JSoupLink> from(List<JSoupLink> results) {
+        List<JSoupLink> links = new ArrayList<>();
+        for (JSoupLink link : results) {
+            links.add(link.clone());
+        }
+        return links;
     }
 
     @Override

@@ -119,6 +119,11 @@ public abstract class SimpleTabActivity extends BaseActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+
+    protected abstract String getDataSource();
+
+    protected abstract void search(String keyword);
+
     protected abstract Observable<List<JSoupLink>> initTabs();
 
     private void initViewPager() {
@@ -126,7 +131,7 @@ public abstract class SimpleTabActivity extends BaseActivity {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabs -> {
-                    SimplePagerAdapter simplePagerAdapter = new SimplePagerAdapter(this, getSupportFragmentManager(), tabs);
+                    SimplePagerAdapter simplePagerAdapter = new SimplePagerAdapter(this, getSupportFragmentManager(), tabs, getDataSource());
                     viewPager.setAdapter(simplePagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
                 });
@@ -183,7 +188,5 @@ public abstract class SimpleTabActivity extends BaseActivity {
             Timber.e(e, "initSearchView exception");
         }
     }
-
-    protected abstract void search(String keyword);
 
 }

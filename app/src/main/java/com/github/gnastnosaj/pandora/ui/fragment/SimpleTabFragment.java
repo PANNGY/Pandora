@@ -33,13 +33,15 @@ public class SimpleTabFragment extends Fragment {
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
+    private String datasource;
     private String href;
     private View rootView;
     private GestureDetector gestureDetector;
     private MVCHelper mvcHelper;
 
-    public static SimpleTabFragment newInstance(String href) {
+    public static SimpleTabFragment newInstance(String datasource, String href) {
         SimpleTabFragment instance = new SimpleTabFragment();
+        instance.datasource = datasource;
         instance.href = href;
         return instance;
     }
@@ -56,7 +58,7 @@ public class SimpleTabFragment extends Fragment {
     }
 
     private void initSimpleTabView() {
-        SimpleDataSource simpleDataSource = new SimpleDataSource(getActivity(), href);
+        SimpleDataSource simpleDataSource = new SimpleDataSource(getActivity(), datasource, href);
         SimpleAdapter simpleTabAdapter = new SimpleAdapter(getActivity());
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);

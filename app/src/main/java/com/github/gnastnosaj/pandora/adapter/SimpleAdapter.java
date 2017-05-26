@@ -65,7 +65,7 @@ public class SimpleAdapter extends RecyclerView.Adapter implements IDataAdapter<
         holder.thumbnail.setController(draweeController);
         holder.title.setText(jsoupData.getAttr("title"));
     }
-    
+
     @Override
     public int getItemCount() {
         return data.size();

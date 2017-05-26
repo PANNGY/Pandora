@@ -7,6 +7,8 @@ import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.github.gnastnosaj.pandora.BuildConfig;
+import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
@@ -22,6 +24,9 @@ import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 
 /**
  * Created by jasontsang on 5/26/17.
@@ -29,21 +34,17 @@ import io.reactivex.schedulers.Schedulers;
 
 public class JAVLibActivity extends SimpleTabActivity {
 
-    private static List<JSoupLink> tabs;
+    private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("_JAVLIB_TABS_CACHE_").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+
+    private static List<JSoupLink> tabs;
+
     private JSoupDataSource searchDataSource;
 
     @Override
-    protected Observable<List<JSoupLink>> initTabs() {
-        if (ListUtils.isEmpty(tabs)) {
-            return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> jsoupDataSource.loadTabs()).flatMap(data -> {
-                tabs = data;
-                return Observable.just(data);
-            });
-        } else {
-            return Observable.just(tabs);
-        }
+    protected String getDataSource() {
+        return GithubService.DATE_SOURCE_JAVLIB_TAB;
     }
 
     @Override
@@ -116,5 +117,46 @@ public class JAVLibActivity extends SimpleTabActivity {
                                 }).setCancelable(false).show();
                     }
                 });
+    }
+
+    @Override
+    protected Observable<List<JSoupLink>> initTabs() {
+        if (ListUtils.isEmpty(tabs)) {
+            Realm realm = Realm.getInstance(realmConfig);
+            RealmResults<JSoupLink> results = realm.where(JSoupLink.class).findAll();
+            tabs = JSoupLink.from(results);
+            realm.close();
+
+            if (ListUtils.isEmpty(tabs)) {
+                return githubService.getJSoupDataSource(getDataSource())
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
+                        .flatMap(data -> {
+                            tabs = data;
+                            Realm bgRealm = Realm.getInstance(realmConfig);
+                            bgRealm.executeTransactionAsync(bg -> {
+                                bg.delete(JSoupLink.class);
+                                bg.insertOrUpdate(tabs);
+                            });
+                            bgRealm.close();
+                            return Observable.just(data);
+                        });
+            } else {
+                githubService.getJSoupDataSource(getDataSource())
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(data -> {
+                            tabs = data;
+                            Realm bgRealm = Realm.getInstance(realmConfig);
+                            bgRealm.executeTransactionAsync(bg -> {
+                                bg.delete(JSoupLink.class);
+                                bg.insertOrUpdate(tabs);
+                            });
+                            bgRealm.close();
+                        });
+                return Observable.just(tabs);
+            }
+        } else {
+            return Observable.just(tabs);
+        }
     }
 }
