@@ -168,27 +168,6 @@ public class WebVideoViewActivity extends BaseActivity {
         }
     }
 
-    public Disposable newHideOrShowToolbarDisposable(boolean show) {
-        return Observable.timer(5000, TimeUnit.MILLISECONDS)
-                .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> hideOrShowToolbar(show));
-    }
-
-    public void hideOrShowToolbar(boolean show) {
-        isAppBarHidden = show;
-        hideOrShowToolbar();
-    }
-
-    public void hideOrShowToolbar() {
-        appBar.animate()
-                .translationY(isAppBarHidden ? 0 : -appBar.getHeight())
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-        isAppBarHidden = !isAppBarHidden;
-    }
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -281,12 +260,25 @@ public class WebVideoViewActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private class WebVideoViewClient extends WebViewClient {
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);
-            extractVideoSrc();
-        }
+    public Disposable newHideOrShowToolbarDisposable(boolean show) {
+        return Observable.timer(5000, TimeUnit.MILLISECONDS)
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(aLong -> hideOrShowToolbar(show));
+    }
+
+    public void hideOrShowToolbar(boolean show) {
+        isAppBarHidden = show;
+        hideOrShowToolbar();
+    }
+
+    public void hideOrShowToolbar() {
+        appBar.animate()
+                .translationY(isAppBarHidden ? 0 : -appBar.getHeight())
+                .setInterpolator(new DecelerateInterpolator(2))
+                .start();
+        isAppBarHidden = !isAppBarHidden;
     }
 
     private void injectCSS(String filename) {
@@ -315,6 +307,14 @@ public class WebVideoViewActivity extends BaseActivity {
                 "alert('video.src=' + src);" +
                 "video.play();" +
                 "})()");
+    }
+
+    private class WebVideoViewClient extends WebViewClient {
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            extractVideoSrc();
+        }
     }
 
     private class WebChrome extends WebChromeClient implements MediaPlayer.OnCompletionListener {

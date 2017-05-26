@@ -34,7 +34,6 @@ import butterknife.ButterKnife;
  */
 
 public class PandoraTabFragment extends Fragment {
-
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -104,7 +103,7 @@ public class PandoraTabFragment extends Fragment {
                             for (int i = 0; i < groups.length; i++) {
                                 String group = groups[i];
                                 if (group.equals(model.data)) {
-                                    RxBus.getInstance().post(TabEvent.class, new TabEvent(i));
+                                    RxBus.getInstance().post(TabEvent.TAG_PANDORA_TAB, new TabEvent(i));
                                     break;
                                 }
                             }

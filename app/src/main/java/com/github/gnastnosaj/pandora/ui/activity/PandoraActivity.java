@@ -81,6 +81,8 @@ public class PandoraActivity extends BaseActivity {
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
 
+    private Observable<TabEvent> tabEventObservable;
+
     private JSoupDataSource searchDataSource;
 
     @Override
@@ -101,10 +103,18 @@ public class PandoraActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
+        tabEventObservable = RxBus.getInstance().register(TabEvent.TAG_PANDORA_TAB, TabEvent.class);
+
         initViewPager();
         initSearchView();
         checkForUpdate();
         prepareSplashImage();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RxBus.getInstance().unregister(TabEvent.TAG_PANDORA_TAB, tabEventObservable);
     }
 
     @Override
@@ -152,7 +162,7 @@ public class PandoraActivity extends BaseActivity {
         PandoraAdapter pandoraAdapter = new PandoraAdapter(this, getSupportFragmentManager());
         viewPager.setAdapter(pandoraAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        RxBus.getInstance().register(TabEvent.class, TabEvent.class)
+        tabEventObservable
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabEvent -> viewPager.setCurrentItem(tabEvent.tab));

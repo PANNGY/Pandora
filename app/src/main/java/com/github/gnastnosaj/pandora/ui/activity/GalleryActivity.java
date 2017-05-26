@@ -3,6 +3,7 @@ package com.github.gnastnosaj.pandora.ui.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -12,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 
 import com.bilibili.socialize.share.core.shareparam.ShareImage;
 import com.bilibili.socialize.share.core.shareparam.ShareParamImage;
@@ -21,6 +23,7 @@ import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.GalleryAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.event.TagEvent;
+import com.github.gnastnosaj.pandora.event.ToolbarEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
@@ -36,6 +39,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import me.next.tagview.TagCloudView;
 
@@ -48,6 +52,9 @@ public class GalleryActivity extends BaseActivity {
     public final static String EXTRA_TITLE = "title";
     public final static String EXTRA_HREF = "href";
     public static final String EXTRA_CACHE = "cache";
+
+    @BindView(R.id.app_bar)
+    AppBarLayout appBar;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -63,7 +70,15 @@ public class GalleryActivity extends BaseActivity {
     private String href;
     private List<JSoupData> cache;
 
+    private Observable<TagEvent> tagEventObservable;
+    private boolean isAppBarHidden;
     private GalleryAdapter galleryAdapter;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RxBus.getInstance().unregister(href, tagEventObservable);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +104,8 @@ public class GalleryActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        RxBus.getInstance().register(TagEvent.class, TagEvent.class)
-                .compose(bindToLifecycle())
+        tagEventObservable = RxBus.getInstance().register(href, TagEvent.class);
+        tagEventObservable.compose(bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tagEvent -> {
                     List<String> tags = new ArrayList<>();
@@ -101,6 +116,14 @@ public class GalleryActivity extends BaseActivity {
                 });
 
         initViewPager();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ToolbarEvent.observable.compose(bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(toolbarEvent -> hideOrShowToolbar());
     }
 
     @Override
@@ -125,9 +148,9 @@ public class GalleryActivity extends BaseActivity {
                 onBackPressed();
                 return true;
             case R.id.action_share:
-                String cover = galleryAdapter.getData().get(0).getAttr("cover");
-                ShareParamImage shareParamImage = new ShareParamImage(title, cover, href);
-                shareParamImage.setImage(new ShareImage(cover));
+                String thumbnail = galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail");
+                ShareParamImage shareParamImage = new ShareParamImage(title, thumbnail, href);
+                shareParamImage.setImage(new ShareImage(thumbnail));
                 ShareHelper.share(this, shareParamImage);
                 return true;
             case R.id.action_mosaic:
@@ -182,5 +205,13 @@ public class GalleryActivity extends BaseActivity {
             }
         });
         mvcHelper.refresh();
+    }
+
+    public void hideOrShowToolbar() {
+        appBar.animate()
+                .translationY(isAppBarHidden ? 0 : -appBar.getHeight())
+                .setInterpolator(new DecelerateInterpolator(2))
+                .start();
+        isAppBarHidden = !isAppBarHidden;
     }
 }

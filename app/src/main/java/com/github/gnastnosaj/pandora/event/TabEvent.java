@@ -5,6 +5,8 @@ package com.github.gnastnosaj.pandora.event;
  */
 
 public class TabEvent {
+    public final static String TAG_PANDORA_TAB = "pandora_tab";
+
     public int tab;
 
     public TabEvent(int tab) {
