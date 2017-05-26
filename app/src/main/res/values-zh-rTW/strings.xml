@@ -30,5 +30,11 @@
 
     <string name="share_pandora">發現了一款福利App「Pandora」，免費觀看熱門影片，更有隱藏福利等你來挖掘，太贊了！推薦~：http://fir.im/vrbx</string>
 
+    <string name="save_to_phone">保存到相册？</string>
+    <string name="save_do">保存</string>
+    <string name="save_cancel">取消</string>
+    <string name="save_picture_success">圖片已保存 %s</string>
+    <string name="save_picture_fail">保存失敗，請重試</string>
+
     <string name="copy_magnet_success">磁鐵連結已複製到剪貼板</string>
 </resources>

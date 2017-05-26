@@ -45,6 +45,7 @@ public class JSoupDataSource {
     public DataSelector searchSelector;
 
     private List<String> history = new ArrayList<>();
+
     private String currentPage;
     private Document currentDocument;
     private String nextPage;
@@ -420,6 +421,10 @@ public class JSoupDataSource {
             Timber.e(e, "loadData exception");
         }
         return data;
+    }
+
+    public String getCurrentPage() {
+        return currentPage;
     }
 
     public String getNextPage() {

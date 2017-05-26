@@ -30,5 +30,11 @@
 
     <string name="share_pandora">Found a welfare App "Pandora", free to watch popular movies, more hidden benefits and so you come to dig, recommendation ~:http://fir.im/vrbx is great!</string>
 
+    <string name="save_to_phone">Saving to phone?</string>
+    <string name="save_do">Saving</string>
+    <string name="save_cancel">Cancel</string>
+    <string name="save_picture_success">picture saved to %s</string>
+    <string name="save_picture_fail">fail to save picture, please try again</string>
+
     <string name="copy_magnet_success">The Magnet Link has been copied to clipboard</string>
 </resources>

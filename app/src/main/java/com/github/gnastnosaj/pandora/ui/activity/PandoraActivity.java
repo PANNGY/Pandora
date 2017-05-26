@@ -28,6 +28,7 @@ import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
+import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
@@ -79,6 +80,8 @@ public class PandoraActivity extends BaseActivity {
 
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
+
+    private JSoupDataSource searchDataSource;
 
     @Override
     public void onBackPressed() {
@@ -215,6 +218,8 @@ public class PandoraActivity extends BaseActivity {
 
         GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
 
+        searchDataSource = null;
+
         githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB)
                 .flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()))
                 .zipWith(
@@ -229,21 +234,30 @@ public class PandoraActivity extends BaseActivity {
                 )
                 .switchMap((data -> {
                     if (ListUtils.isEmpty(data)) {
-                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()));
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> {
+                            searchDataSource = jsoupDataSource;
+                            return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                        });
                     } else {
                         return Observable.just(data);
                     }
                 }))
                 .switchMap((data -> {
                     if (ListUtils.isEmpty(data)) {
-                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_TAB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()));
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_TAB).flatMap(jsoupDataSource -> {
+                            searchDataSource = jsoupDataSource;
+                            return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                        });
                     } else {
                         return Observable.just(data);
                     }
                 }))
                 .switchMap((data -> {
                     if (ListUtils.isEmpty(data)) {
-                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB).flatMap(jsoupDataSource -> jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>()));
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB).flatMap(jsoupDataSource -> {
+                            searchDataSource = jsoupDataSource;
+                            return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                        });
                     } else {
                         return Observable.just(data);
                     }
@@ -260,10 +274,23 @@ public class PandoraActivity extends BaseActivity {
                                 .setMessage(R.string.search_result_found)
                                 .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
                                 .setPositiveButton(R.string.action_check, (dialog, which) -> {
-                                    JSoupData jsoupData = data.get(0);
-                                    if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
-
-                                    } else if (!TextUtils.isEmpty(jsoupData.getAttr("magnet"))) {
+                                    if (searchDataSource.id.equals(GithubService.DATE_SOURCE_JAVLIB_TAB)) {
+                                        JSoupData jsoupData = data.get(0);
+                                        if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
+                                            Intent i = new Intent(this, GalleryActivity.class);
+                                            i.putExtra(GalleryActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                            i.putExtra(GalleryActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(GalleryActivity.EXTRA_HREF, searchDataSource.getCurrentPage());
+                                            i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                            startActivity(i);
+                                        } else {
+                                            Intent i = new Intent(this, GalleryActivity.class);
+                                            i.putExtra(GalleryActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                            i.putExtra(GalleryActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(GalleryActivity.EXTRA_HREF, jsoupData.getAttr("url"));
+                                            startActivity(i);
+                                        }
+                                    } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
                                         Intent i = new Intent(this, BTDBActivity.class);
                                         i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
                                         i.putExtra(BTDBActivity.EXTRA_TITLE, keyword);

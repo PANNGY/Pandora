@@ -34,8 +34,10 @@ import timber.log.Timber;
 public class ShareHelper {
     private final static ShareListener shareListener = new ShareListener();
 
+    public  static BiliShareConfiguration configuration;
+
     public static void initialize(Context context) {
-        BiliShareConfiguration configuration = new BiliShareConfiguration.Builder(context)
+        ShareHelper.configuration = new BiliShareConfiguration.Builder(context)
                 .imageDownloader(new ShareFrescoImageDownloader())
                 .build();
         BiliShare.global().config(configuration);

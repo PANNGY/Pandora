@@ -30,5 +30,11 @@
 
     <string name="share_pandora">発見した一本の福祉アプリ「Pandora」、性感美女写真唯美の大本営が隠し福祉待って発掘し、かっこよかった！推薦～：http://fir.im/vrbx</string>
 
+    <string name="save_to_phone">アルバムに保存してある？</string>
+    <string name="save_do">保存</string>
+    <string name="save_cancel">キャンセル</string>
+    <string name="save_picture_success">写真は保存している %s</string>
+    <string name="save_picture_fail">セーブに失敗し、再び試みて下さい</string>
+
     <string name="copy_magnet_success">マグネット・リンクをクリップボードにコピーされました</string>
 </resources>

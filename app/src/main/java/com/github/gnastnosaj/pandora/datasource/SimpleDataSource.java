@@ -2,12 +2,14 @@ package com.github.gnastnosaj.pandora.datasource;
 
 import android.content.Context;
 
+import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
+import com.github.gnastnosaj.pandora.event.TagEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
 import com.shizhefei.mvc.IDataSource;
@@ -36,6 +38,7 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
     private JSoupDataSource simpleDataSource;
 
+    private String href;
     private List<JSoupData> cache;
 
     private CountDownLatch initLock;
@@ -43,6 +46,12 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
     private CountDownLatch loadMoreLock;
 
     public SimpleDataSource(Context context, String dataSource) {
+        this(context, dataSource, null);
+    }
+
+    public SimpleDataSource(Context context, String dataSource, String href) {
+        this.href = href;
+
         realmConfig = new RealmConfiguration.Builder().name(dataSource).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
@@ -69,11 +78,15 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
     @Override
     public List<JSoupData> loadCache(boolean isEmpty) {
         if (!ListUtils.isEmpty(cache)) {
+            RxBus.getInstance().post(TagEvent.class, new TagEvent(cache.get(0).tags));
             return cache;
         } else {
             Realm realm = Realm.getInstance(realmConfig);
             RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
             List<JSoupData> data = JSoupData.from(results);
+            if (!ListUtils.isEmpty(data)) {
+                RxBus.getInstance().post(TagEvent.class, new TagEvent(data.get(0).tags));
+            }
             realm.close();
             return data;
         }
@@ -93,11 +106,14 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
         initLock.await();
 
-        Observable<List<JSoupData>> refresh = simpleDataSource.loadData(null, true);
+        Observable<List<JSoupData>> refresh = simpleDataSource.loadData(href, true);
 
         refresh.subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupData -> {
                     data.addAll(jsoupData);
+                    if (!ListUtils.isEmpty(data)) {
+                        RxBus.getInstance().post(TagEvent.class, new TagEvent(data.get(0).tags));
+                    }
                     Realm realm = Realm.getInstance(realmConfig);
                     realm.executeTransactionAsync(bgRealm -> {
                         bgRealm.delete(JSoupData.class);
