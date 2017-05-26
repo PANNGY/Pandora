@@ -13,6 +13,6 @@
         android:layout_marginRight="12dp"
         android:layout_marginTop="12dp"
         app:iiv_color="@color/white"
-        app:iiv_icon="gmd-delete" />
+        app:iiv_icon="gmi-delete" />
     
 </FrameLayout>
