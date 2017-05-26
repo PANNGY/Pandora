@@ -15,11 +15,14 @@ import android.view.View;
 
 import com.bilibili.socialize.share.core.shareparam.ShareImage;
 import com.bilibili.socialize.share.core.shareparam.ShareParamImage;
+import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.GalleryAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
+import com.github.gnastnosaj.pandora.event.TagEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
@@ -28,10 +31,13 @@ import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCNormalHelper;
 import com.shizhefei.mvc.viewhandler.ViewHandler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import me.next.tagview.TagCloudView;
 
 /**
  * Created by jasontsang on 5/26/17.
@@ -48,6 +54,9 @@ public class GalleryActivity extends BaseActivity {
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
+
+    @BindView(R.id.tag_cloud_view)
+    TagCloudView tagCloudView;
 
     private String datasource;
     private String title;
@@ -79,6 +88,17 @@ public class GalleryActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        RxBus.getInstance().register(TagEvent.class, TagEvent.class)
+                .compose(bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(tagEvent -> {
+                    List<String> tags = new ArrayList<>();
+                    for (JSoupLink link : tagEvent.tags) {
+                        tags.add(link.title);
+                    }
+                    tagCloudView.setTags(tags);
+                });
 
         initViewPager();
     }
