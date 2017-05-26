@@ -28,13 +28,13 @@ import cn.trinea.android.common.util.ListUtils;
 /**
  * Created by Jason on 7/17/2015.
  */
-public class PandoraTabAdapter extends RecyclerView.Adapter implements IDataAdapter<List<JSoupData>> {
+public class SimpleAdapter extends RecyclerView.Adapter implements IDataAdapter<List<JSoupData>> {
 
     private Context context;
 
     private List<JSoupData> data = new ArrayList<>();
 
-    public PandoraTabAdapter(Context context) {
+    public SimpleAdapter(Context context) {
         this.context = context;
     }
 
