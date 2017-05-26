@@ -1,9 +1,12 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import android.os.Parcelable;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
@@ -17,30 +20,43 @@ import android.widget.ProgressBar;
 
 import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
+import com.github.gnastnosaj.pandora.BuildConfig;
+import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.SimplePagerAdapter;
+import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
+import com.github.gnastnosaj.pandora.datasource.service.GithubService;
+import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
+import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmResults;
 import timber.log.Timber;
 
 /**
  * Created by jasontsang on 5/26/17.
  */
 
-public abstract class SimpleTabActivity extends BaseActivity {
+public class SimpleTabActivity extends BaseActivity {
+    public final static String EXTRA_DATASOURCE = "datasource";
+
     @BindView(R.id.toolbar)
     Toolbar toolbar;
 
@@ -55,6 +71,13 @@ public abstract class SimpleTabActivity extends BaseActivity {
 
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
+
+    private static List<JSoupLink> tabs;
+
+    private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+    private String datasource;
+    private RealmConfiguration tabCacheRealmConfig;
+    private JSoupDataSource searchDataSource;
 
     @Override
     public void onBackPressed() {
@@ -73,6 +96,9 @@ public abstract class SimpleTabActivity extends BaseActivity {
 
         setSupportActionBar(toolbar);
         initSystemBar();
+
+        datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
+        tabCacheRealmConfig = new RealmConfiguration.Builder().name(datasource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initViewPager();
         initSearchView();
@@ -119,22 +145,55 @@ public abstract class SimpleTabActivity extends BaseActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-
-    protected abstract String getDataSource();
-
-    protected abstract void search(String keyword);
-
-    protected abstract Observable<List<JSoupLink>> initTabs();
-
     private void initViewPager() {
         initTabs().compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabs -> {
-                    SimplePagerAdapter simplePagerAdapter = new SimplePagerAdapter(this, getSupportFragmentManager(), tabs, getDataSource());
+                    SimplePagerAdapter simplePagerAdapter = new SimplePagerAdapter(this, getSupportFragmentManager(), tabs, datasource);
                     viewPager.setAdapter(simplePagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
                 });
+    }
+
+    private Observable<List<JSoupLink>> initTabs() {
+        if (ListUtils.isEmpty(tabs)) {
+            Realm realm = Realm.getInstance(tabCacheRealmConfig);
+            RealmResults<JSoupLink> results = realm.where(JSoupLink.class).findAll();
+            tabs = JSoupLink.from(results);
+            realm.close();
+
+            if (ListUtils.isEmpty(tabs)) {
+                return githubService.getJSoupDataSource(datasource)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
+                        .flatMap(data -> {
+                            tabs = data;
+                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
+                            bgRealm.executeTransactionAsync(bg -> {
+                                bg.delete(JSoupLink.class);
+                                bg.insertOrUpdate(tabs);
+                            });
+                            bgRealm.close();
+                            return Observable.just(data);
+                        });
+            } else {
+                githubService.getJSoupDataSource(datasource)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(data -> {
+                            tabs = data;
+                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
+                            bgRealm.executeTransactionAsync(bg -> {
+                                bg.delete(JSoupLink.class);
+                                bg.insertOrUpdate(tabs);
+                            });
+                            bgRealm.close();
+                        });
+                return Observable.just(tabs);
+            }
+        } else {
+            return Observable.just(tabs);
+        }
     }
 
     private void initSearchView() {
@@ -189,4 +248,74 @@ public abstract class SimpleTabActivity extends BaseActivity {
         }
     }
 
+    private void search(String keyword) {
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();
+
+        searchDataSource = null;
+
+        githubService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB).flatMap(jsoupDataSource -> {
+            searchDataSource = jsoupDataSource;
+            return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+        }).switchMap((data -> {
+            if (ListUtils.isEmpty(data)) {
+                return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_AVSOX_TAB).flatMap(jsoupDataSource -> {
+                    searchDataSource = jsoupDataSource;
+                    return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                });
+            } else {
+                return Observable.just(data);
+            }
+        })).switchMap((data -> {
+            if (ListUtils.isEmpty(data)) {
+                return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB).flatMap(jsoupDataSource -> {
+                    searchDataSource = jsoupDataSource;
+                    return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                });
+            } else {
+                return Observable.just(data);
+            }
+        }))
+                .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(data -> {
+                    progressBar.setVisibility(View.GONE);
+                    if (ListUtils.isEmpty(data)) {
+                        Snackbar.make(searchView, R.string.search_result_not_found, Snackbar.LENGTH_LONG).show();
+                    } else {
+                        new AlertDialog.Builder(this)
+                                .setMessage(R.string.search_result_found)
+                                .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
+                                .setPositiveButton(R.string.action_check, (dialog, which) -> {
+                                    if (searchDataSource.id.equals(GithubService.DATE_SOURCE_JAVLIB_TAB)) {
+                                        JSoupData jsoupData = data.get(0);
+                                        if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
+                                            Intent i = new Intent(this, GalleryActivity.class);
+                                            i.putExtra(GalleryActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                            i.putExtra(GalleryActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(GalleryActivity.EXTRA_HREF, searchDataSource.getCurrentPage());
+                                            i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                            startActivity(i);
+                                        } else {
+                                            Intent i = new Intent(this, GalleryActivity.class);
+                                            i.putExtra(GalleryActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                            i.putExtra(GalleryActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(GalleryActivity.EXTRA_HREF, jsoupData.getAttr("url"));
+                                            startActivity(i);
+                                        }
+                                    } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
+                                        Intent i = new Intent(this, BTDBActivity.class);
+                                        i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
+                                        i.putExtra(BTDBActivity.EXTRA_TITLE, keyword);
+                                        i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                        startActivity(i);
+                                    }
+                                    dialog.dismiss();
+                                }).setCancelable(false).show();
+                    }
+                });
+    }
 }

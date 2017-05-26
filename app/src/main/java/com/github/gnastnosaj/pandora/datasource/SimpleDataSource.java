@@ -1,6 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
@@ -56,7 +57,7 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
         this.href = href;
 
-        realmConfig = new RealmConfiguration.Builder().name(dataSource).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+        realmConfig = new RealmConfiguration.Builder().name(dataSource + (TextUtils.isEmpty(href) ? "" : ("_" + href.hashCode()))).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
 
