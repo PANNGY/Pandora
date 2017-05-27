@@ -17,6 +17,7 @@ import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.ui.activity.BTDBActivity;
 import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleTabActivity;
+import com.github.gnastnosaj.pandora.ui.activity.SimpleViewPagerActivity;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class SearchService {
     public final static int TYPE_MAGNET = 1;
 
     private Context context;
+    private String keyword;
 
     private SearchListener searchListener;
     private JSoupDataSource searchDataSource;
@@ -53,7 +55,36 @@ public class SearchService {
         search(title, keyword, TYPE_DEFAULT);
     }
 
-    private void search(String title, String keyword, int type) {
+    private void search(String title, String _keyword, int type) {
+        switch (_keyword) {
+            case "girl":
+                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                return;
+            case "man":
+                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_TAB)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_GALLERY)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                return;
+            case "jav":
+                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                return;
+            case "avsox":
+                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_TAB)
+                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_GALLERY)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                return;
+        }
+
+        keyword = betterKeyword(_keyword);
+
         if (searchListener != null) {
             searchListener.onStart();
         }

@@ -19,7 +19,6 @@ import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 
 import java.text.SimpleDateFormat;
@@ -101,9 +100,6 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void start() {
-        startActivity(new Intent(this, SimpleViewPagerActivity.class)
-                .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_TAB)
-                .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_GALLERY)
-                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+        startActivity(new Intent(this, PandoraActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }
