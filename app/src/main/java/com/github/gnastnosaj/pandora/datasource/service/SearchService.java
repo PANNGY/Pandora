@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
+import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.ui.activity.BTDBActivity;
 import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
@@ -140,6 +141,8 @@ public class SearchService {
                                                 Intent i = new Intent(context, GalleryActivity.class);
                                                 i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
                                                 i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                                jsoupData.attrs.add(new JSoupAttr("url", searchDataSource.getCurrentPage()));
+                                                jsoupData.attrs.add(new JSoupAttr("id", keyword));
                                                 i.putExtra(GalleryActivity.EXTRA_DATA, jsoupData);
                                                 i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                 context.startActivity(i);
