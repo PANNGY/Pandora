@@ -203,7 +203,7 @@ public class GalleryActivity extends BaseActivity {
             Realm realm = Realm.getInstance(favouriteRealmConfiguration);
             RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
             for (JSoupData result : results) {
-                if (href.equals(result.getAttr("href")) || href.equals(result.getAttr("url"))) {
+                if (href.equals(result.getAttr("href"))) {
                     favourite = true;
                     break;
                 }
@@ -267,7 +267,7 @@ public class GalleryActivity extends BaseActivity {
                         realm.executeTransactionAsync(bgRealm -> {
                             RealmResults<JSoupData> results = bgRealm.where(JSoupData.class).findAll();
                             for (JSoupData result : results) {
-                                if (href.equals(result.getAttr("href")) || href.equals(result.getAttr("url"))) {
+                                if (href.equals(result.getAttr("href"))) {
                                     result.deleteFromRealm();
                                     break;
                                 }
