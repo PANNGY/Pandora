@@ -304,6 +304,7 @@ public class GalleryActivity extends BaseActivity {
                                 .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                                 .color(getResources().getColor(R.color.colorAccent)).sizeDp(18));
                     }
+                    favourite = !favourite;
                 }
                 return true;
             case R.id.action_mosaic:
