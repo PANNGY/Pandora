@@ -102,8 +102,8 @@ public class SplashActivity extends BaseActivity {
 
     private void start() {
         startActivity(new Intent(this, SimpleViewPagerActivity.class)
-                .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_TAB)
-                .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_GALLERY)
+                .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_TAB)
+                .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_GALLERY)
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

@@ -9,12 +9,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
@@ -26,6 +26,7 @@ import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
+import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
@@ -33,6 +34,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
@@ -46,6 +48,7 @@ import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import me.next.tagview.TagCloudView;
 import timber.log.Timber;
 
 /**
@@ -72,14 +75,18 @@ public class SimpleViewPagerActivity extends BaseActivity {
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
 
+    ListView suggestionsListView;
+
     private String title;
     private String tabDataSource;
     private String galleryDataSource;
 
+    private static List catalog;
     private static List<JSoupLink> tabs;
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
     private RealmConfiguration tabCacheRealmConfig;
+    private RealmConfiguration catalogCacheRealmConfig;
     private JSoupDataSource searchDataSource;
 
     @Override
@@ -112,16 +119,20 @@ public class SimpleViewPagerActivity extends BaseActivity {
 
         initViewPager();
         initSearchView();
+        initCatalog();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_pandora, menu);
+        getMenuInflater().inflate(R.menu.menu_simple_view_pager, menu);
         menu.findItem(R.id.action_search).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_search)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_share)
+                .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
+                .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                 .color(Color.WHITE).sizeDp(18));
         return true;
     }
@@ -139,23 +150,16 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 ShareHelper.share(this, new ShareParamText(getResources().getString(R.string.action_share), getResources().getString(R.string.share_pandora)));
                 return true;
             case R.id.action_favourite:
+                Intent i = new Intent(this, SimpleTabActivity.class);
+                i.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
+                i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
+                i.putExtra(SimpleTabActivity.EXTRA_TYPE, SimpleTabActivity.TYPE_FAVOURITE);
+                startActivity(i);
                 return true;
             case R.id.action_about:
                 return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
-            Intent i = new Intent(Intent.ACTION_MAIN);
-            i.addCategory(Intent.CATEGORY_HOME);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
     }
 
     private void initViewPager() {
@@ -211,6 +215,116 @@ public class SimpleViewPagerActivity extends BaseActivity {
         }
     }
 
+    private void initCatalog() {
+        if (ListUtils.isEmpty(catalog)) {
+            catalogCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_CATALOG_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+
+            Realm realm = Realm.getInstance(catalogCacheRealmConfig);
+            RealmResults results = realm.where(JSoupLink.class).findAll();
+            catalog = JSoupLink.from(results);
+            if (ListUtils.isEmpty(results)) {
+                results = realm.where(JSoupCatalog.class).findAll();
+                catalog = JSoupLink.from(results);
+            }
+            realm.close();
+
+            if (ListUtils.isEmpty(catalog)) {
+                githubService.getJSoupDataSource(tabDataSource)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
+                        .flatMap(data -> {
+                            catalog = (List) data;
+                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
+                            bgRealm.executeTransactionAsync(bg -> {
+                                if (!ListUtils.isEmpty(catalog)) {
+                                    if (catalog.get(0) instanceof JSoupCatalog) {
+                                        bg.delete(JSoupCatalog.class);
+                                    } else {
+                                        bg.delete(JSoupLink.class);
+                                    }
+                                    bg.insertOrUpdate(catalog);
+                                }
+                            });
+                            bgRealm.close();
+                            return Observable.just(data);
+                        }).compose(bindUntilEvent(ActivityEvent.DESTROY))
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(data -> setCatalog());
+            } else {
+                setCatalog();
+                githubService.getJSoupDataSource(tabDataSource)
+                        .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
+                        .subscribeOn(Schedulers.newThread())
+                        .subscribe(data -> {
+                            catalog = (List) data;
+                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
+                            bgRealm.executeTransactionAsync(bg -> {
+                                if (!ListUtils.isEmpty(catalog)) {
+                                    if (catalog.get(0) instanceof JSoupCatalog) {
+                                        bg.delete(JSoupCatalog.class);
+                                    } else {
+                                        bg.delete(JSoupLink.class);
+                                    }
+                                    bg.insertOrUpdate(catalog);
+                                }
+                            });
+                            bgRealm.close();
+                        });
+            }
+        } else {
+            setCatalog();
+        }
+    }
+
+    private void setCatalog() {
+        if (!ListUtils.isEmpty(this.catalog)) {
+            if (this.catalog.get(0) instanceof JSoupCatalog) {
+                List<JSoupCatalog> catalog = (List<JSoupCatalog>) this.catalog;
+                for (JSoupCatalog jsoupCatalog : catalog) {
+                    View tagGroupView = getLayoutInflater().inflate(R.layout.item_tag_cloud, null);
+                    TextView tagGroupTitle = (TextView) tagGroupView.findViewById(R.id.tag_group_title);
+                    tagGroupTitle.setText(jsoupCatalog.link.title);
+
+                    TagCloudView tagCloudView = (TagCloudView) tagGroupView.findViewById(R.id.tag_cloud_view);
+
+                    List<String> tags = new ArrayList<>();
+                    for (JSoupLink link : jsoupCatalog.tags) {
+                        tags.add(link.title);
+                    }
+                    tagCloudView.setTags(tags);
+                    tagCloudView.setOnTagClickListener(position -> {
+                        Intent intent = new Intent(this, SimpleTabActivity.class);
+                        intent.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
+                        intent.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
+                        intent.putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position));
+                        intent.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupCatalog.tags.get(position).url);
+                        startActivity(intent);
+                    });
+                    suggestionsListView.addFooterView(tagGroupView);
+                }
+            } else {
+                List<JSoupLink> catalog = (List<JSoupLink>) this.catalog;
+                View tagGroupView = getLayoutInflater().inflate(R.layout.item_tag_cloud, null);
+                TagCloudView tagCloudView = (TagCloudView) tagGroupView.findViewById(R.id.tag_cloud_view);
+
+                List<String> tags = new ArrayList<>();
+                for (JSoupLink link : catalog) {
+                    tags.add(link.title);
+                }
+                tagCloudView.setTags(tags);
+                tagCloudView.setOnTagClickListener(position -> {
+                    Intent intent = new Intent(this, SimpleTabActivity.class);
+                    intent.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
+                    intent.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
+                    intent.putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position));
+                    intent.putExtra(SimpleTabActivity.EXTRA_HREF, catalog.get(position).url);
+                    startActivity(intent);
+                });
+                suggestionsListView.addFooterView(tagGroupView);
+            }
+        }
+    }
+
     private void initSearchView() {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
@@ -253,7 +367,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
             }
         });
         try {
-            ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+            suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
             if (suggestionsListView.getHeaderViewsCount() == 0) {
                 View deleteIconView = getLayoutInflater().inflate(R.layout.view_search_delete, null);
                 suggestionsListView.addHeaderView(deleteIconView);

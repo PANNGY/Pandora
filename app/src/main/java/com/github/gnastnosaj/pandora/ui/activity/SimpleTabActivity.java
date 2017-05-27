@@ -16,6 +16,7 @@ import android.view.View;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.SimpleTabAdapter;
+import com.github.gnastnosaj.pandora.datasource.FavouriteDataSource;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.MVCHelper;
@@ -36,7 +37,11 @@ public class SimpleTabActivity extends BaseActivity {
     public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
     public final static String EXTRA_TITLE = "title";
     public final static String EXTRA_HREF = "href";
-    public static final String EXTRA_CACHE = "cache";
+    public final static String EXTRA_CACHE = "cache";
+    public final static String EXTRA_TYPE = "type";
+
+    public final static int TYPE_DEFAULT = 0;
+    public final static int TYPE_FAVOURITE = 1;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -52,6 +57,7 @@ public class SimpleTabActivity extends BaseActivity {
 
     private String tabDataSource;
     private String galleryDataSource;
+    private int type;
     private String title;
     private String href;
     private List<JSoupData> cache;
@@ -72,6 +78,7 @@ public class SimpleTabActivity extends BaseActivity {
 
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
         galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
+        type = getIntent().getIntExtra(EXTRA_TYPE, TYPE_DEFAULT);
         title = getIntent().getStringExtra(EXTRA_TITLE);
         href = getIntent().getStringExtra(EXTRA_HREF);
         cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
@@ -97,8 +104,6 @@ public class SimpleTabActivity extends BaseActivity {
 
     private void initContentView() {
         SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter(this);
-        SimpleDataSource simpleDataSource = new SimpleDataSource(this, tabDataSource, href);
-        simpleDataSource.setCache(cache);
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
@@ -146,7 +151,14 @@ public class SimpleTabActivity extends BaseActivity {
         });
 
         MVCHelper mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
-        mvcHelper.setDataSource(simpleDataSource);
+        if (type == TYPE_DEFAULT) {
+            SimpleDataSource simpleDataSource = new SimpleDataSource(this, tabDataSource, href);
+            simpleDataSource.setCache(cache);
+            mvcHelper.setDataSource(simpleDataSource);
+        } else if (type == TYPE_FAVOURITE) {
+            FavouriteDataSource favouriteDataSource = new FavouriteDataSource(tabDataSource);
+            mvcHelper.setDataSource(favouriteDataSource);
+        }
         mvcHelper.setAdapter(simpleTabAdapter);
         mvcHelper.refresh();
     }

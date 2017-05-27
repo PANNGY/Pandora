@@ -10,4 +10,15 @@ import io.realm.RealmObject;
 public class JSoupCatalog extends RealmObject {
     public JSoupLink link;
     public RealmList<JSoupLink> tags;
+
+    @Override
+    protected JSoupCatalog clone() {
+        JSoupCatalog catalog = new JSoupCatalog();
+        catalog.link = link.clone();
+        catalog.tags = new RealmList<>();
+        for (JSoupLink jsoupLink : tags) {
+            catalog.tags.add(jsoupLink.clone());
+        }
+        return catalog;
+    }
 }
