@@ -206,7 +206,7 @@ public class BTDBActivity extends BaseActivity {
                         JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
                         Uri uri = Uri.parse(jsoupData.getAttr("magnet"));
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                        intent.putExtra(WebVideoViewActivity.EXTRA_ID, keyword);
+                        intent.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword);
                         intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, jsoupData.getAttr("title"));
                         startActivity(intent);
                     }

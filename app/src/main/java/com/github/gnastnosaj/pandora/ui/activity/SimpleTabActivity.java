@@ -126,7 +126,7 @@ public class SimpleTabActivity extends BaseActivity {
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
                         JSoupData data = simpleTabAdapter.getData().get(childPosition);
                         Intent i = new Intent(SimpleTabActivity.this, GalleryActivity.class);
-                        i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, tabDataSource);
+                        i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
                         i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
                         i.putExtra(GalleryActivity.EXTRA_DATA, data);
                         startActivity(i);

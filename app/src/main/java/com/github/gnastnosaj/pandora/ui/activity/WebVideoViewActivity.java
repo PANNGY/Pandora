@@ -54,10 +54,8 @@ import timber.log.Timber;
  * Created by jason on 8/17/2016.
  */
 public class WebVideoViewActivity extends BaseActivity {
-
-    public static final String EXTRA_ID = "id";
+    public static final String EXTRA_KEYWORD = "keyword";
     public static final String EXTRA_TITLE = "title";
-    public static final String EXTRA_HREF = "href";
 
     public static final String BASE_URL = "https://apiv.ga/magnet/";
     public static final String HACK_CSS_DIR = "hack_css/";
@@ -82,10 +80,11 @@ public class WebVideoViewActivity extends BaseActivity {
     private Disposable appBarHiddenDisposable;
     private GestureDetector gestureDetector;
 
-    private String id;
+    private String keyword;
     private String title;
-    private String href;
     private String magnet;
+
+    private String href;
     private String videoSrc;
 
     @Override
@@ -99,9 +98,8 @@ public class WebVideoViewActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-        id = getIntent().getStringExtra(EXTRA_ID);
+        keyword = getIntent().getStringExtra(EXTRA_KEYWORD);
         title = getIntent().getStringExtra(EXTRA_TITLE);
-        href = getIntent().getStringExtra(EXTRA_HREF);
         magnet = getIntent().getDataString();
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);
@@ -333,7 +331,7 @@ public class WebVideoViewActivity extends BaseActivity {
             if (message.startsWith("video.src=")) {
                 videoSrc = message.substring(10);
                 ArchiveEvent archiveEvent = new ArchiveEvent();
-                archiveEvent.keyword = TextUtils.isEmpty(id) ? title : id;
+                archiveEvent.keyword = keyword;
                 archiveEvent.magnet = magnet;
                 RxBus.getInstance().post(ArchiveEvent.class, archiveEvent);
             } else {

@@ -46,10 +46,14 @@ public class SearchService {
     }
 
     private void search(String keyword) {
-        search(keyword, TYPE_DEFAULT);
+        search(null, keyword, TYPE_DEFAULT);
     }
 
-    private void search(String keyword, int type) {
+    private void search(String title, String keyword) {
+        search(title, keyword, TYPE_DEFAULT);
+    }
+
+    private void search(String title, String keyword, int type) {
         if (searchListener != null) {
             searchListener.onStart();
         }
@@ -141,7 +145,8 @@ public class SearchService {
                                                 Intent i = new Intent(context, GalleryActivity.class);
                                                 i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
                                                 i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                                jsoupData.attrs.add(new JSoupAttr("url", searchDataSource.getCurrentPage()));
+                                                jsoupData.attrs.add(new JSoupAttr("href", searchDataSource.getCurrentPage()));
+                                                jsoupData.attrs.add(new JSoupAttr("title", TextUtils.isEmpty(title) ? keyword : title));
                                                 jsoupData.attrs.add(new JSoupAttr("id", keyword));
                                                 i.putExtra(GalleryActivity.EXTRA_DATA, jsoupData);
                                                 i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
@@ -150,14 +155,14 @@ public class SearchService {
                                                 Intent i = new Intent(context, SimpleTabActivity.class);
                                                 i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
                                                 i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                                i.putExtra(SimpleTabActivity.EXTRA_TITLE, keyword);
+                                                i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
                                                 i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("href"));
                                                 context.startActivity(i);
                                             }
                                         } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
                                             Intent i = new Intent(context, BTDBActivity.class);
                                             i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
-                                            i.putExtra(BTDBActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
                                             i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                             context.startActivity(i);
                                         }
@@ -176,11 +181,19 @@ public class SearchService {
     }
 
     public static void search(@NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
-        new SearchService(context, searchListener).search(keyword);
+        new SearchService(context, searchListener).search(null, keyword);
+    }
+
+    public static void search(@Nullable String title, @NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(title, keyword);
     }
 
     public static void search(@NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
-        new SearchService(context, searchListener).search(keyword, type);
+        new SearchService(context, searchListener).search(keyword, null, type);
+    }
+
+    public static void search(@Nullable String title, @NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(title, keyword, type);
     }
 
     public static String betterKeyword(String keyword) {

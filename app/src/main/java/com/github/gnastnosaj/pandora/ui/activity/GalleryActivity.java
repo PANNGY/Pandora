@@ -236,7 +236,7 @@ public class GalleryActivity extends BaseActivity {
                 ShareHelper.share(this, shareParamImage);
                 return true;
             case R.id.action_search:
-                SearchService.search(keyword, SearchService.TYPE_MAGNET, this, null);
+                SearchService.search(title, keyword, SearchService.TYPE_MAGNET, this, null);
                 return true;
             case R.id.action_play:
                 Observable.<ArchiveEvent>create(subcriber -> {
@@ -254,7 +254,7 @@ public class GalleryActivity extends BaseActivity {
                             if (archiveEvent != null) {
                                 Uri uri = Uri.parse(archiveEvent.magnet);
                                 Intent i = new Intent(Intent.ACTION_VIEW, uri);
-                                i.putExtra(WebVideoViewActivity.EXTRA_ID, id);
+                                i.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, id);
                                 i.putExtra(WebVideoViewActivity.EXTRA_TITLE, title);
                                 startActivity(i);
                             }
