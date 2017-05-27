@@ -29,12 +29,10 @@ import android.widget.ProgressBar;
 
 import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
+import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
-import com.github.gnastnosaj.pandora.BuildConfig;
-import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.model.JSoupAttr;
-import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.event.ArchiveEvent;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
@@ -49,9 +47,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.RealmList;
 import mehdi.sakout.dynamicbox.DynamicBox;
 import timber.log.Timber;
 
@@ -82,7 +77,6 @@ public class WebVideoViewActivity extends BaseActivity {
     @BindView(R.id.web_view)
     WebView webView;
 
-    private RealmConfiguration realmConfig;
     private DynamicBox dynamicBox;
     private boolean isAppBarHidden;
     private Disposable appBarHiddenDisposable;
@@ -99,8 +93,6 @@ public class WebVideoViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_video_view);
         ButterKnife.bind(this);
-
-        realmConfig = new RealmConfiguration.Builder().name("WEB_VIDEO").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         dynamicBox = createDynamicBox(swipeRefreshLayout);
 
@@ -340,16 +332,10 @@ public class WebVideoViewActivity extends BaseActivity {
         public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
             if (message.startsWith("video.src=")) {
                 videoSrc = message.substring(10);
-                JSoupData jsoupData = new JSoupData();
-                jsoupData.attrs = new RealmList<>();
-                jsoupData.attrs.add(new JSoupAttr("id", id));
-                jsoupData.attrs.add(new JSoupAttr("title", title));
-                jsoupData.attrs.add(new JSoupAttr("href", href));
-                jsoupData.attrs.add(new JSoupAttr("magnet", magnet));
-                jsoupData.attrs.add(new JSoupAttr("videoSrc", videoSrc));
-                Realm realm = Realm.getInstance(realmConfig);
-                realm.executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(jsoupData));
-                realm.close();
+                ArchiveEvent archiveEvent = new ArchiveEvent();
+                archiveEvent.keyword = TextUtils.isEmpty(id) ? title : id;
+                archiveEvent.magnet = magnet;
+                RxBus.getInstance().post(ArchiveEvent.class, archiveEvent);
             } else {
                 Timber.d(message);
             }

@@ -179,6 +179,14 @@ public class SearchService {
         new SearchService(context, searchListener).search(keyword);
     }
 
+    public static void search(@NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(keyword, type);
+    }
+
+    public static String betterKeyword(String keyword) {
+        return keyword.replace("-", " ");
+    }
+
     public interface SearchListener {
         void onStart();
 
