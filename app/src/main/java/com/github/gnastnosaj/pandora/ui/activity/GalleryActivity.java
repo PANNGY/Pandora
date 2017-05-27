@@ -323,7 +323,6 @@ public class GalleryActivity extends BaseActivity {
         MVCHelper mvcHelper = new MVCNormalHelper(viewPager, MVCHelper.loadViewFactory.madeLoadView(), new ILoadViewFactory.ILoadMoreView() {
             @Override
             public void init(ILoadViewFactory.FootViewAdder footViewHolder, View.OnClickListener onClickLoadMoreListener) {
-
             }
 
             @Override
