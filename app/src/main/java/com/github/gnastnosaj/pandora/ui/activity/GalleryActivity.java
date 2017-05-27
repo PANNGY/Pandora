@@ -102,6 +102,9 @@ public class GalleryActivity extends BaseActivity {
         id = data.getAttr("id");
         title = data.getAttr("title");
         href = data.getAttr("href");
+        if (TextUtils.isEmpty("href")) {
+            href = data.getAttr("url");
+        }
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
