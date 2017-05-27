@@ -145,6 +145,8 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
 
         List<JSoupData> data = new ArrayList<>();
 
+        initLock.await();
+
         Observable<List<JSoupData>> loadMore = simpleDataSource.loadData();
 
         if (context instanceof BaseActivity) {

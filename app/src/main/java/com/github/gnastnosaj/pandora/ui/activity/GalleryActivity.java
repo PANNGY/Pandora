@@ -5,12 +5,10 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,13 +30,13 @@ import com.github.gnastnosaj.pandora.event.TagEvent;
 import com.github.gnastnosaj.pandora.event.ToolbarEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
+import com.github.gnastnosaj.pandora.ui.widget.ViewPagerViewHandler;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.shizhefei.mvc.ILoadViewFactory;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCNormalHelper;
-import com.shizhefei.mvc.viewhandler.ViewHandler;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
@@ -322,42 +320,35 @@ public class GalleryActivity extends BaseActivity {
         galleryDataSource.setCache(cache);
         galleryAdapter = new GalleryAdapter(this);
 
-        MVCHelper mvcHelper = new MVCNormalHelper(viewPager);
-
-        mvcHelper.setDataSource(galleryDataSource);
-        mvcHelper.setAdapter(galleryAdapter, new ViewHandler() {
+        MVCHelper mvcHelper = new MVCNormalHelper(viewPager, MVCHelper.loadViewFactory.madeLoadView(), new ILoadViewFactory.ILoadMoreView() {
             @Override
-            public boolean handleSetAdapter(View contentView, Object viewAdapter, ILoadViewFactory.ILoadMoreView loadMoreView, View.OnClickListener onClickLoadMoreListener) {
-                ViewPager viewPager = (ViewPager) contentView;
-                boolean hasInit = false;
-                if (loadMoreView != null) {
-                    loadMoreView.init(new ILoadViewFactory.FootViewAdder() {
-                        @Override
-                        public View addFootView(View view) {
-                            return view;
-                        }
+            public void init(ILoadViewFactory.FootViewAdder footViewHolder, View.OnClickListener onClickLoadMoreListener) {
 
-                        @Override
-                        public View addFootView(int layoutId) {
-                            View view = LayoutInflater.from(viewPager.getContext()).inflate(layoutId, viewPager, false);
-                            return addFootView(view);
-                        }
-
-                        @Override
-                        public View getContentView() {
-                            return viewPager;
-                        }
-                    }, onClickLoadMoreListener);
-                    hasInit = true;
-                }
-                viewPager.setAdapter((PagerAdapter) viewAdapter);
-                return hasInit;
             }
 
             @Override
-            public void setOnScrollBottomListener(View view, MVCHelper.OnScrollBottomListener onScrollBottomListener) {
+            public void showNormal() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void showNomore() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void showLoading() {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void showFail(Exception e) {
+                progressBar.setVisibility(View.GONE);
             }
         });
+
+        mvcHelper.setDataSource(galleryDataSource);
+        mvcHelper.setAdapter(galleryAdapter, new ViewPagerViewHandler());
         mvcHelper.refresh();
     }
 

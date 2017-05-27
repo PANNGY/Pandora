@@ -152,6 +152,8 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
         List<JSoupData> data = new ArrayList<>();
 
+        initLock.await();
+
         Observable<List<JSoupData>> leeeboTabLoadData = leeeboTabDataSource.loadData();
         Observable<List<JSoupData>> k8dyTabLoadData = k8dyTabDataSource.loadData();
 
