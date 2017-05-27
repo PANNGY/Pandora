@@ -208,6 +208,10 @@ public class GalleryActivity extends BaseActivity {
                 .translationY(isAppBarHidden ? 0 : -appBar.getHeight())
                 .setInterpolator(new DecelerateInterpolator(2))
                 .start();
+        tagCloudView.animate()
+                .translationY(isAppBarHidden ? 0 : tagCloudView.getHeight())
+                .setInterpolator(new DecelerateInterpolator(2))
+                .start();
         isAppBarHidden = !isAppBarHidden;
     }
 }
