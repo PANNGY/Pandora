@@ -1,75 +1,111 @@
-package com.github.gnastnosaj.pandora.ui.fragment;
+package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.GestureDetector;
-import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 
+import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.SimpleTabAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
-import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 
+import java.util.List;
+
+import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by jasontsang on 5/24/17.
+ * Created by jasontsang on 5/26/17.
  */
 
-public class SimpleTabFragment extends Fragment {
+public class SimpleTabActivity extends BaseActivity {
+    public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
+    public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
+    public final static String EXTRA_TITLE = "title";
+    public final static String EXTRA_HREF = "href";
+    public static final String EXTRA_CACHE = "cache";
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    private String href;
+    @BindView(R.id.search_view)
+    MaterialSearchView searchView;
+
     private String tabDataSource;
     private String galleryDataSource;
+    private String title;
+    private String href;
+    private List<JSoupData> cache;
 
-    private View rootView;
-
-    public static SimpleTabFragment newInstance(String href, String tabDataSource, String galleryDataSource) {
-        SimpleTabFragment instance = new SimpleTabFragment();
-        instance.tabDataSource = tabDataSource;
-        instance.galleryDataSource = galleryDataSource;
-        instance.href = href;
-        return instance;
-    }
-
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        if (rootView == null) {
-            rootView = inflater.inflate(R.layout.layout_recycler_view_with_swipe_refresh, container, false);
-            ButterKnife.bind(this, rootView);
-            initSimpleTabView();
-        }
-        return rootView;
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
-    private void initSimpleTabView() {
-        SimpleDataSource simpleDataSource = new SimpleDataSource(getContext(), tabDataSource, href);
-        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter(getContext());
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_coordinator_with_recycler_view);
+        ButterKnife.bind(this);
+
+        setSupportActionBar(toolbar);
+        initSystemBar();
+
+        tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
+        galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
+        title = getIntent().getStringExtra(EXTRA_TITLE);
+        href = getIntent().getStringExtra(EXTRA_HREF);
+        cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
+
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        initContentView();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initContentView() {
+        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter(this);
+        SimpleDataSource simpleDataSource = new SimpleDataSource(this, tabDataSource, href);
+        simpleDataSource.setCache(cache);
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
         staggeredGridLayoutManager.setItemPrefetchEnabled(false);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
-        GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
@@ -89,7 +125,7 @@ public class SimpleTabFragment extends Fragment {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
                         JSoupData data = simpleTabAdapter.getData().get(childPosition);
-                        Intent i = new Intent(getContext(), GalleryActivity.class);
+                        Intent i = new Intent(SimpleTabActivity.this, GalleryActivity.class);
                         i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, tabDataSource);
                         i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
                         i.putExtra(GalleryActivity.EXTRA_HREF, data.getAttr("url"));
@@ -113,7 +149,6 @@ public class SimpleTabFragment extends Fragment {
         MVCHelper mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
         mvcHelper.setDataSource(simpleDataSource);
         mvcHelper.setAdapter(simpleTabAdapter);
-
         mvcHelper.refresh();
     }
 }

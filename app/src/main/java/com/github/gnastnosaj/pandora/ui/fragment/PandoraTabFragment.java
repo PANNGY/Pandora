@@ -42,8 +42,6 @@ public class PandoraTabFragment extends Fragment {
 
     private int tab;
     private View rootView;
-    private GestureDetector gestureDetector;
-    private MVCHelper mvcHelper;
 
     public static PandoraTabFragment newInstance(int tab) {
         PandoraTabFragment instance = new PandoraTabFragment();
@@ -79,7 +77,7 @@ public class PandoraTabFragment extends Fragment {
         decoration.registerTypePinnedHeader(1, (parent, adapterPosition) -> true);
         recyclerView.addItemDecoration(decoration);
 
-        gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
@@ -120,7 +118,7 @@ public class PandoraTabFragment extends Fragment {
             }
         });
 
-        mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
+        MVCHelper mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
         mvcHelper.setDataSource(pandoraHomeDataSource);
         mvcHelper.setAdapter(pandoraHomeAdapter);
 
@@ -136,7 +134,7 @@ public class PandoraTabFragment extends Fragment {
         staggeredGridLayoutManager.setItemPrefetchEnabled(false);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
-        gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
@@ -171,7 +169,7 @@ public class PandoraTabFragment extends Fragment {
             }
         });
 
-        mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
+        MVCHelper mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
         mvcHelper.setDataSource(pandoraTabDataSource);
         mvcHelper.setAdapter(pandoraTabAdapter);
 

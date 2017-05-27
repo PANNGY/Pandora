@@ -48,7 +48,8 @@ import me.next.tagview.TagCloudView;
  */
 
 public class GalleryActivity extends BaseActivity {
-    public final static String EXTRA_DATASOURCE = "datasource";
+    public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
+    public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
     public final static String EXTRA_TITLE = "title";
     public final static String EXTRA_HREF = "href";
     public static final String EXTRA_CACHE = "cache";
@@ -65,13 +66,14 @@ public class GalleryActivity extends BaseActivity {
     @BindView(R.id.tag_cloud_view)
     TagCloudView tagCloudView;
 
-    private String datasource;
+    private String tabDataSource;
+    private String galleryDataSource;
     private String title;
     private String href;
     private List<JSoupData> cache;
 
-    private Observable<TagEvent> tagEventObservable;
     private boolean isAppBarHidden;
+    private Observable<TagEvent> tagEventObservable;
     private GalleryAdapter galleryAdapter;
 
     @Override
@@ -89,7 +91,8 @@ public class GalleryActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-        datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
+        tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
+        galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
         title = getIntent().getStringExtra(EXTRA_TITLE);
         href = getIntent().getStringExtra(EXTRA_HREF);
         cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
@@ -109,6 +112,14 @@ public class GalleryActivity extends BaseActivity {
                         tags.add(link.title);
                     }
                     tagCloudView.setTags(tags);
+                    tagCloudView.setOnTagClickListener(position -> {
+                        Intent intent = new Intent(this, SimpleTabActivity.class);
+                        intent.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
+                        intent.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
+                        intent.putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position));
+                        intent.putExtra(SimpleTabActivity.EXTRA_HREF, tagEvent.tags.get(position).url);
+                        startActivity(intent);
+                    });
                 });
 
         initViewPager();
@@ -151,8 +162,8 @@ public class GalleryActivity extends BaseActivity {
                 return true;
             case R.id.action_mosaic:
                 Intent i = new Intent(this, MosaicActivity.class);
-                i.putExtra(MosaicActivity.EXTRA_IMAGE_TITLE, title);
-                i.putExtra(MosaicActivity.EXTRA_IMAGE_URL, galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail"));
+                i.putExtra(MosaicActivity.EXTRA_TITLE, title);
+                i.putExtra(MosaicActivity.EXTRA_URL, galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail"));
                 startActivity(i);
                 return true;
         }
@@ -160,7 +171,7 @@ public class GalleryActivity extends BaseActivity {
     }
 
     private void initViewPager() {
-        SimpleDataSource galleryDataSource = new SimpleDataSource(this, datasource, href);
+        SimpleDataSource galleryDataSource = new SimpleDataSource(this, this.galleryDataSource, href);
         galleryDataSource.setCache(cache);
         galleryAdapter = new GalleryAdapter(this);
 

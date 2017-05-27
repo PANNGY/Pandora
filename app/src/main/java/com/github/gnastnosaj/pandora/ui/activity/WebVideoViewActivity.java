@@ -112,7 +112,7 @@ public class WebVideoViewActivity extends BaseActivity {
         href = getIntent().getStringExtra(EXTRA_HREF);
         magnet = getIntent().getDataString();
 
-        setTitle(title);
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);

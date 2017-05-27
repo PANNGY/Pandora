@@ -39,8 +39,8 @@ import timber.log.Timber;
  * Created by Jason on 7/22/2015.
  */
 public class MosaicActivity extends BaseActivity {
-    public static final String EXTRA_IMAGE_TITLE = "image_title";
-    public static final String EXTRA_IMAGE_URL = "image_url";
+    public static final String EXTRA_TITLE = "title";
+    public static final String EXTRA_URL = "url";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -48,8 +48,8 @@ public class MosaicActivity extends BaseActivity {
     @BindView(R.id.mosaic_view)
     MosaicView mosaicView;
 
-    private String imageTitle;
-    private String imageUrl;
+    private String title;
+    private String url;
 
     private String cache;
 
@@ -62,17 +62,17 @@ public class MosaicActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-        imageTitle = getIntent().getStringExtra(EXTRA_IMAGE_TITLE);
-        imageUrl = getIntent().getStringExtra(EXTRA_IMAGE_URL);
+        title = getIntent().getStringExtra(EXTRA_TITLE);
+        url = getIntent().getStringExtra(EXTRA_URL);
 
-        setTitle(imageTitle);
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         try {
-            ShareHelper.configuration.getImageDownloader().download(this, imageUrl, ShareHelper.configuration.getImageCachePath(this), new IImageDownloader.OnImageDownloadListener() {
+            ShareHelper.configuration.getImageDownloader().download(this, url, ShareHelper.configuration.getImageCachePath(this), new IImageDownloader.OnImageDownloadListener() {
                 @Override
                 public void onStart() {
 

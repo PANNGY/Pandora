@@ -63,8 +63,6 @@ public class BTDBActivity extends BaseActivity {
     private BTDBAdapter btdbAdapter;
     private MVCHelper<List<JSoupData>> mvcHelper;
 
-    private GestureDetector gestureDetector;
-
     private String keyword;
     private String title;
     private List<JSoupData> cache;
@@ -91,7 +89,7 @@ public class BTDBActivity extends BaseActivity {
         title = getIntent().getStringExtra(EXTRA_TITLE);
         cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
 
-        setTitle(title);
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -175,7 +173,7 @@ public class BTDBActivity extends BaseActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).size(1).build());
 
-        gestureDetector = new GestureDetector(BTDBActivity.this, new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector gestureDetector = new GestureDetector(BTDBActivity.this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
