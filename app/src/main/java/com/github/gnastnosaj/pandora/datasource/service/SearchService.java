@@ -151,7 +151,7 @@ public class SearchService {
                                                 i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
                                                 i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
                                                 i.putExtra(SimpleTabActivity.EXTRA_TITLE, keyword);
-                                                i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("url"));
+                                                i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("href"));
                                                 context.startActivity(i);
                                             }
                                         } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
