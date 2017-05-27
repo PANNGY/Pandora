@@ -90,10 +90,9 @@ public class SimpleTabFragment extends Fragment {
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
                         JSoupData data = simpleTabAdapter.getData().get(childPosition);
                         Intent i = new Intent(getContext(), GalleryActivity.class);
-                        i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, tabDataSource);
+                        i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
                         i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                        i.putExtra(GalleryActivity.EXTRA_HREF, data.getAttr("url"));
-                        i.putExtra(GalleryActivity.EXTRA_TITLE, data.getAttr("title"));
+                        i.putExtra(GalleryActivity.EXTRA_DATA, data);
                         startActivity(i);
                     }
                     return true;

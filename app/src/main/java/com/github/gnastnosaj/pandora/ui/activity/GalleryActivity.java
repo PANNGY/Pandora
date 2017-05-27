@@ -22,6 +22,7 @@ import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.GalleryAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
+import com.github.gnastnosaj.pandora.datasource.service.SearchService;
 import com.github.gnastnosaj.pandora.event.TagEvent;
 import com.github.gnastnosaj.pandora.event.ToolbarEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
@@ -50,8 +51,7 @@ import me.next.tagview.TagCloudView;
 public class GalleryActivity extends BaseActivity {
     public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
     public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
-    public final static String EXTRA_TITLE = "title";
-    public final static String EXTRA_HREF = "href";
+    public final static String EXTRA_DATA = "data";
     public static final String EXTRA_CACHE = "cache";
 
     @BindView(R.id.app_bar)
@@ -68,9 +68,12 @@ public class GalleryActivity extends BaseActivity {
 
     private String tabDataSource;
     private String galleryDataSource;
+    private List<JSoupData> cache;
+    private JSoupData data;
+
+    private String id;
     private String title;
     private String href;
-    private List<JSoupData> cache;
 
     private boolean isAppBarHidden;
     private Observable<TagEvent> tagEventObservable;
@@ -93,9 +96,12 @@ public class GalleryActivity extends BaseActivity {
 
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
         galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
-        title = getIntent().getStringExtra(EXTRA_TITLE);
-        href = getIntent().getStringExtra(EXTRA_HREF);
         cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
+        data = getIntent().getParcelableExtra(EXTRA_DATA);
+
+        id = data.getAttr("id");
+        title = data.getAttr("title");
+        href = data.getAttr("href");
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
@@ -139,6 +145,9 @@ public class GalleryActivity extends BaseActivity {
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_share)
                 .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_search).setIcon(new IconicsDrawable(this)
+                .icon(MaterialDesignIconic.Icon.gmi_archive)
+                .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                 .color(Color.WHITE).sizeDp(18));
@@ -153,6 +162,9 @@ public class GalleryActivity extends BaseActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 onBackPressed();
+                return true;
+            case R.id.action_search:
+                SearchService.search(TextUtils.isEmpty(id) ? title : id, this, null);
                 return true;
             case R.id.action_share:
                 String thumbnail = galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail");

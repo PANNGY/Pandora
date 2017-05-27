@@ -3,24 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_search"
-        android:title="@string/action_search"
         android:orderInCategory="100"
+        android:title="@string/action_search"
         app:showAsAction="always|collapseActionView" />
 
     <item
         android:id="@+id/action_share"
-        android:title="@string/action_share"
         android:orderInCategory="100"
-        app:showAsAction="always"/>
+        android:title="@string/action_share"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_favourite"
+        android:orderInCategory="100"
         android:title="@string/action_favourite"
-        android:orderInCategory="100"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
-    <item android:id="@+id/action_about"
-        android:title="@string/action_about"
+    <item
+        android:id="@+id/action_about"
         android:orderInCategory="100"
-        app:showAsAction="never"/>
+        android:title="@string/action_about"
+        app:showAsAction="never" />
 </menu>
