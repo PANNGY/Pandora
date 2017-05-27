@@ -154,6 +154,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 i.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
                 i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
                 i.putExtra(SimpleTabActivity.EXTRA_TYPE, SimpleTabActivity.TYPE_FAVOURITE);
+                i.putExtra(SimpleTabActivity.EXTRA_TITLE, getResources().getString(R.string.action_favourite));
                 startActivity(i);
                 return true;
             case R.id.action_about:
