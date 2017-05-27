@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ProgressBar;
 
 import com.bilibili.socialize.share.core.shareparam.ShareImage;
 import com.bilibili.socialize.share.core.shareparam.ShareParamImage;
@@ -69,6 +70,9 @@ public class GalleryActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     @BindView(R.id.view_pager)
     ViewPager viewPager;
@@ -236,7 +240,22 @@ public class GalleryActivity extends BaseActivity {
                 ShareHelper.share(this, shareParamImage);
                 return true;
             case R.id.action_search:
-                SearchService.search(title, keyword, SearchService.TYPE_MAGNET, this, null);
+                SearchService.search(title, keyword, SearchService.TYPE_MAGNET, this, new SearchService.SearchListener() {
+                    @Override
+                    public void onStart() {
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onSuccess(List<JSoupData> data) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
                 return true;
             case R.id.action_play:
                 Observable.<ArchiveEvent>create(subcriber -> {
