@@ -1,19 +1,17 @@
-package com.github.gnastnosaj.pandora.util;
+package com.github.gnastnosaj.pandora.datasource.service;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
-import android.view.View;
-import android.widget.ProgressBar;
 
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
-import com.github.gnastnosaj.pandora.datasource.service.GithubService;
-import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.ui.activity.BTDBActivity;
 import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
@@ -22,7 +20,6 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.mauker.materialsearchview.MaterialSearchView;
 import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -32,27 +29,23 @@ import io.reactivex.schedulers.Schedulers;
  * Created by jasontsang on 5/27/17.
  */
 
-public class SearchHelper {
+public class SearchService {
     private Context context;
-    private ProgressBar progressBar;
-    private MaterialSearchView searchView;
 
+    private SearchListener searchListener;
     private JSoupDataSource searchDataSource;
 
-    private SearchHelper(Context context, ProgressBar progressBar, MaterialSearchView searchView) {
+    private SearchService(Context context, SearchListener searchListener) {
         this.context = context;
-        this.progressBar = progressBar;
-        this.searchView = searchView;
+        this.searchListener = searchListener;
     }
 
     private void search(String keyword) {
-        if (progressBar != null) {
-            progressBar.setVisibility(View.VISIBLE);
+        if (searchListener != null) {
+            searchListener.onStart();
         }
 
-        if (searchView != null) {
-            Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();
-        } else if (context instanceof BaseActivity) {
+        if (context instanceof BaseActivity) {
             Snackbar.make(((BaseActivity) context).findViewById(android.R.id.content), R.string.searching, Snackbar.LENGTH_LONG).show();
         }
 
@@ -110,14 +103,12 @@ public class SearchHelper {
         search.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(data -> {
-                    if (progressBar != null) {
-                        progressBar.setVisibility(View.GONE);
+                    if (searchListener != null) {
+                        searchListener.onSuccess(data);
                     }
                     if (ListUtils.isEmpty(data)) {
-                        if (searchView != null) {
-                            Snackbar.make(searchView, R.string.searching, Snackbar.LENGTH_LONG).show();
-                        } else if (context instanceof BaseActivity) {
-                            Snackbar.make(searchView, R.string.search_result_not_found, Snackbar.LENGTH_LONG).show();
+                        if (context instanceof BaseActivity) {
+                            Snackbar.make(((BaseActivity) context).findViewById(android.R.id.content), R.string.search_result_not_found, Snackbar.LENGTH_LONG).show();
                         }
                     } else {
                         new AlertDialog.Builder(context)
@@ -150,10 +141,25 @@ public class SearchHelper {
                                     dialog.dismiss();
                                 }).setCancelable(false).show();
                     }
+                }, throwable -> {
+                    if (context instanceof BaseActivity) {
+                        Snackbar.make(((BaseActivity) context).findViewById(android.R.id.content), R.string.search_result_not_found, Snackbar.LENGTH_LONG).show();
+                    }
+                    if (searchListener != null) {
+                        searchListener.onFailure(throwable);
+                    }
                 });
     }
 
-    public static void search(String keyword, Context context, ProgressBar progressBar, MaterialSearchView searchView) {
-        new SearchHelper(context, progressBar, searchView).search(keyword);
+    public static void search(@NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(keyword);
+    }
+
+    public interface SearchListener {
+        void onStart();
+
+        void onSuccess(List<JSoupData> data);
+
+        void onFailure(Throwable throwable);
     }
 }

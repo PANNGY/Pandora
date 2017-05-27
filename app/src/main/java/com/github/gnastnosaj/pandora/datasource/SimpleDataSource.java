@@ -48,10 +48,6 @@ public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCach
     private CountDownLatch refreshLock;
     private CountDownLatch loadMoreLock;
 
-    public SimpleDataSource(Context context, String dataSource) {
-        this(context, dataSource, null);
-    }
-
     public SimpleDataSource(Context context, String dataSource, String href) {
         this.context = context;
 

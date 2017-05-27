@@ -21,12 +21,13 @@ import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.adapter.SimplePagerAdapter;
+import com.github.gnastnosaj.pandora.adapter.SimpleViewPagerAdapter;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
+import com.github.gnastnosaj.pandora.datasource.service.SearchService;
+import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
-import com.github.gnastnosaj.pandora.util.SearchHelper;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
@@ -51,9 +52,10 @@ import timber.log.Timber;
  * Created by jasontsang on 5/26/17.
  */
 
-public class SimpleTabActivity extends BaseActivity {
+public class SimpleViewPagerActivity extends BaseActivity {
     public final static String EXTRA_TITLE = "title";
-    public final static String EXTRA_DATASOURCE = "datasource";
+    public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
+    public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -71,7 +73,8 @@ public class SimpleTabActivity extends BaseActivity {
     MaterialSearchView searchView;
 
     private String title;
-    private String datasource;
+    private String tabDataSource;
+    private String galleryDataSource;
 
     private static List<JSoupLink> tabs;
 
@@ -98,7 +101,8 @@ public class SimpleTabActivity extends BaseActivity {
         initSystemBar();
 
         title = getIntent().getStringExtra(EXTRA_TITLE);
-        datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
+        tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
+        galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
@@ -159,7 +163,7 @@ public class SimpleTabActivity extends BaseActivity {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabs -> {
-                    SimplePagerAdapter simplePagerAdapter = new SimplePagerAdapter(this, getSupportFragmentManager(), tabs, datasource);
+                    SimpleViewPagerAdapter simplePagerAdapter = new SimpleViewPagerAdapter(this, getSupportFragmentManager(), tabs, tabDataSource, galleryDataSource);
                     viewPager.setAdapter(simplePagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
                 });
@@ -167,7 +171,7 @@ public class SimpleTabActivity extends BaseActivity {
 
     private Observable<List<JSoupLink>> initTabs() {
         if (ListUtils.isEmpty(tabs)) {
-            tabCacheRealmConfig = new RealmConfiguration.Builder().name(datasource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+            tabCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
             Realm realm = Realm.getInstance(tabCacheRealmConfig);
             RealmResults<JSoupLink> results = realm.where(JSoupLink.class).findAll();
@@ -175,7 +179,7 @@ public class SimpleTabActivity extends BaseActivity {
             realm.close();
 
             if (ListUtils.isEmpty(tabs)) {
-                return githubService.getJSoupDataSource(datasource)
+                return githubService.getJSoupDataSource(tabDataSource)
                         .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
                         .flatMap(data -> {
                             tabs = data;
@@ -188,7 +192,7 @@ public class SimpleTabActivity extends BaseActivity {
                             return Observable.just(data);
                         });
             } else {
-                githubService.getJSoupDataSource(datasource)
+                githubService.getJSoupDataSource(tabDataSource)
                         .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
                         .subscribeOn(Schedulers.newThread())
                         .subscribe(data -> {
@@ -212,7 +216,7 @@ public class SimpleTabActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
-                    SearchHelper.search(query, SimpleTabActivity.this, progressBar, searchView);
+                    search(query);
                 } catch (Exception e) {
                     Timber.e(e, "searchView onQueryText exception");
                 }
@@ -233,13 +237,13 @@ public class SimpleTabActivity extends BaseActivity {
                     } else {
                         String keyword = searchView.getSuggestionAtPosition(i - 1);
                         if (!TextUtils.isEmpty(keyword)) {
-                            SearchHelper.search(keyword, SimpleTabActivity.this, progressBar, searchView);
+                            search(keyword);
                         }
                     }
                 } else {
                     String keyword = searchView.getSuggestionAtPosition(i);
                     if (!TextUtils.isEmpty(keyword)) {
-                        SearchHelper.search(keyword, SimpleTabActivity.this, progressBar, searchView);
+                        search(keyword);
                     }
                 }
             } catch (Exception e) {
@@ -257,5 +261,24 @@ public class SimpleTabActivity extends BaseActivity {
         } catch (Exception e) {
             Timber.e(e, "initSearchView exception");
         }
+    }
+
+    private void search(String keyword) {
+        SearchService.search(keyword, this, new SearchService.SearchListener() {
+            @Override
+            public void onStart() {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onSuccess(List<JSoupData> data) {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 }

@@ -102,8 +102,7 @@ public class BTDBActivity extends BaseActivity {
         initContentView();
 
         btdbAdapter = new BTDBAdapter();
-        btdbDataSource = new SearchDataSource(this, GithubService.DATE_SOURCE_BTDB);
-        btdbDataSource.setKeyword(keyword);
+        btdbDataSource = new SearchDataSource(this, GithubService.DATE_SOURCE_BTDB, keyword);
         btdbDataSource.setCache(cache);
 
         mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);

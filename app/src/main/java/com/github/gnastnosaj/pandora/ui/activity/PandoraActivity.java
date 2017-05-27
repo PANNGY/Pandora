@@ -29,9 +29,10 @@ import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
+import com.github.gnastnosaj.pandora.datasource.service.SearchService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 import com.github.gnastnosaj.pandora.event.TabEvent;
-import com.github.gnastnosaj.pandora.util.SearchHelper;
+import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
@@ -42,6 +43,7 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
@@ -167,7 +169,7 @@ public class PandoraActivity extends BaseActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
-                    SearchHelper.search(query, PandoraActivity.this, progressBar, searchView);
+                    search(query);
                 } catch (Exception e) {
                     Timber.e(e, "searchView onQueryText exception");
                 }
@@ -188,13 +190,13 @@ public class PandoraActivity extends BaseActivity {
                     } else {
                         String keyword = searchView.getSuggestionAtPosition(i - 1);
                         if (!TextUtils.isEmpty(keyword)) {
-                            SearchHelper.search(keyword, PandoraActivity.this, progressBar, searchView);
+                            search(keyword);
                         }
                     }
                 } else {
                     String keyword = searchView.getSuggestionAtPosition(i);
                     if (!TextUtils.isEmpty(keyword)) {
-                        SearchHelper.search(keyword, PandoraActivity.this, progressBar, searchView);
+                        search(keyword);
                     }
                 }
             } catch (Exception e) {
@@ -212,6 +214,25 @@ public class PandoraActivity extends BaseActivity {
         } catch (Exception e) {
             Timber.e(e, "initSearchView exception");
         }
+    }
+
+    private void search(String keyword) {
+        SearchService.search(keyword, this, new SearchService.SearchListener() {
+            @Override
+            public void onStart() {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onSuccess(List<JSoupData> data) {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void checkForUpdate() {

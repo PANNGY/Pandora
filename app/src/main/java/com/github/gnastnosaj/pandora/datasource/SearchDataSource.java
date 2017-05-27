@@ -46,10 +46,11 @@ public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCach
     private CountDownLatch refreshLock;
     private CountDownLatch loadMoreLock;
 
-    public SearchDataSource(Context context, String dataSource) {
+    public SearchDataSource(Context context, String dataSource, String keyword) {
         this.context = context;
+        this.keyword = keyword;
 
-        realmConfig = new RealmConfiguration.Builder().name(dataSource).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
+        realmConfig = new RealmConfiguration.Builder().name(dataSource + (TextUtils.isEmpty(keyword) ? "" : ("_" + keyword.hashCode()))).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         initLock = new CountDownLatch(1);
 

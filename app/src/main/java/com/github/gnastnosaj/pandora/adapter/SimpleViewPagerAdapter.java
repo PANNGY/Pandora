@@ -15,16 +15,16 @@ import java.util.List;
  * Created by jasontsang on 5/26/17.
  */
 
-public class SimplePagerAdapter extends FragmentPagerAdapter {
+public class SimpleViewPagerAdapter extends FragmentPagerAdapter {
     private List<JSoupLink> tabs;
     private List<Fragment> fragments;
 
-    public SimplePagerAdapter(Context context, FragmentManager fm, List<JSoupLink> tabs, String datasource) {
+    public SimpleViewPagerAdapter(Context context, FragmentManager fm, List<JSoupLink> tabs, String tabDataSource, String galleryDataSource) {
         super(fm);
         this.tabs = new ArrayList<>(tabs);
         fragments = new ArrayList<>();
         for (JSoupLink tab : this.tabs) {
-            fragments.add(SimpleTabFragment.newInstance(datasource, tab.url));
+            fragments.add(SimpleTabFragment.newInstance(tab.url, tabDataSource, galleryDataSource));
         }
     }
 

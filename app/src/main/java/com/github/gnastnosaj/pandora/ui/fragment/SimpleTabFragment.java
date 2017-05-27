@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,9 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.adapter.SimpleAdapter;
+import com.github.gnastnosaj.pandora.adapter.SimpleTabAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 
@@ -33,15 +35,18 @@ public class SimpleTabFragment extends Fragment {
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    private String datasource;
     private String href;
+    private String tabDataSource;
+    private String galleryDataSource;
+
     private View rootView;
     private GestureDetector gestureDetector;
     private MVCHelper mvcHelper;
 
-    public static SimpleTabFragment newInstance(String datasource, String href) {
+    public static SimpleTabFragment newInstance(String href, String tabDataSource, String galleryDataSource) {
         SimpleTabFragment instance = new SimpleTabFragment();
-        instance.datasource = datasource;
+        instance.tabDataSource = tabDataSource;
+        instance.galleryDataSource = galleryDataSource;
         instance.href = href;
         return instance;
     }
@@ -58,8 +63,8 @@ public class SimpleTabFragment extends Fragment {
     }
 
     private void initSimpleTabView() {
-        SimpleDataSource simpleDataSource = new SimpleDataSource(getActivity(), datasource, href);
-        SimpleAdapter simpleTabAdapter = new SimpleAdapter(getActivity());
+        SimpleDataSource simpleDataSource = new SimpleDataSource(getActivity(), tabDataSource, href);
+        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter(getActivity());
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
@@ -86,6 +91,11 @@ public class SimpleTabFragment extends Fragment {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
                         JSoupData data = simpleTabAdapter.getData().get(childPosition);
+                        Intent i = new Intent(getContext(), GalleryActivity.class);
+                        i.putExtra(GalleryActivity.EXTRA_DATASOURCE, galleryDataSource);
+                        i.putExtra(GalleryActivity.EXTRA_HREF, data.getAttr("url"));
+                        i.putExtra(GalleryActivity.EXTRA_TITLE, data.getAttr("title"));
+                        startActivity(i);
                     }
                     return true;
                 }

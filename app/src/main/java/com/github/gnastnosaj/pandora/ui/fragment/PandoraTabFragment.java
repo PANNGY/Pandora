@@ -16,7 +16,7 @@ import com.daimajia.slider.library.SliderLayout;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraHomeAdapter;
-import com.github.gnastnosaj.pandora.adapter.SimpleAdapter;
+import com.github.gnastnosaj.pandora.adapter.SimpleTabAdapter;
 import com.github.gnastnosaj.pandora.datasource.PandoraHomeDataSource;
 import com.github.gnastnosaj.pandora.datasource.PandoraHomeDataSource.Model;
 import com.github.gnastnosaj.pandora.datasource.PandoraTabDataSource;
@@ -129,7 +129,7 @@ public class PandoraTabFragment extends Fragment {
 
     private void initPandoraTabView() {
         PandoraTabDataSource pandoraTabDataSource = new PandoraTabDataSource(getActivity(), tab);
-        SimpleAdapter pandoraTabAdapter = new SimpleAdapter(getActivity());
+        SimpleTabAdapter pandoraTabAdapter = new SimpleTabAdapter(getActivity());
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
