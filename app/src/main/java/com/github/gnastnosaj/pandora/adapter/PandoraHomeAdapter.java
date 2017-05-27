@@ -61,7 +61,7 @@ public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAda
         } else if (viewType == 1) {
             v = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_pandora_home_group, parent, false);
         } else if (viewType == 2) {
-            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_contains_simple_drawee, parent, false);
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_contains_ratio_image, parent, false);
         }
         return new ViewHolder(v);
     }

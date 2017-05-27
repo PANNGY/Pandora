@@ -15,6 +15,7 @@ import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.ui.activity.BTDBActivity;
 import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
+import com.github.gnastnosaj.pandora.ui.activity.SimpleTabActivity;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
@@ -119,16 +120,18 @@ public class SearchService {
                                         JSoupData jsoupData = data.get(0);
                                         if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
                                             Intent i = new Intent(context, GalleryActivity.class);
-                                            i.putExtra(GalleryActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                            i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                            i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
                                             i.putExtra(GalleryActivity.EXTRA_TITLE, keyword);
                                             i.putExtra(GalleryActivity.EXTRA_HREF, searchDataSource.getCurrentPage());
                                             i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                             context.startActivity(i);
                                         } else {
-                                            Intent i = new Intent(context, GalleryActivity.class);
-                                            i.putExtra(GalleryActivity.EXTRA_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                            i.putExtra(GalleryActivity.EXTRA_TITLE, keyword);
-                                            i.putExtra(GalleryActivity.EXTRA_HREF, jsoupData.getAttr("url"));
+                                            Intent i = new Intent(context, SimpleTabActivity.class);
+                                            i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                            i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                            i.putExtra(SimpleTabActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("url"));
                                             context.startActivity(i);
                                         }
                                     } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {

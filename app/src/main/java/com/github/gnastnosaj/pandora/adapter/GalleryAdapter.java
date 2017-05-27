@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.bilibili.socialize.share.download.IImageDownloader;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.image.ImageInfo;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
@@ -82,7 +83,7 @@ public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JS
         JSoupData jsoupData = data.get(position);
 
         PhotoDraweeView draweeView = new PhotoDraweeView(context);
-        draweeView.getHierarchy().setPlaceholderImage(R.drawable.ic_source_pandora_light);
+        draweeView.getHierarchy().setPlaceholderImage(R.drawable.ic_source_pandora_light, ScalingUtils.ScaleType.FIT_CENTER);
 
         DraweeController draweeController = Fresco.newDraweeControllerBuilder()
                 .setUri(jsoupData.getAttr("thumbnail"))

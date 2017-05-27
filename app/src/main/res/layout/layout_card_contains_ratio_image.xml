@@ -21,7 +21,8 @@
             android:id="@+id/radio_image_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            fresco:placeholderImage="@drawable/ic_source_pandora" />
+            fresco:placeholderImage="@drawable/ic_source_pandora"
+            fresco:placeholderImageScaleType="fitCenter" />
 
         <FrameLayout
             android:layout_width="match_parent"
