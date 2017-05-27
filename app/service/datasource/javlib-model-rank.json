@@ -28,7 +28,7 @@
         }
       },
       {
-        "label": "url",
+        "label": "href",
         "cssQuery": "a",
         "analyzer": {
           "method": 1,

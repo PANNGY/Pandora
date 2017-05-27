@@ -74,7 +74,7 @@
         }
       },
       {
-        "label": "url",
+        "label": "href",
         "cssQuery": "div.thumbnail a.zoom",
         "analyzer": {
           "method": 1,

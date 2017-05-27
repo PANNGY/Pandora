@@ -100,7 +100,7 @@
         }
       },
       {
-        "label": "url",
+        "label": "href",
         "cssQuery": "a",
         "analyzer": {
           "method": 1,
@@ -151,7 +151,7 @@
         }
       },
       {
-        "label": "url",
+        "label": "href",
         "cssQuery": "a",
         "analyzer": {
           "method": 1,

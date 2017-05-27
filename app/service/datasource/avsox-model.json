@@ -36,7 +36,7 @@
         }
       },
       {
-        "label": "url",
+        "label": "href",
         "analyzer": {
           "method": 1,
           "args": [

@@ -75,7 +75,7 @@
         }
       },
       {
-        "label": "url",
+        "label": "href",
         "cssQuery": "div.album-grid a",
         "analyzer": {
           "method": 1,
