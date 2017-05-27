@@ -254,7 +254,7 @@ public class GalleryActivity extends BaseActivity {
                             if (archiveEvent != null) {
                                 Uri uri = Uri.parse(archiveEvent.magnet);
                                 Intent i = new Intent(Intent.ACTION_VIEW, uri);
-                                i.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, id);
+                                i.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword);
                                 i.putExtra(WebVideoViewActivity.EXTRA_TITLE, title);
                                 startActivity(i);
                             }
