@@ -174,8 +174,10 @@ public class SimpleViewPagerActivity extends BaseActivity {
     }
 
     private Observable<List<JSoupLink>> initTabs() {
-        List<JSoupLink> tabs = tabMap.containsKey(tabDataSource) ? new ArrayList<>(tabMap.get(tabDataSource)) : new ArrayList<>();
-
+        List<JSoupLink> tabs = tabMap.containsKey(tabDataSource) ? tabMap.get(tabDataSource) : new ArrayList<>();
+        if(!tabMap.containsKey(tabDataSource)) {
+            tabMap.put(tabDataSource, tabs);
+        }
         if (ListUtils.isEmpty(tabs)) {
             tabCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
@@ -212,7 +214,10 @@ public class SimpleViewPagerActivity extends BaseActivity {
     }
 
     private Observable<List> initCatalog() {
-        List catalog = catalogMap.containsKey(tabDataSource) ? new ArrayList<>(catalogMap.get(tabDataSource)) : new ArrayList<>();
+        List catalog = catalogMap.containsKey(tabDataSource) ? catalogMap.get(tabDataSource) : new ArrayList<>();
+        if(!catalogMap.containsKey(tabDataSource)) {
+            catalogMap.put(tabDataSource, catalog);
+        }
 
         if (ListUtils.isEmpty(catalog)) {
             catalogCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_CATALOG_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
