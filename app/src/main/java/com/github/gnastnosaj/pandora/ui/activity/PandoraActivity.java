@@ -24,7 +24,6 @@ import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
-import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
@@ -77,8 +76,6 @@ public class PandoraActivity extends BaseActivity {
     MaterialSearchView searchView;
 
     private Observable<TabEvent> tabEventObservable;
-
-    private JSoupDataSource searchDataSource;
 
     @Override
     public void onBackPressed() {

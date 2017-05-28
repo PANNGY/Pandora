@@ -90,12 +90,13 @@ public class GalleryActivity extends BaseActivity {
     private String href;
     private String keyword;
 
-    private boolean isAppBarHidden;
-    private Observable<TagEvent> tagEventObservable;
     private GalleryAdapter galleryAdapter;
 
-    private RealmConfiguration favouriteRealmConfiguration;
+    private boolean isAppBarHidden;
     private boolean favourite;
+    private Observable<TagEvent> tagEventObservable;
+
+    private RealmConfiguration favouriteRealmConfiguration;
     private RealmConfiguration archiveRealmConfiguration;
 
     @Override

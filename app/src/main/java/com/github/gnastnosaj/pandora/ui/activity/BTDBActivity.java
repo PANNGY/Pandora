@@ -59,9 +59,9 @@ public class BTDBActivity extends BaseActivity {
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
 
+    private MVCHelper<List<JSoupData>> mvcHelper;
     private SearchDataSource btdbDataSource;
     private BTDBAdapter btdbAdapter;
-    private MVCHelper<List<JSoupData>> mvcHelper;
 
     private String keyword;
     private String title;
@@ -99,9 +99,9 @@ public class BTDBActivity extends BaseActivity {
 
         initContentView();
 
-        btdbAdapter = new BTDBAdapter();
         btdbDataSource = new SearchDataSource(this, GithubService.DATE_SOURCE_BTDB, keyword);
         btdbDataSource.setCache(cache);
+        btdbAdapter = new BTDBAdapter();
 
         mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
         mvcHelper.setDataSource(btdbDataSource);

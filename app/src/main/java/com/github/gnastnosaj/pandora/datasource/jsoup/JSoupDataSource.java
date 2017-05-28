@@ -80,7 +80,7 @@ public class JSoupDataSource {
         });
     }
 
-    public Observable loadCatalogs() {
+    public Observable<List> loadCatalogs() {
         return Observable.create(subscriber -> {
             try {
                 catalogSelector.url = betterData(catalogSelector.url);

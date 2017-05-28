@@ -35,10 +35,10 @@ import butterknife.ButterKnife;
 public class SimpleTabActivity extends BaseActivity {
     public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
     public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
+    public final static String EXTRA_TYPE = "type";
     public final static String EXTRA_TITLE = "title";
     public final static String EXTRA_HREF = "href";
     public final static String EXTRA_CACHE = "cache";
-    public final static String EXTRA_TYPE = "type";
 
     public final static int TYPE_DEFAULT = 0;
     public final static int TYPE_FAVOURITE = 1;
