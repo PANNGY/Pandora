@@ -94,7 +94,8 @@
         "method": 1,
         "args": [
           "href"
-        ]
+        ],
+        "urlDecode": true
       }
     }
   }
