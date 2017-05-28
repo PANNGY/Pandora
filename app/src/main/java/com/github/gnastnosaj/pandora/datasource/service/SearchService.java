@@ -166,32 +166,34 @@ public class SearchService {
                                     .setMessage(R.string.search_result_found)
                                     .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
                                     .setPositiveButton(R.string.action_check, (dialog, which) -> {
-                                        if (searchDataSource.id.equals(GithubService.DATE_SOURCE_JAVLIB_TAB)) {
-                                            JSoupData jsoupData = data.get(0);
-                                            if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
-                                                Intent i = new Intent(context, GalleryActivity.class);
-                                                i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
-                                                i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                                jsoupData.attrs.add(new JSoupAttr("href", searchDataSource.getCurrentPage()));
-                                                jsoupData.attrs.add(new JSoupAttr("title", TextUtils.isEmpty(title) ? keyword : title));
-                                                jsoupData.attrs.add(new JSoupAttr("id", keyword));
-                                                i.putExtra(GalleryActivity.EXTRA_DATA, jsoupData);
-                                                i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
-                                                context.startActivity(i);
-                                            } else {
-                                                Intent i = new Intent(context, SimpleTabActivity.class);
-                                                i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
-                                                i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                                i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
-                                                i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("href"));
+                                        if (searchDataSource != null) {
+                                            if (searchDataSource.id.equals(GithubService.DATE_SOURCE_JAVLIB_TAB)) {
+                                                JSoupData jsoupData = data.get(0);
+                                                if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
+                                                    Intent i = new Intent(context, GalleryActivity.class);
+                                                    i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                                    i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                                    jsoupData.attrs.add(new JSoupAttr("href", searchDataSource.getCurrentPage()));
+                                                    jsoupData.attrs.add(new JSoupAttr("title", TextUtils.isEmpty(title) ? keyword : title));
+                                                    jsoupData.attrs.add(new JSoupAttr("id", keyword));
+                                                    i.putExtra(GalleryActivity.EXTRA_DATA, jsoupData);
+                                                    i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                                    context.startActivity(i);
+                                                } else {
+                                                    Intent i = new Intent(context, SimpleTabActivity.class);
+                                                    i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("href"));
+                                                    context.startActivity(i);
+                                                }
+                                            } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
+                                                Intent i = new Intent(context, BTDBActivity.class);
+                                                i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
+                                                i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
+                                                i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                 context.startActivity(i);
                                             }
-                                        } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
-                                            Intent i = new Intent(context, BTDBActivity.class);
-                                            i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
-                                            i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
-                                            i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
-                                            context.startActivity(i);
                                         }
                                         dialog.dismiss();
                                     }).setCancelable(false).show();
