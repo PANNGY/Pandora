@@ -248,7 +248,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 .flatMap(data -> {
                     catalog.clear();
                     catalog.addAll(data);
-                    Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
+                    Realm bgRealm = Realm.getInstance(catalogCacheRealmConfig);
                     bgRealm.executeTransactionAsync(bg -> {
                         if (!ListUtils.isEmpty(data)) {
                             if (data.get(0) instanceof JSoupCatalog) {
