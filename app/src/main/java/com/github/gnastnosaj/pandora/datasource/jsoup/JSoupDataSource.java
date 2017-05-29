@@ -194,11 +194,17 @@ public class JSoupDataSource {
                 throw new Exception("page is loaded");
             }
             history.add(page);
-            currentPage = betterData(page);
-            Document document = dataSelector.loadDocument(currentPage);
-            currentDocument = document;
 
-            return _loadData(document, dataSelector);
+            List<JSoupData> data = new ArrayList<>();
+            try {
+                currentPage = betterData(page);
+                Document document = dataSelector.loadDocument(currentPage);
+                currentDocument = document;
+                data.addAll(_loadData(document, dataSelector));
+            } catch (Exception e) {
+                history.remove(page);
+            }
+            return data;
         }
     }
 
@@ -341,6 +347,8 @@ public class JSoupDataSource {
                     Timber.w(e, "loadData exception");
                 }
             }
+        } else {
+            nextPage = null;
         }
 
         return data;
