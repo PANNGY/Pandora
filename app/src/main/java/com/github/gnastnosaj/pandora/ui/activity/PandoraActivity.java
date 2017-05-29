@@ -121,6 +121,9 @@ public class PandoraActivity extends BaseActivity {
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_share)
                 .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
+                .icon(MaterialDesignIconic.Icon.gmi_label_heart)
+                .color(Color.WHITE).sizeDp(18));
         return true;
     }
 
