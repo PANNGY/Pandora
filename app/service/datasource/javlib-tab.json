@@ -120,7 +120,7 @@
         ],
         "format": "{baseUrl}%s",
         "regexp": {
-          "pattern": "{baseUrl}vl_",
+          "pattern": "\\{baseUrl\\}vl_",
           "replace": "{baseUrl}/{area}/vl_"
         }
       }
@@ -175,7 +175,7 @@
         ],
         "format": "{baseUrl}%s",
         "regexp": {
-          "pattern": "{baseUrl}vl_",
+          "pattern": "\\{baseUrl\\}vl_",
           "replace": "{baseUrl}/{area}/vl_"
         }
       }
