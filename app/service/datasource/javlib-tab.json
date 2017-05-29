@@ -171,8 +171,8 @@
         ],
         "format": "{baseUrl}%s",
         "regexp": {
-          "pattern": "^vl_update.php",
-          "format": "{baseUrl}/{area}/%s"
+          "pattern": "vl_update.php",
+          "replace": "/{area}/vl_update.php"
         }
       }
     },
