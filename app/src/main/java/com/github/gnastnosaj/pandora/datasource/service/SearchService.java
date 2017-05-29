@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
+import android.view.inputmethod.InputMethodManager;
 
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
@@ -56,6 +57,10 @@ public class SearchService {
     }
 
     private void search(String title, String _keyword, int type) {
+        if (context instanceof BaseActivity) {
+            InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(((BaseActivity) context).getWindow().peekDecorView().getWindowToken(), InputMethodManager.RESULT_UNCHANGED_HIDDEN);
+        }
         switch (_keyword) {
             case "girlatlas":
                 context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
