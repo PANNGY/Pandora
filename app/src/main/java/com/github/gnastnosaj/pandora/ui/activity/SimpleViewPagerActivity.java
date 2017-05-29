@@ -223,10 +223,10 @@ public class SimpleViewPagerActivity extends BaseActivity {
             catalogCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_CATALOG_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
             Realm realm = Realm.getInstance(catalogCacheRealmConfig);
-            RealmResults results = realm.where(JSoupLink.class).findAll();
-            catalog.addAll(JSoupLink.from(results));
+            RealmResults results = realm.where(JSoupCatalog.class).findAll();
+            catalog.addAll(JSoupCatalog.from(results));
             if (ListUtils.isEmpty(catalog)) {
-                results = realm.where(JSoupCatalog.class).findAll();
+                results = realm.where(JSoupLink.class).findAll();
                 catalog.addAll(JSoupLink.from(results));
             }
             realm.close();
