@@ -181,10 +181,11 @@ public class SearchService {
                                                     context.startActivity(i);
                                                 } else {
                                                     Intent i = new Intent(context, SimpleTabActivity.class);
-                                                    i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
                                                     i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
                                                     i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
-                                                    i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("href"));
+                                                    i.putExtra(SimpleTabActivity.EXTRA_HREF, searchDataSource.getCurrentPage());
+                                                    i.putParcelableArrayListExtra(SimpleTabActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                     context.startActivity(i);
                                                 }
                                             } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
