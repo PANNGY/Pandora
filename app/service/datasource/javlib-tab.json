@@ -120,8 +120,8 @@
         ],
         "format": "{baseUrl}%s",
         "regexp": {
-          "pattern": "vl_update.php",
-          "replace": "/{area}/vl_update.php"
+          "pattern": "{baseUrl}vl_",
+          "replace": "{baseUrl}/{area}/vl_"
         }
       }
     }
@@ -173,7 +173,11 @@
         "args": [
           "href"
         ],
-        "format": "{baseUrl}%s"
+        "format": "{baseUrl}%s",
+        "regexp": {
+          "pattern": "{baseUrl}vl_",
+          "replace": "{baseUrl}/{area}/vl_"
+        }
       }
     },
     "reserveSelector": {
