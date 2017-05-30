@@ -13,13 +13,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -33,7 +30,6 @@ import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
-import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +38,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.dynamicbox.DynamicBox;
 import timber.log.Timber;
@@ -72,9 +67,6 @@ public class WebViewActivity extends BaseActivity {
     WebView webView;
 
     private DynamicBox dynamicBox;
-    private boolean isAppBarHidden;
-    private Disposable appBarHiddenDisposable;
-    private GestureDetector gestureDetector;
 
     private String href;
     private String title;
@@ -98,13 +90,6 @@ public class WebViewActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                return true;
-            }
-        });
 
         webView.setWebViewClient(new WebVideoViewClient());
         webView.setWebChromeClient(new WebChrome());
@@ -160,18 +145,6 @@ public class WebViewActivity extends BaseActivity {
 
         }
         return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (gestureDetector != null && gestureDetector.onTouchEvent(ev)) {
-            if (appBarHiddenDisposable != null && !appBarHiddenDisposable.isDisposed()) {
-                appBarHiddenDisposable.dispose();
-            }
-            hideOrShowToolbar(true);
-            appBarHiddenDisposable = newHideOrShowToolbarDisposable(false);
-        }
-        return super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -232,27 +205,6 @@ public class WebViewActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public Disposable newHideOrShowToolbarDisposable(boolean show) {
-        return Observable.timer(5000, TimeUnit.MILLISECONDS)
-                .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(aLong -> hideOrShowToolbar(show));
-    }
-
-    public void hideOrShowToolbar(boolean show) {
-        isAppBarHidden = show;
-        hideOrShowToolbar();
-    }
-
-    public void hideOrShowToolbar() {
-        appBar.animate()
-                .translationY(isAppBarHidden ? 0 : -appBar.getHeight())
-                .setInterpolator(new DecelerateInterpolator(2))
-                .start();
-        isAppBarHidden = !isAppBarHidden;
-    }
-
     private void injectCSS(String filename) {
         try {
             InputStream inputStream = getAssets().open(HACK_CSS_DIR + filename);
@@ -294,7 +246,6 @@ public class WebViewActivity extends BaseActivity {
             } else {
                 webView.setVisibility(View.VISIBLE);
                 dismissDynamicBox(WebViewActivity.this);
-                appBarHiddenDisposable = newHideOrShowToolbarDisposable(false);
             }
         }
 
