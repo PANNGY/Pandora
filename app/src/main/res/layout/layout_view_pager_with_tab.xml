@@ -10,10 +10,16 @@
 
         <include layout="@layout/view_toolbar_with_indicator" />
 
-        <com.github.gnastnosaj.pandora.ui.widget.HackyViewPager
-            android:id="@+id/view_pager"
+        <FrameLayout
+            android:id="@+id/hacky_dynamic_box"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <com.github.gnastnosaj.pandora.ui.widget.HackyViewPager
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
 
     </LinearLayout>
 

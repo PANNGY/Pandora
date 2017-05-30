@@ -5,24 +5,30 @@
     android:background="@color/black"
     android:fitsSystemWindows="true">
 
-    <com.github.gnastnosaj.pandora.ui.widget.HackyViewPager
-        android:id="@+id/view_pager"
+    <FrameLayout
+        android:id="@+id/hacky_dynamic_box"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-    <include layout="@layout/view_toolbar"/>
+        <com.github.gnastnosaj.pandora.ui.widget.HackyViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <include layout="@layout/view_toolbar" />
 
     <me.next.tagview.TagCloudView
         android:id="@+id/tag_cloud_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:tcvBackground="@color/colorAccent"
+        app:tcvBorder="8dp"
+        app:tcvCanTagClick="true"
         app:tcvItemBorderHorizontal="8dp"
         app:tcvItemBorderVertical="6dp"
-        app:tcvBorder="8dp"
-        app:tcvBackground="@color/colorAccent"
         app:tcvTextColor="@color/white"
-        app:tcvTextSize="6sp"
-        app:tcvCanTagClick="true"
-        android:layout_gravity="bottom" />
+        app:tcvTextSize="6sp" />
 
 </FrameLayout>

@@ -107,6 +107,8 @@ public class SimpleViewPagerActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
+        createDynamicBox(findViewById(R.id.hacky_dynamic_box));
+
         title = getIntent().getStringExtra(EXTRA_TITLE);
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
         galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
@@ -163,10 +165,12 @@ public class SimpleViewPagerActivity extends BaseActivity {
     }
 
     private void initViewPager() {
+        showDynamicBoxCustomView(DYNAMIC_BOX_AV_BALLGRIDPULSE, this);
         initTabs().compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabs -> {
+                    dismissDynamicBox(this);
                     SimpleViewPagerAdapter simplePagerAdapter = new SimpleViewPagerAdapter(this, getSupportFragmentManager(), tabs, tabDataSource, galleryDataSource);
                     viewPager.setAdapter(simplePagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
