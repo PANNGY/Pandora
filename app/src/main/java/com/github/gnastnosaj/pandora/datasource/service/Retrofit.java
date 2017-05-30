@@ -41,7 +41,13 @@ public class Retrofit {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        return retrofit.create(baseService);
+        T service = retrofit.create(baseService);
+
+//        if (service instanceof GithubService) {
+//            service = (T) new GithubServicePlus((GithubService) service, newSimpleService(GitOSCService.BASE_URL, GitOSCService.class, timeout));
+//        }
+
+        return service;
     }
 
     public static <T> T newSimpleService(@NonNull String baseUrl, @NonNull Class<T> baseService) {

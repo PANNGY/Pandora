@@ -24,7 +24,6 @@ import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
-import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
@@ -42,7 +41,6 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
@@ -236,7 +234,6 @@ public class PandoraActivity extends BaseActivity {
                                     .setButtonUpdateClickListener((dialog, which) ->
                                             Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
                                                     .getUpdateData()
-                                                    .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
                                                     .compose(bindUntilEvent(ActivityEvent.DESTROY))
                                                     .subscribeOn(Schedulers.newThread())
                                                     .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
