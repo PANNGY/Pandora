@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.URLDecoder;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,7 @@ public class JSoupAnalyzer {
     public String[] args;
     public String format;
     public JSoupRegexp regexp;
+    public boolean urlDecode;
 
     public String analyze(Elements elements) {
         if (elements == null || elements.isEmpty()) {
@@ -79,6 +81,9 @@ public class JSoupAnalyzer {
                         }
                     }
                 }
+            }
+            if(urlDecode) {
+                data = URLDecoder.decode(data);
             }
         }
         return data;

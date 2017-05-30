@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -19,31 +20,42 @@ import android.widget.ProgressBar;
 import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
+import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
+import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
+import com.github.gnastnosaj.pandora.datasource.service.GithubService;
+import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
-import com.github.gnastnosaj.pandora.datasource.service.UpdateService;
 import com.github.gnastnosaj.pandora.event.TabEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
+import com.github.javiersantos.appupdater.AppUpdater;
+import com.github.javiersantos.appupdater.enums.Display;
+import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
+import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.trinea.android.common.util.PackageUtils;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
+import zlc.season.rxdownload2.RxDownload;
 
 /**
  * Created by jasontsang on 4/23/17.
@@ -109,6 +121,9 @@ public class PandoraActivity extends BaseActivity {
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_share)
+                .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
+                .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                 .color(Color.WHITE).sizeDp(18));
         return true;
     }

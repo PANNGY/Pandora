@@ -43,9 +43,9 @@ public class SimpleTabFragment extends Fragment {
 
     public static SimpleTabFragment newInstance(String href, String tabDataSource, String galleryDataSource) {
         SimpleTabFragment instance = new SimpleTabFragment();
+        instance.href = href;
         instance.tabDataSource = tabDataSource;
         instance.galleryDataSource = galleryDataSource;
-        instance.href = href;
         return instance;
     }
 

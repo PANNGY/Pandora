@@ -44,7 +44,8 @@
           "method": 1,
           "args": [
             "href"
-          ]
+          ],
+          "urlDecode": true
         }
       }
     }
@@ -93,7 +94,8 @@
         "method": 1,
         "args": [
           "href"
-        ]
+        ],
+        "urlDecode": true
       }
     }
   }

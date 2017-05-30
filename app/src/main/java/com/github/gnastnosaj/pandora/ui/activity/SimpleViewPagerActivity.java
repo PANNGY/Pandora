@@ -22,7 +22,6 @@ import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.SimpleViewPagerAdapter;
-import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
@@ -35,7 +34,9 @@ import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
@@ -81,13 +82,12 @@ public class SimpleViewPagerActivity extends BaseActivity {
     private String tabDataSource;
     private String galleryDataSource;
 
-    private static List catalog;
-    private static List<JSoupLink> tabs;
+    private static Map<String, List> catalogMap = new HashMap<>();
+    private static Map<String, List<JSoupLink>> tabMap = new HashMap<>();
 
     private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
     private RealmConfiguration tabCacheRealmConfig;
     private RealmConfiguration catalogCacheRealmConfig;
-    private JSoupDataSource searchDataSource;
 
     @Override
     public void onBackPressed() {
@@ -107,6 +107,8 @@ public class SimpleViewPagerActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
+        createDynamicBox(findViewById(R.id.hacky_dynamic_box));
+
         title = getIntent().getStringExtra(EXTRA_TITLE);
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
         galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
@@ -119,7 +121,6 @@ public class SimpleViewPagerActivity extends BaseActivity {
 
         initViewPager();
         initSearchView();
-        initCatalog();
     }
 
     @Override
@@ -165,10 +166,12 @@ public class SimpleViewPagerActivity extends BaseActivity {
     }
 
     private void initViewPager() {
+        showDynamicBoxCustomView(DYNAMIC_BOX_AV_BALLGRIDPULSE, this);
         initTabs().compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabs -> {
+                    dismissDynamicBox(this);
                     SimpleViewPagerAdapter simplePagerAdapter = new SimpleViewPagerAdapter(this, getSupportFragmentManager(), tabs, tabDataSource, galleryDataSource);
                     viewPager.setAdapter(simplePagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
@@ -176,40 +179,22 @@ public class SimpleViewPagerActivity extends BaseActivity {
     }
 
     private Observable<List<JSoupLink>> initTabs() {
+        List<JSoupLink> tabs = tabMap.containsKey(tabDataSource) ? tabMap.get(tabDataSource) : new ArrayList<>();
+        if(!tabMap.containsKey(tabDataSource)) {
+            tabMap.put(tabDataSource, tabs);
+        }
         if (ListUtils.isEmpty(tabs)) {
             tabCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_TAB_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
             Realm realm = Realm.getInstance(tabCacheRealmConfig);
             RealmResults<JSoupLink> results = realm.where(JSoupLink.class).findAll();
-            tabs = JSoupLink.from(results);
+            tabs.addAll(JSoupLink.from(results));
             realm.close();
 
             if (ListUtils.isEmpty(tabs)) {
-                return githubService.getJSoupDataSource(tabDataSource)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
-                        .flatMap(data -> {
-                            tabs = data;
-                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
-                            bgRealm.executeTransactionAsync(bg -> {
-                                bg.delete(JSoupLink.class);
-                                bg.insertOrUpdate(tabs);
-                            });
-                            bgRealm.close();
-                            return Observable.just(data);
-                        });
+                return initTabs(tabs);
             } else {
-                githubService.getJSoupDataSource(tabDataSource)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
-                        .subscribeOn(Schedulers.newThread())
-                        .subscribe(data -> {
-                            tabs = data;
-                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
-                            bgRealm.executeTransactionAsync(bg -> {
-                                bg.delete(JSoupLink.class);
-                                bg.insertOrUpdate(tabs);
-                            });
-                            bgRealm.close();
-                        });
+                initTabs(tabs).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribeOn(Schedulers.newThread()).subscribe();
                 return Observable.just(tabs);
             }
         } else {
@@ -217,71 +202,77 @@ public class SimpleViewPagerActivity extends BaseActivity {
         }
     }
 
-    private void initCatalog() {
+    private Observable<List<JSoupLink>> initTabs(List<JSoupLink> tabs) {
+        return githubService.getJSoupDataSource(tabDataSource)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadTabs())
+                .flatMap(data -> {
+                    tabs.clear();
+                    tabs.addAll(data);
+                    Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
+                    bgRealm.executeTransactionAsync(bg -> {
+                        bg.delete(JSoupLink.class);
+                        bg.insertOrUpdate(data);
+                    });
+                    bgRealm.close();
+                    return Observable.just(data);
+                });
+    }
+
+    private Observable<List> initCatalog() {
+        List catalog = catalogMap.containsKey(tabDataSource) ? catalogMap.get(tabDataSource) : new ArrayList<>();
+        if(!catalogMap.containsKey(tabDataSource)) {
+            catalogMap.put(tabDataSource, catalog);
+        }
+
         if (ListUtils.isEmpty(catalog)) {
             catalogCacheRealmConfig = new RealmConfiguration.Builder().name(tabDataSource + "_CATALOG_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
             Realm realm = Realm.getInstance(catalogCacheRealmConfig);
-            RealmResults results = realm.where(JSoupLink.class).findAll();
-            catalog = JSoupLink.from(results);
-            if (ListUtils.isEmpty(results)) {
-                results = realm.where(JSoupCatalog.class).findAll();
-                catalog = JSoupLink.from(results);
+            RealmResults results = realm.where(JSoupCatalog.class).findAll();
+            catalog.addAll(JSoupCatalog.from(results));
+            if (ListUtils.isEmpty(catalog)) {
+                results = realm.where(JSoupLink.class).findAll();
+                catalog.addAll(JSoupLink.from(results));
             }
             realm.close();
 
             if (ListUtils.isEmpty(catalog)) {
-                githubService.getJSoupDataSource(tabDataSource)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
-                        .flatMap(data -> {
-                            catalog = (List) data;
-                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
-                            bgRealm.executeTransactionAsync(bg -> {
-                                if (!ListUtils.isEmpty(catalog)) {
-                                    if (catalog.get(0) instanceof JSoupCatalog) {
-                                        bg.delete(JSoupCatalog.class);
-                                    } else {
-                                        bg.delete(JSoupLink.class);
-                                    }
-                                    bg.insertOrUpdate(catalog);
-                                }
-                            });
-                            bgRealm.close();
-                            return Observable.just(data);
-                        }).compose(bindUntilEvent(ActivityEvent.DESTROY))
-                        .subscribeOn(Schedulers.newThread())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(data -> setCatalog());
+                return initCatalog(catalog);
             } else {
-                setCatalog();
-                githubService.getJSoupDataSource(tabDataSource)
-                        .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
-                        .subscribeOn(Schedulers.newThread())
-                        .subscribe(data -> {
-                            catalog = (List) data;
-                            Realm bgRealm = Realm.getInstance(tabCacheRealmConfig);
-                            bgRealm.executeTransactionAsync(bg -> {
-                                if (!ListUtils.isEmpty(catalog)) {
-                                    if (catalog.get(0) instanceof JSoupCatalog) {
-                                        bg.delete(JSoupCatalog.class);
-                                    } else {
-                                        bg.delete(JSoupLink.class);
-                                    }
-                                    bg.insertOrUpdate(catalog);
-                                }
-                            });
-                            bgRealm.close();
-                        });
+                initCatalog(catalog).compose(bindUntilEvent(ActivityEvent.DESTROY)).subscribeOn(Schedulers.newThread()).subscribe();
+                return Observable.just(catalog);
             }
         } else {
-            setCatalog();
+            return Observable.just(catalog);
         }
     }
 
-    private void setCatalog() {
-        if (!ListUtils.isEmpty(this.catalog)) {
-            if (this.catalog.get(0) instanceof JSoupCatalog) {
-                List<JSoupCatalog> catalog = (List<JSoupCatalog>) this.catalog;
+    private Observable<List> initCatalog(List catalog) {
+        return githubService.getJSoupDataSource(tabDataSource)
+                .flatMap(jsoupDataSource -> jsoupDataSource.loadCatalogs())
+                .flatMap(data -> {
+                    catalog.clear();
+                    catalog.addAll(data);
+                    Realm bgRealm = Realm.getInstance(catalogCacheRealmConfig);
+                    bgRealm.executeTransactionAsync(bg -> {
+                        if (!ListUtils.isEmpty(data)) {
+                            if (data.get(0) instanceof JSoupCatalog) {
+                                bg.delete(JSoupCatalog.class);
+                            } else {
+                                bg.delete(JSoupLink.class);
+                            }
+                            bg.insertOrUpdate(data);
+                        }
+                    });
+                    bgRealm.close();
+                    return Observable.just(data);
+                });
+    }
+
+    private void setCatalog(List _catalog) {
+        if (!ListUtils.isEmpty(_catalog)) {
+            if (_catalog.get(0) instanceof JSoupCatalog) {
+                List<JSoupCatalog> catalog = (List<JSoupCatalog>) _catalog;
                 for (JSoupCatalog jsoupCatalog : catalog) {
                     View tagGroupView = getLayoutInflater().inflate(R.layout.item_tag_cloud, null);
                     TextView tagGroupTitle = (TextView) tagGroupView.findViewById(R.id.tag_group_title);
@@ -305,7 +296,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
                     suggestionsListView.addFooterView(tagGroupView);
                 }
             } else {
-                List<JSoupLink> catalog = (List<JSoupLink>) this.catalog;
+                List<JSoupLink> catalog = (List<JSoupLink>) _catalog;
                 View tagGroupView = getLayoutInflater().inflate(R.layout.item_tag_cloud, null);
                 TagCloudView tagCloudView = (TagCloudView) tagGroupView.findViewById(R.id.tag_cloud_view);
 
@@ -375,8 +366,12 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 suggestionsListView.addHeaderView(deleteIconView);
             }
         } catch (Exception e) {
-            Timber.e(e, "initSearchView exception");
+            Timber.e(e, "init searchView exception");
         }
+        initCatalog().compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(catalog -> setCatalog(catalog));
     }
 
     private void search(String keyword) {

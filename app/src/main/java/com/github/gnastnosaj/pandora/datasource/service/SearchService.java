@@ -22,6 +22,7 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
@@ -56,38 +57,46 @@ public class SearchService {
     }
 
     private void search(String title, String _keyword, int type) {
+        if (searchListener != null) {
+            searchListener.onStart();
+        }
+
         switch (_keyword) {
-            case "girl":
-                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+            case "girlatlas":
+                Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+                    searchListener.onSuccess(null);
+                    context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_GIRL_ATLAS_GALLERY));
+                });
                 return;
-            case "man":
-                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_TAB)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_GALLERY)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+            case "nanrencd":
+                Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+                    searchListener.onSuccess(null);
+                    context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_TAB)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_NANRENCD_GALLERY));
+                });
                 return;
-            case "jav":
-                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+            case "javlib":
+                Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+                    searchListener.onSuccess(null);
+                    context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY));
+                });
                 return;
             case "avsox":
-                context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_TAB)
-                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_GALLERY)
-                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK));
+                Observable.timer(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(aLong -> {
+                    searchListener.onSuccess(null);
+                    context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_TAB)
+                            .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_GALLERY));
+                });
                 return;
         }
 
         keyword = betterKeyword(_keyword);
-
-        if (searchListener != null) {
-            searchListener.onStart();
-        }
 
         if (context instanceof BaseActivity) {
             Snackbar.make(((BaseActivity) context).findViewById(android.R.id.content), R.string.searching, Snackbar.LENGTH_LONG).show();
@@ -170,32 +179,35 @@ public class SearchService {
                                     .setMessage(R.string.search_result_found)
                                     .setNegativeButton(R.string.action_cancel, (dialog, which) -> dialog.dismiss())
                                     .setPositiveButton(R.string.action_check, (dialog, which) -> {
-                                        if (searchDataSource.id.equals(GithubService.DATE_SOURCE_JAVLIB_TAB)) {
-                                            JSoupData jsoupData = data.get(0);
-                                            if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
-                                                Intent i = new Intent(context, GalleryActivity.class);
-                                                i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
-                                                i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                                jsoupData.attrs.add(new JSoupAttr("href", searchDataSource.getCurrentPage()));
-                                                jsoupData.attrs.add(new JSoupAttr("title", TextUtils.isEmpty(title) ? keyword : title));
-                                                jsoupData.attrs.add(new JSoupAttr("id", keyword));
-                                                i.putExtra(GalleryActivity.EXTRA_DATA, jsoupData);
-                                                i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
-                                                context.startActivity(i);
-                                            } else {
-                                                Intent i = new Intent(context, SimpleTabActivity.class);
-                                                i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
-                                                i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
-                                                i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
-                                                i.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupData.getAttr("href"));
+                                        if (searchDataSource != null) {
+                                            if (searchDataSource.id.equals(GithubService.DATE_SOURCE_JAVLIB_TAB)) {
+                                                JSoupData jsoupData = data.get(0);
+                                                if (!TextUtils.isEmpty(jsoupData.getAttr("cover"))) {
+                                                    Intent i = new Intent(context, GalleryActivity.class);
+                                                    i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                                    i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                                    jsoupData.attrs.add(new JSoupAttr("href", searchDataSource.getCurrentPage()));
+                                                    jsoupData.attrs.add(new JSoupAttr("title", TextUtils.isEmpty(title) ? keyword : title));
+                                                    jsoupData.attrs.add(new JSoupAttr("id", keyword));
+                                                    i.putExtra(GalleryActivity.EXTRA_DATA, jsoupData);
+                                                    i.putParcelableArrayListExtra(GalleryActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                                    context.startActivity(i);
+                                                } else {
+                                                    Intent i = new Intent(context, SimpleTabActivity.class);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_TAB);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_JAVLIB_GALLERY);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
+                                                    i.putExtra(SimpleTabActivity.EXTRA_HREF, searchDataSource.getCurrentPage());
+                                                    i.putParcelableArrayListExtra(SimpleTabActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                                    context.startActivity(i);
+                                                }
+                                            } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
+                                                Intent i = new Intent(context, BTDBActivity.class);
+                                                i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
+                                                i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
+                                                i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                 context.startActivity(i);
                                             }
-                                        } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
-                                            Intent i = new Intent(context, BTDBActivity.class);
-                                            i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
-                                            i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
-                                            i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
-                                            context.startActivity(i);
                                         }
                                         dialog.dismiss();
                                     }).setCancelable(false).show();

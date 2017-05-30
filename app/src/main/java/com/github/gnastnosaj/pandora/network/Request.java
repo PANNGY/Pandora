@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora.network;
 
-import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
 import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 
@@ -8,7 +7,6 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +29,6 @@ public class Request {
         countDownLatch = new CountDownLatch(1);
         Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
                 .getRequestConfigs()
-                .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getRequestConfigs())
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(data -> {
                     ehancers = data;

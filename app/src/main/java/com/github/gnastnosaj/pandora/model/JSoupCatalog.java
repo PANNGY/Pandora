@@ -1,5 +1,8 @@
 package com.github.gnastnosaj.pandora.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 
@@ -18,6 +21,14 @@ public class JSoupCatalog extends RealmObject {
         catalog.tags = new RealmList<>();
         for (JSoupLink jsoupLink : tags) {
             catalog.tags.add(jsoupLink.clone());
+        }
+        return catalog;
+    }
+
+    public static List<JSoupCatalog> from(List<JSoupCatalog> results) {
+        List<JSoupCatalog> catalog = new ArrayList<>();
+        for (JSoupCatalog jsoupCatalog : results) {
+            catalog.add(jsoupCatalog.clone());
         }
         return catalog;
     }
