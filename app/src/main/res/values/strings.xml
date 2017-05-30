@@ -37,4 +37,14 @@
     <string name="save_picture_fail">fail to save picture, please try again</string>
 
     <string name="copy_magnet_success">The Magnet Link has been copied to clipboard</string>
+
+    <string name="about">About</string>
+    <string name="about_features">Features</string>
+    <string name="about_help_and_feedback">Help &#038; Feedback</string>
+    <string name="about_check_for_updates">Check for Updates</string>
+    <string name="about_version">Pandora %1$s</string>
+    <string name="about_copyright">Copyright &#169; %1$s Jason Tsang.\nAll Rights Reserved.</string>
+
+    <string name="url_features">https://github.com/gnastnosaj/Pandora/wiki</string>
+    <string name="url_help_and_feedback">https://github.com/gnastnosaj/Pandora/issues</string>
 </resources>

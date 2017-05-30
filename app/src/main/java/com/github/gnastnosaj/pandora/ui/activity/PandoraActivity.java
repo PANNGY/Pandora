@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -20,42 +19,31 @@ import android.widget.ProgressBar;
 import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
-import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
-import com.github.gnastnosaj.pandora.datasource.service.GitOSCService;
-import com.github.gnastnosaj.pandora.datasource.service.GithubService;
-import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
+import com.github.gnastnosaj.pandora.datasource.service.UpdateService;
 import com.github.gnastnosaj.pandora.event.TabEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
-import com.github.javiersantos.appupdater.AppUpdater;
-import com.github.javiersantos.appupdater.enums.Display;
-import com.github.javiersantos.appupdater.enums.UpdateFrom;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
-import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
-import java.io.File;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.trinea.android.common.util.PackageUtils;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
-import zlc.season.rxdownload2.RxDownload;
 
 /**
  * Created by jasontsang on 4/23/17.
@@ -103,7 +91,7 @@ public class PandoraActivity extends BaseActivity {
 
         initViewPager();
         initSearchView();
-        checkForUpdate();
+        UpdateService.checkForUpdate(this);
         prepareSplashImage();
     }
 
@@ -137,6 +125,7 @@ public class PandoraActivity extends BaseActivity {
             case R.id.action_favourite:
                 return true;
             case R.id.action_about:
+                startActivity(new Intent(this, AboutActivity.class));
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -233,42 +222,6 @@ public class PandoraActivity extends BaseActivity {
                 progressBar.setVisibility(View.GONE);
             }
         });
-    }
-
-    private void checkForUpdate() {
-        new RxPermissions(this).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
-                .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                .subscribe(grant -> {
-                            AppUpdater appUpdater = new AppUpdater(this)
-                                    .setDisplay(Display.DIALOG)
-                                    .setUpdateFrom(UpdateFrom.JSON)
-                                    .setUpdateJSON(getResources().getString(R.string.update_url))
-                                    .setButtonUpdateClickListener((dialog, which) ->
-                                            Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
-                                                    .getUpdateData()
-                                                    .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
-                                                    .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                                                    .subscribeOn(Schedulers.newThread())
-                                                    .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
-                                                                    .download(updateData.url)
-                                                                    .compose(bindUntilEvent(ActivityEvent.DESTROY))
-                                                                    .subscribeOn(Schedulers.io())
-                                                                    .observeOn(AndroidSchedulers.mainThread())
-                                                                    .subscribe(downloadStatus -> {
-                                                                            },
-                                                                            throwable -> Timber.w(throwable, "update download exception"),
-                                                                            () -> {
-                                                                                File[] files = RxDownload.getInstance(Boilerplate.getInstance()).getRealFiles(updateData.url);
-                                                                                if (files != null) {
-                                                                                    File file = files[0];
-                                                                                    PackageUtils.install(Boilerplate.getInstance(), file.getPath());
-                                                                                }
-                                                                            }),
-                                                            throwable -> Timber.w(throwable, "update check exception"))
-                                    );
-                            appUpdater.start();
-                        },
-                        throwable -> Timber.w(throwable, "update permission exception"));
     }
 
     private void prepareSplashImage() {
