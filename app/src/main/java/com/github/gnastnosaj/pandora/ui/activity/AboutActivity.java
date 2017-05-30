@@ -13,6 +13,9 @@ import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.service.UpdateService;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -51,11 +54,11 @@ public class AboutActivity extends BaseActivity implements View.OnClickListener 
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        version.setText(String.format(getResources().getString(R.string.about_version), Boilerplate.versionName));
+        version.setText(getResources().getString(R.string.about_version, Boilerplate.versionName));
         features.setOnClickListener(this);
         helpAndFeedback.setOnClickListener(this);
         checkForUpdates.setOnClickListener(this);
-        copyright.setText(R.string.about_copyright);
+        copyright.setText(getResources().getString(R.string.about_copyright, new SimpleDateFormat("yyyy").format(new Date())));
     }
 
     @Override
