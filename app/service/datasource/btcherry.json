@@ -79,24 +79,7 @@
       }
     ],
     "nextPageSelector": {
-      "cssQuery": "ul.pagination li.next",
-      "filter": {
-        "filters": [
-          {
-            "notQuery": ".disabled"
-          },
-          {
-            "cssQuery": "a"
-          }
-        ]
-      },
-      "analyzer": {
-        "method": 1,
-        "args": [
-          "href"
-        ],
-        "format": "{baseUrl}%s"
-      }
+      "content": "{baseUrl}{pages[1]}(keyword)&p={number}"
     }
   }
 }

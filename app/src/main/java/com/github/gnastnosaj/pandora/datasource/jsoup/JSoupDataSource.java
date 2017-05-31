@@ -480,6 +480,7 @@ public class JSoupDataSource {
                     Timber.e(e, "betterData exception");
                 }
             }
+            data = data.replace("{number}", "" + (history.size() + 1));
             if (!ArrayUtils.isEmpty(pages)) {
                 Matcher matcher = Pattern.compile("\\{pages\\[\\d+\\]\\}").matcher(data);
                 if (matcher.find()) {
