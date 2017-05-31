@@ -83,6 +83,9 @@ public class WebViewActivity extends BaseActivity {
         initSystemBar();
 
         href = getIntent().getStringExtra(EXTRA_HREF);
+        if (TextUtils.isEmpty(href)) {
+            href = getIntent().getDataString();
+        }
         title = getIntent().getStringExtra(EXTRA_TITLE);
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);
