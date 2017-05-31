@@ -222,7 +222,7 @@ public class SearchService {
                                                     i.putParcelableArrayListExtra(SimpleTabActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                     context.startActivity(i);
                                                 }
-                                            } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB)) {
+                                            } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB) || searchDataSource.id.equals(GithubService.DATE_SOURCE_BTCHERRY)) {
                                                 Intent i = new Intent(context, BTDBActivity.class);
                                                 i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
                                                 i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
