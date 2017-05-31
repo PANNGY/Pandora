@@ -86,20 +86,10 @@
         <activity
             android:name=".ui.activity.WebViewActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|screenSize|smallestScreenSize"
-            android:exported="true"
+            android:exported="false"
             android:hardwareAccelerated="true"
             android:screenOrientation="sensor"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".ui.activity.AboutActivity"
