@@ -97,4 +97,8 @@
 
     <string name="url_features">https://github.com/gnastnosaj/Pandora/wiki</string>
     <string name="url_help_and_feedback">https://github.com/gnastnosaj/Pandora/issues</string>
+
+    <string name="plugin_center_my_plugins">My Plugins</string>
+    <string name="plugin_center_manage">Manage</string>
+    <string name="plugin_center_complete">Complete</string>
 </resources>

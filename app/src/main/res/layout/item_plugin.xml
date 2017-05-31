@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:id="@+id/item_plugin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/item_plugin_selector"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        tools:ignore="UselessParent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.github.gnastnosaj.pandora.ui.widget.RatioImageView
+                android:id="@+id/icon_plugin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp" />
+
+            <com.mikepenz.iconics.view.IconicsTextView
+                android:id="@+id/add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="5dp"
+                android:text="{faw-plus-circle}"
+                android:textColor="@color/md_green_500"
+                android:textSize="15sp"
+                android:visibility="invisible"
+                tools:ignore="HardcodedText" />
+
+            <com.mikepenz.iconics.view.IconicsTextView
+                android:id="@+id/added"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="5dp"
+                android:text="{faw-check-circle}"
+                android:textColor="@color/md_grey_500"
+                android:textSize="15sp"
+                android:visibility="invisible"
+                tools:ignore="HardcodedText" />
+
+            <com.mikepenz.iconics.view.IconicsTextView
+                android:id="@+id/remove"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="5dp"
+                android:text="{faw-minus-circle}"
+                android:textColor="@color/md_grey_500"
+                android:textSize="15sp"
+                android:visibility="invisible"
+                tools:ignore="HardcodedText" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/title_plugin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal" />
+
+    </LinearLayout>
+
+</FrameLayout>
