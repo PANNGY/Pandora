@@ -1,7 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -102,7 +101,7 @@ public class OpenSourceActivity extends BaseActivity implements View.OnTouchList
             if (link.length != 0) {
                 if (action == MotionEvent.ACTION_UP) {
                     Intent i = new Intent(this, WebViewActivity.class);
-                    i.putExtra(WebViewActivity.EXTRA_HREF, Uri.parse(link[0].getURL()));
+                    i.putExtra(WebViewActivity.EXTRA_HREF, link[0].getURL());
                     startActivity(i);
                 }
                 return true;
