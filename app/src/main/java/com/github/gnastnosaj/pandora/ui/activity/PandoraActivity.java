@@ -77,17 +77,6 @@ public class PandoraActivity extends BaseActivity {
     private Observable<TabEvent> tabEventObservable;
 
     @Override
-    public void onBackPressed() {
-        if (searchView.isOpen()) {
-            searchView.closeSearch();
-        } else if (drawer.isDrawerOpen()) {
-            drawer.closeDrawer();
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_view_pager_with_tab);
@@ -146,13 +135,20 @@ public class PandoraActivity extends BaseActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
+        if (searchView.isOpen()) {
+            searchView.closeSearch();
+            return true;
+        } else if (drawer.isDrawerOpen()) {
+            drawer.closeDrawer();
+            return true;
+        } else if (keyCode == KeyEvent.KEYCODE_BACK) {
             Intent i = new Intent(Intent.ACTION_MAIN);
             i.addCategory(Intent.CATEGORY_HOME);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);
             return true;
         }
+
         return super.onKeyDown(keyCode, event);
     }
 

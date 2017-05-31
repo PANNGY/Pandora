@@ -150,12 +150,33 @@ public class SearchService {
                         } else {
                             return Observable.just(data);
                         }
+                    }))
+                    .switchMap((data -> {
+                        if (ListUtils.isEmpty(data)) {
+                            return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTCHERRY).flatMap(jsoupDataSource -> {
+                                searchDataSource = jsoupDataSource;
+                                return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                            });
+                        } else {
+                            return Observable.just(data);
+                        }
                     }));
         } else if (type == TYPE_MAGNET) {
-            search = githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB).flatMap(jsoupDataSource -> {
-                searchDataSource = jsoupDataSource;
-                return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
-            });
+            search = githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTDB)
+                    .flatMap(jsoupDataSource -> {
+                        searchDataSource = jsoupDataSource;
+                        return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                    })
+                    .switchMap((data -> {
+                        if (ListUtils.isEmpty(data)) {
+                            return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_BTCHERRY).flatMap(jsoupDataSource -> {
+                                searchDataSource = jsoupDataSource;
+                                return jsoupDataSource.searchData(keyword).onErrorReturn(throwable -> new ArrayList<>());
+                            });
+                        } else {
+                            return Observable.just(data);
+                        }
+                    }));
         }
 
         if (search != null) {

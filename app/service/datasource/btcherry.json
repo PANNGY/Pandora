@@ -1,0 +1,102 @@
+{
+  "id": "btcherry",
+  "baseUrl": "http://www.btcherry.info/",
+  "pages": [
+    "/",
+    "/search?keyword="
+  ],
+  "searchSelector": {
+    "url": "{baseUrl}{pages[1]}(keyword)",
+    "cssQuery": "div.r a.link",
+    "attrSelectors": [
+      {
+        "label": "title",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "magnet",
+        "preTreat": {
+          "nextElementSibling": true
+        },
+        "cssQuery": "a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      },
+      {
+        "label": "size",
+        "preTreat": {
+          "nextElementSibling": true
+        },
+        "cssQuery": "span.prop_val",
+        "filter": {
+          "indexes": [
+            1
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "files",
+        "preTreat": {
+          "nextElementSibling": true
+        },
+        "cssQuery": "span.prop_val",
+        "filter": {
+          "indexes": [
+            2
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "addTime",
+        "preTreat": {
+          "nextElementSibling": true
+        },
+        "cssQuery": "span.prop_val",
+        "filter": {
+          "indexes": [
+            0
+          ]
+        },
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "popularity",
+        "content": ""
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "ul.pagination li.next",
+      "filter": {
+        "filters": [
+          {
+            "notQuery": ".disabled"
+          },
+          {
+            "cssQuery": "a"
+          }
+        ]
+      },
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
+  }
+}
