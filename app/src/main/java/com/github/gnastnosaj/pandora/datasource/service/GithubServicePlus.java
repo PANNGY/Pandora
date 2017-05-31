@@ -1,6 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource.service;
 
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
+import com.github.gnastnosaj.pandora.model.Plugin;
 import com.github.gnastnosaj.pandora.model.UpdateData;
 import com.github.gnastnosaj.pandora.network.Request;
 
@@ -41,8 +42,8 @@ public class GithubServicePlus implements GithubService {
     }
 
     @Override
-    public Observable<List<String>> getDataSources() {
-        return githubService.getDataSources().timeout(timeout, TimeUnit.SECONDS, gitOSCService.getDataSources());
+    public Observable<List<Plugin>> getPlugins() {
+        return githubService.getPlugins().timeout(timeout, TimeUnit.SECONDS, gitOSCService.getPlugins());
     }
 
     @Override

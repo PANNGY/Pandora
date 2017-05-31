@@ -191,12 +191,13 @@ public class PandoraActivity extends BaseActivity {
                 })
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     if (drawerItem != null) {
-                        Intent intent = null;
+                        Intent i = null;
                         switch ((int) drawerItem.getIdentifier()) {
-
+                            case R.string.drawer_item_open_source:
+                                i = new Intent(this, OpenSourceActivity.class);
                         }
-                        if (intent != null) {
-                            startActivity(intent);
+                        if (i != null) {
+                            startActivity(i);
                         }
                     }
                     return false;

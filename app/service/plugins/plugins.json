@@ -57,7 +57,7 @@
       "type": 1,
       "reference": "girl-atlas",
       "args": "{\"model\": \"false\"}",
-      "icon": "girlatlas.png",
+      "icon": "https://girl-atlas.com/favicon.ico",
       "versionCode": 1,
       "versionName": "1.0.0"
     }
