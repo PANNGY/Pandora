@@ -320,6 +320,9 @@ public class WebVideoViewActivity extends BaseActivity {
                 webView.setVisibility(View.INVISIBLE);
                 showDynamicBoxExceptionLayout(WebVideoViewActivity.this);
             } else {
+                if (TextUtils.isEmpty(WebVideoViewActivity.this.title)) {
+                    setTitle(title);
+                }
                 webView.setVisibility(View.VISIBLE);
                 dismissDynamicBox(WebVideoViewActivity.this);
                 appBarHiddenDisposable = newHideOrShowToolbarDisposable(false);

@@ -247,6 +247,9 @@ public class WebViewActivity extends BaseActivity {
                 webView.setVisibility(View.INVISIBLE);
                 showDynamicBoxExceptionLayout(WebViewActivity.this);
             } else {
+                if (TextUtils.isEmpty(WebViewActivity.this.title)) {
+                    setTitle(title);
+                }
                 webView.setVisibility(View.VISIBLE);
                 dismissDynamicBox(WebViewActivity.this);
             }
