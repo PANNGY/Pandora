@@ -8,6 +8,14 @@
 
     <string name="update_url">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
 
+    <string name="drawer_item_plugin_center">拡張機能</string>
+    <string name="drawer_item_section_plugins">アプリ</string>
+    <string name="drawer_item_help">助ける</string>
+    <string name="drawer_item_open_source">オープンソース</string>
+    <string name="drawer_item_terminal">端末</string>
+    <string name="drawer_item_settings">設置</string>
+    <string name="drawer_item_nsw">NSW</string>
+
     <string name="action_cancel">キャンセル</string>
     <string name="action_check">査看</string>
     <string name="action_about">について</string>

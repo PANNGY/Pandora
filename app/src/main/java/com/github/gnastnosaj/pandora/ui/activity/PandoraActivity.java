@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -31,6 +32,13 @@ import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
+import com.mikepenz.materialdrawer.Drawer;
+import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
+import com.mikepenz.octicons_typeface_library.Octicons;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.List;
@@ -64,12 +72,16 @@ public class PandoraActivity extends BaseActivity {
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
 
+    Drawer drawer;
+
     private Observable<TabEvent> tabEventObservable;
 
     @Override
     public void onBackPressed() {
         if (searchView.isOpen()) {
             searchView.closeSearch();
+        } else if (drawer.isDrawerOpen()) {
+            drawer.closeDrawer();
         } else {
             super.onBackPressed();
         }
@@ -86,6 +98,7 @@ public class PandoraActivity extends BaseActivity {
 
         tabEventObservable = RxBus.getInstance().register(TabEvent.TAG_PANDORA_TAB, TabEvent.class);
 
+        initDrawer();
         initViewPager();
         initSearchView();
         UpdateService.checkForUpdate(this);
@@ -141,6 +154,58 @@ public class PandoraActivity extends BaseActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void initDrawer() {
+        drawer = new DrawerBuilder()
+                .withActivity(this)
+                .withToolbar(toolbar)
+                .withDrawerLayout(new DrawerLayout(this) {
+                    @Override
+                    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+                        widthMeasureSpec = MeasureSpec.makeMeasureSpec(
+                                MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY);
+
+                        heightMeasureSpec = MeasureSpec.makeMeasureSpec(
+                                MeasureSpec.getSize(heightMeasureSpec), MeasureSpec.EXACTLY);
+
+                        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+                    }
+                })
+                .withHeader(new View(this))
+                .withTranslucentStatusBar(false)
+                .withActionBarDrawerToggle(true)
+                .withActionBarDrawerToggleAnimated(true)
+                .addDrawerItems(
+                        new PrimaryDrawerItem().withName(R.string.drawer_item_plugin_center).withIdentifier(R.string.drawer_item_plugin_center).withIcon(Octicons.Icon.oct_package).withSelectable(false),
+                        new SectionDrawerItem().withName(R.string.drawer_item_section_plugins).withIdentifier(R.string.drawer_item_section_plugins)
+                )
+                .addStickyDrawerItems(
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_help).withIdentifier(R.string.drawer_item_help).withIcon(MaterialDesignIconic.Icon.gmi_help).withSelectable(false),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_open_source).withIdentifier(R.string.drawer_item_open_source).withIcon(MaterialDesignIconic.Icon.gmi_github).withSelectable(false),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_terminal).withIdentifier(R.string.drawer_item_terminal).withIcon(Octicons.Icon.oct_terminal).withSelectable(false),
+                        new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIdentifier(R.string.drawer_item_settings).withIcon(MaterialDesignIconic.Icon.gmi_settings).withSelectable(false),
+                        new SwitchDrawerItem().withName(R.string.drawer_item_nsw).withIdentifier(R.string.drawer_item_nsw).withIcon(Octicons.Icon.oct_eye).withSelectable(false).withChecked(false).withOnCheckedChangeListener((drawerItem, buttonView, isChecked) -> {
+
+                        })
+                )
+                .withOnDrawerNavigationListener((clickedView) -> {
+                    finish();
+                    return true;
+                })
+                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                    if (drawerItem != null) {
+                        Intent intent = null;
+                        switch ((int) drawerItem.getIdentifier()) {
+
+                        }
+                        if (intent != null) {
+                            startActivity(intent);
+                        }
+                    }
+                    return false;
+                })
+                .build();
     }
 
     private void initViewPager() {

@@ -35,11 +35,15 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:+'
     compile 'com.github.javiersantos:AppUpdater:+'
     compile 'cn.trinea.android.common:trinea-android-common:+'
+    compile('com.mikepenz:materialdrawer:+@aar') {
+        transitive = true
+    }
     compile 'br.com.mauker.materialsearchview:materialsearchview:+'
     compile 'com.yqritc:recyclerview-flexibledivider:+'
     compile 'net.qiujuer.genius:graphics:+'
     compile 'com.github.gnastnosaj.BiliShare:library:f4a17c9'
     compile 'com.daimajia.slider:library:+'
+    compile 'com.mikepenz:octicons-typeface:+@aar'
     compile 'com.mikepenz:material-design-iconic-typeface:+@aar'
     compile 'me.zhanghai.android.materialprogressbar:library:+'
     compile 'me.relex:photodraweeview:+'
