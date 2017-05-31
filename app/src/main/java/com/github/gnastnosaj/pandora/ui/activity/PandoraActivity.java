@@ -193,6 +193,11 @@ public class PandoraActivity extends BaseActivity {
                     if (drawerItem != null) {
                         Intent i = null;
                         switch ((int) drawerItem.getIdentifier()) {
+                            case R.string.drawer_item_help:
+                                i = new Intent(this, WebViewActivity.class);
+                                i.putExtra(WebViewActivity.EXTRA_TITLE, getResources().getString(R.string.drawer_item_help));
+                                i.putExtra(WebViewActivity.EXTRA_HREF, getResources().getString(R.string.url_help_and_feedback));
+                                break;
                             case R.string.drawer_item_open_source:
                                 i = new Intent(this, OpenSourceActivity.class);
                         }

@@ -6,7 +6,7 @@
     <string name="application_info_text" formatted="false">
         <![CDATA[
             <p>Version: %1$s</p>
-            <p>This application is open source at <a href="https://github.com/gnastnosaj/Ashley">github.com/gnastnosaj/Ashley</a></p>
+            <p>This application is open source at <a href="https://github.com/gnastnosaj/Pandora">https://github.com/gnastnosaj/Pandora</a></p>
         ]]>
     </string>
 

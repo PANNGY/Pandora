@@ -60,6 +60,10 @@ public class OpenSourceActivity extends BaseActivity implements View.OnTouchList
         applicationInfo.setText(Html.fromHtml(getResources().getString(R.string.application_info_text, Boilerplate.versionName)));
         developerInfo.setText(Html.fromHtml(getResources().getString(R.string.developer_info_text)));
         license.setText(Html.fromHtml(getResources().getString(R.string.license_text, new SimpleDateFormat("yyyy").format(new Date()))));
+
+        applicationInfo.setOnTouchListener(this);
+        developerInfo.setOnTouchListener(this);
+        license.setOnTouchListener(this);
     }
 
     @Override
