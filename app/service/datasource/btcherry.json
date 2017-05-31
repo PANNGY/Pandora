@@ -1,6 +1,6 @@
 {
   "id": "btcherry",
-  "baseUrl": "http://www.btcherry.info/",
+  "baseUrl": "http://www.btcherry.info",
   "pages": [
     "/",
     "/search?keyword="
