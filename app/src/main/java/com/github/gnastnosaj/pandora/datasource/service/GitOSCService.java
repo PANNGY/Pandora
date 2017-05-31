@@ -1,6 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource.service;
 
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
+import com.github.gnastnosaj.pandora.model.Plugin;
 import com.github.gnastnosaj.pandora.model.UpdateData;
 import com.github.gnastnosaj.pandora.network.Request;
 
@@ -27,8 +28,8 @@ public interface GitOSCService extends GithubService{
     Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label);
 
     @Headers("Cache-Control: public, max-age=3600")
-    @GET("/jasontsang/Pandora/raw/master/app/service/datasource/include.json")
-    Observable<List<String>> getDataSources();
+    @GET("/jasontsang/Pandora/raw/master/app/service/plugins/plugins.json")
+    Observable<List<Plugin>> getPlugins();
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/request-enhancer.json")

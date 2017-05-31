@@ -1,0 +1,66 @@
+{
+  "plugins": [
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.souhuvideo",
+      "name": "搜狐视频",
+      "desc": "搜狐视频源",
+      "type": 0,
+      "reference": "souhuvideo",
+      "icon": "icon.png",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.pandatv",
+      "name": "熊猫TV",
+      "desc": "熊猫TV源",
+      "type": 0,
+      "reference": "pandatv",
+      "icon": "icon.png",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.zhanqitv",
+      "name": "战旗TV",
+      "desc": "战旗TV源",
+      "type": 0,
+      "reference": "zhanqitv",
+      "icon": "icon.png",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.douyutv",
+      "name": "斗鱼TV",
+      "desc": "斗鱼TV源",
+      "type": 0,
+      "reference": "douyutv",
+      "icon": "icon.png",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.youjizz",
+      "name": "YouJizz.com",
+      "desc": "YouJizz.com, nsw",
+      "type": 0,
+      "reference": "youjizz",
+      "icon": "icon.png",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.girlatlas",
+      "name": "girl-atlas.com",
+      "desc": "girl-atlas.com, nsw",
+      "type": 1,
+      "reference": "girl-atlas",
+      "args": "{\"model\": \"false\"}",
+      "icon": "girlatlas.png",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    }
+  ],
+  "force": false
+}
