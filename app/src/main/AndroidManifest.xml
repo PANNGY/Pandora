@@ -87,8 +87,6 @@
             android:name=".ui.activity.WebViewActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|screenSize|smallestScreenSize"
             android:exported="false"
-            android:hardwareAccelerated="true"
-            android:screenOrientation="sensor"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
