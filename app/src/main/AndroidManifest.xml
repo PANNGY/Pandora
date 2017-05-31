@@ -61,7 +61,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".ui.activity.BTDBActivity"
+            android:name=".ui.activity.BTActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|screenSize|smallestScreenSize"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />

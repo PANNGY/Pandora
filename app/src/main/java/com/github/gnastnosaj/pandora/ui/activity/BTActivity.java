@@ -41,8 +41,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class BTDBActivity extends BaseActivity {
+public class BTActivity extends BaseActivity {
 
+    public static final String EXTRA_DATASOURCE = "datasource";
     public static final String EXTRA_KEYWORD = "keyword";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_CACHE = "cache";
@@ -60,9 +61,10 @@ public class BTDBActivity extends BaseActivity {
     MaterialSearchView searchView;
 
     private MVCHelper<List<JSoupData>> mvcHelper;
-    private SearchDataSource btdbDataSource;
-    private BTDBAdapter btdbAdapter;
+    private SearchDataSource btDataSource;
+    private BTDBAdapter btAdapter;
 
+    private String datasource;
     private String keyword;
     private String title;
     private List<JSoupData> cache;
@@ -85,6 +87,8 @@ public class BTDBActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
+        datasource = getIntent().getStringExtra(EXTRA_DATASOURCE);
+        datasource = TextUtils.isEmpty(datasource) ? GithubService.DATE_SOURCE_BTDB : datasource;
         keyword = getIntent().getStringExtra(EXTRA_KEYWORD);
         title = getIntent().getStringExtra(EXTRA_TITLE);
         cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
@@ -99,13 +103,13 @@ public class BTDBActivity extends BaseActivity {
 
         initContentView();
 
-        btdbDataSource = new SearchDataSource(this, GithubService.DATE_SOURCE_BTDB, keyword);
-        btdbDataSource.setCache(cache);
-        btdbAdapter = new BTDBAdapter();
+        btDataSource = new SearchDataSource(this, datasource, keyword);
+        btDataSource.setCache(cache);
+        btAdapter = new BTDBAdapter();
 
         mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
-        mvcHelper.setDataSource(btdbDataSource);
-        mvcHelper.setAdapter(btdbAdapter);
+        mvcHelper.setDataSource(btDataSource);
+        mvcHelper.setAdapter(btAdapter);
         mvcHelper.refresh();
     }
 
@@ -163,7 +167,7 @@ public class BTDBActivity extends BaseActivity {
 
     private void search(String keyword) {
         setTitle(keyword);
-        btdbDataSource.setKeyword(keyword);
+        btDataSource.setKeyword(keyword);
         mvcHelper.refresh();
     }
 
@@ -173,7 +177,7 @@ public class BTDBActivity extends BaseActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).size(1).build());
 
-        GestureDetector gestureDetector = new GestureDetector(BTDBActivity.this, new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector gestureDetector = new GestureDetector(BTActivity.this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
@@ -185,7 +189,7 @@ public class BTDBActivity extends BaseActivity {
                 try {
                     View childView = recyclerView.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = recyclerView.getChildAdapterPosition(childView);
-                    JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
+                    JSoupData jsoupData = btAdapter.getData().get(childPosition);
                     ClipData clipData = ClipData.newPlainText("Magnet Link", jsoupData.getAttr("magnet"));
                     ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboardManager.setPrimaryClip(clipData);
@@ -202,8 +206,8 @@ public class BTDBActivity extends BaseActivity {
                 if (gestureDetector.onTouchEvent(event)) {
                     View childView = rv.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = rv.getChildAdapterPosition(childView);
-                    if (-1 < childPosition && childPosition < btdbAdapter.getData().size()) {
-                        JSoupData jsoupData = btdbAdapter.getData().get(childPosition);
+                    if (-1 < childPosition && childPosition < btAdapter.getData().size()) {
+                        JSoupData jsoupData = btAdapter.getData().get(childPosition);
                         Uri uri = Uri.parse(jsoupData.getAttr("magnet"));
                         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                         intent.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword);
@@ -220,7 +224,7 @@ public class BTDBActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_btdb, menu);
+        getMenuInflater().inflate(R.menu.menu_bt, menu);
         menu.findItem(R.id.action_search).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_search)
                 .color(Color.WHITE).sizeDp(18));

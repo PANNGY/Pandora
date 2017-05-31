@@ -14,7 +14,7 @@ import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
-import com.github.gnastnosaj.pandora.ui.activity.BTDBActivity;
+import com.github.gnastnosaj.pandora.ui.activity.BTActivity;
 import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleTabActivity;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleViewPagerActivity;
@@ -223,10 +223,11 @@ public class SearchService {
                                                     context.startActivity(i);
                                                 }
                                             } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB) || searchDataSource.id.equals(GithubService.DATE_SOURCE_BTCHERRY)) {
-                                                Intent i = new Intent(context, BTDBActivity.class);
-                                                i.putExtra(BTDBActivity.EXTRA_KEYWORD, keyword);
-                                                i.putExtra(BTDBActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
-                                                i.putParcelableArrayListExtra(BTDBActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                                Intent i = new Intent(context, BTActivity.class);
+                                                i.putExtra(BTActivity.EXTRA_DATASOURCE, searchDataSource.id);
+                                                i.putExtra(BTActivity.EXTRA_KEYWORD, keyword);
+                                                i.putExtra(BTActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
+                                                i.putParcelableArrayListExtra(BTActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                 context.startActivity(i);
                                             }
                                         }
