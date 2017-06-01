@@ -129,7 +129,7 @@ public class PluginCenterActivity extends BaseActivity {
             }
         });
 
-        MyPluginsDataSource myPluginsDataSource = new MyPluginsDataSource();
+        MyPluginsDataSource myPluginsDataSource = new MyPluginsDataSource(this);
 
         MVCNormalHelper myPluginsMVCHelper = new MVCNormalHelper<>(myPlugins, new ILoadViewFactory.ILoadView() {
             @Override
