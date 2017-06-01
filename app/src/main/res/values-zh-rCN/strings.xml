@@ -99,6 +99,6 @@
     <string name="url_python_plugin">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/plugins/python/%1$s.zip</string>
 
     <string name="plugin_center_my_plugins">我的应用</string>
-    <string name="plugin_manage">管理</string>
-    <string name="plugin_complete">完成</string>
+    <string name="plugin_center_manage">管理</string>
+    <string name="plugin_center_complete">完成</string>
 </resources>
