@@ -3,7 +3,9 @@ package com.github.gnastnosaj.pandora.model;
 import android.content.Context;
 import android.net.Uri;
 
+import com.bilibili.socialize.share.download.IImageDownloader;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.github.gnastnosaj.pandora.util.ShareHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.List;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
+import timber.log.Timber;
 
 /**
  * Created by jasontsang on 12/10/16.
@@ -53,7 +56,30 @@ public class Plugin extends RealmObject {
 
     public Uri getIconUri(Context context) {
         if (icon.startsWith("http")) {
-            return Uri.parse(icon);
+            File file = new File(ShareHelper.configuration.getImageCachePath(context), String.valueOf(icon.hashCode()));
+            if (!file.exists()) {
+                try {
+                    ShareHelper.configuration.getImageDownloader().download(context, icon, ShareHelper.configuration.getImageCachePath(context), new IImageDownloader.OnImageDownloadListener() {
+                        @Override
+                        public void onStart() {
+
+                        }
+
+                        @Override
+                        public void onSuccess(String s) {
+
+                        }
+
+                        @Override
+                        public void onFailed(String s) {
+
+                        }
+                    });
+                } catch (Exception e) {
+                    Timber.e(e, "download icon exception");
+                }
+            }
+            return Uri.fromFile(file);
         } else {
             File file = new File(getPluginDirectory(context), icon);
             return Uri.fromFile(file);
