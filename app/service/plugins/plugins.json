@@ -63,8 +63,8 @@
     },
     {
       "id": "com.github.gnastnosaj.pandora.plugin.nanrencd",
-      "name": "www.nanrencd.cc",
-      "desc": "www.nanrencd.cc, nsw",
+      "name": "nanrencd.com",
+      "desc": "nanrencd.com, nsw",
       "type": 1,
       "reference": "nanrencd",
       "args": "{\"model\": \"false\"}",
