@@ -12,7 +12,6 @@ import java.util.List;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import io.realm.annotations.PrimaryKey;
-import timber.log.Timber;
 
 /**
  * Created by jasontsang on 12/10/16.
@@ -52,16 +51,21 @@ public class Plugin extends RealmObject {
         }
     }
 
+    public Uri getIconUri(Context context) {
+        if (icon.startsWith("http")) {
+            return Uri.parse(icon);
+        } else {
+            File file = new File(getPluginDirectory(context), icon);
+            return Uri.fromFile(file);
+        }
+    }
+
     public void icon(Context context, SimpleDraweeView draweeView) {
-        try {
-            if (icon.startsWith("http")) {
-                draweeView.setImageURI(icon);
-            } else {
-                File file = new File(getPluginDirectory(context), icon);
-                draweeView.setImageURI(Uri.fromFile(file));
-            }
-        } catch (Exception e) {
-            Timber.e(e, "plugin icon exception");
+        if (icon.startsWith("http")) {
+            draweeView.setImageURI(icon);
+        } else {
+            File file = new File(getPluginDirectory(context), icon);
+            draweeView.setImageURI(Uri.fromFile(file));
         }
     }
 

@@ -24,17 +24,19 @@ import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
-import com.github.gnastnosaj.pandora.adapter.PluginCenterAdapter;
+import com.github.gnastnosaj.pandora.datasource.service.PluginService;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 import com.github.gnastnosaj.pandora.datasource.service.UpdateService;
 import com.github.gnastnosaj.pandora.event.TabEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.model.Plugin;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.ImageHolder;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
@@ -51,6 +53,8 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
+import io.realm.RealmResults;
 import timber.log.Timber;
 
 /**
@@ -93,6 +97,12 @@ public class PandoraActivity extends BaseActivity {
         initSearchView();
         UpdateService.checkForUpdate(this);
         prepareSplashImage();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateDrawer();
     }
 
     @Override
@@ -213,6 +223,26 @@ public class PandoraActivity extends BaseActivity {
                     return false;
                 })
                 .build();
+    }
+
+    private void updateDrawer() {
+        Realm.getDefaultInstance().executeTransactionAsync(bgRealm -> {
+            RealmResults<Plugin> results = bgRealm.where(Plugin.class).findAll();
+            Observable.just(Plugin.from(results))
+                    .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(plugins -> {
+                        while (drawer.getPosition(R.string.drawer_item_section_plugins) != drawer.getDrawerItems().size()) {
+                            drawer.removeItemByPosition(drawer.getPosition(R.string.drawer_item_section_plugins) + 1);
+                        }
+                        for (Plugin plugin : plugins) {
+                            drawer.addItemAtPosition(new SecondaryDrawerItem().withIdentifier(plugin.id.hashCode()).withName(plugin.name).withIcon(new ImageHolder(plugin.getIconUri(this))).withSelectable(false).withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                                PluginService.start(this, plugin);
+                                return false;
+                            }), drawer.getPosition(R.string.drawer_item_section_plugins) + 1);
+                        }
+                    });
+        });
     }
 
     private void initViewPager() {
