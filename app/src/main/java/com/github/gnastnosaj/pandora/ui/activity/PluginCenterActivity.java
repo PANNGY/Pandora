@@ -107,7 +107,7 @@ public class PluginCenterActivity extends BaseActivity {
                                         myPluginsDataAdapter.getData().remove(plugin);
                                         myPluginsDataAdapter.notifyDataSetChanged();
                                     });
-                                    RxBus.getInstance().send(new PluginEvent(PluginEvent.TYPE_REFRESH, plugin));
+                                    RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_REFRESH, plugin));
                                 }
                             });
                         } else {
@@ -233,7 +233,7 @@ public class PluginCenterActivity extends BaseActivity {
                                         myPluginsDataAdapter.getData().add(plugin);
                                         myPluginsDataAdapter.notifyDataSetChanged();
                                     });
-                                    RxBus.getInstance().send(new PluginEvent(PluginEvent.TYPE_REFRESH, plugin));
+                                    RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_REFRESH, plugin));
                                 }
                             });
                         } else {
@@ -338,12 +338,12 @@ public class PluginCenterActivity extends BaseActivity {
                     item.setTitle(R.string.plugin_center_complete);
                     myPluginsDataAdapter.state = PluginCenterAdapter.STATE_MANAGE;
                     pluginCenterDataAdapter.state = PluginCenterAdapter.STATE_MANAGE;
-                    RxBus.getInstance().send(new PluginEvent(PluginEvent.TYPE_MANAGE, null));
+                    RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_MANAGE, null));
                 } else {
                     item.setTitle(R.string.plugin_center_manage);
                     myPluginsDataAdapter.state = PluginCenterAdapter.STATE_COMPLETE;
                     pluginCenterDataAdapter.state = PluginCenterAdapter.STATE_COMPLETE;
-                    RxBus.getInstance().send(new PluginEvent(PluginEvent.TYPE_COMPLETE, null));
+                    RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_COMPLETE, null));
                 }
                 return true;
         }
