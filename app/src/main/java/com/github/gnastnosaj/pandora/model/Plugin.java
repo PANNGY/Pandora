@@ -56,7 +56,7 @@ public class Plugin extends RealmObject {
         }
     }
 
-    public Uri getIconUri(Context context) {
+    public File getIcon(Context context) {
         if (icon.startsWith("http")) {
             File file = new File(ShareHelper.configuration.getImageCachePath(context), String.valueOf(icon.hashCode()));
             if (!file.exists()) {
@@ -81,10 +81,9 @@ public class Plugin extends RealmObject {
                     Timber.e(e, "download icon exception");
                 }
             }
-            return Uri.fromFile(file);
+            return file;
         } else {
-            File file = new File(getPluginDirectory(context), icon);
-            return Uri.fromFile(file);
+            return new File(getPluginDirectory(context), icon);
         }
     }
 

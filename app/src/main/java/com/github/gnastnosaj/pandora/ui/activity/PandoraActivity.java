@@ -3,6 +3,7 @@ package com.github.gnastnosaj.pandora.ui.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
@@ -45,6 +46,7 @@ import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.octicons_typeface_library.Octicons;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
+import java.io.File;
 import java.util.List;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
@@ -244,7 +246,8 @@ public class PandoraActivity extends BaseActivity {
                         for (Plugin plugin : plugins) {
                             boolean nsw = sharedPreferences.getBoolean(Pandora.PRE_PRO_VERSION, false);
                             if (nsw || !plugin.desc.contains(Plugin.NSW)) {
-                                drawer.addItemAtPosition(new SecondaryDrawerItem().withIdentifier(plugin.id.hashCode()).withName(plugin.name).withIcon(new ImageHolder(plugin.getIconUri(this))).withSelectable(false).withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                                File icon = plugin.getIcon(this);
+                                drawer.addItemAtPosition(new SecondaryDrawerItem().withIdentifier(plugin.id.hashCode()).withName(plugin.name).withIcon(icon.exists() ? new ImageHolder(Uri.fromFile(icon)) : new ImageHolder(MaterialDesignIconic.Icon.gmi_widgets)).withSelectable(false).withOnDrawerItemClickListener((view, position, drawerItem) -> {
                                     PluginService.start(this, plugin);
                                     return false;
                                 }), drawer.getPosition(R.string.drawer_item_section_plugins) + 1);
