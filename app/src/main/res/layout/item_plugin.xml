@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -8,7 +10,7 @@
     <LinearLayout
         android:id="@+id/item_plugin"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@drawable/item_plugin_selector"
         android:orientation="vertical"
         android:paddingBottom="10dp"
@@ -16,16 +18,17 @@
         android:paddingRight="10dp"
         tools:ignore="UselessParent">
 
-        <FrameLayout
+        <android.support.percent.PercentFrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <com.github.gnastnosaj.pandora.ui.widget.RatioImageView
                 android:id="@+id/icon_plugin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="15dp" />
+                android:layout_marginTop="15dp"
+                app:layout_aspectRatio="100%"
+                app:layout_widthPercent="50%"
+                fresco:actualImageScaleType="fitCenter" />
 
             <com.mikepenz.iconics.view.IconicsTextView
                 android:id="@+id/add"
@@ -63,7 +66,7 @@
                 android:visibility="invisible"
                 tools:ignore="HardcodedText" />
 
-        </FrameLayout>
+        </android.support.percent.PercentFrameLayout>
 
         <TextView
             android:id="@+id/title_plugin"

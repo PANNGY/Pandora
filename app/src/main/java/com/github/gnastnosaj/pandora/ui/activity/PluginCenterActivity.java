@@ -191,7 +191,13 @@ public class PluginCenterActivity extends BaseActivity {
         myPluginsMVCHelper.refresh();
 
 
-        GridLayoutManager pluginCenterLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount));
+        GridLayoutManager pluginCenterLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount)) {
+
+            @Override
+            public void onMeasure(RecyclerView.Recycler recycler, RecyclerView.State state, int widthSpec, int heightSpec) {
+                super.onMeasure(recycler, state, widthSpec, heightSpec);
+            }
+        };
         pluginCenter.setLayoutManager(pluginCenterLayoutManager);
 
         pluginCenterDataAdapter = new PluginCenterAdapter(this, PluginCenterAdapter.TYPE_PLUGIN_CENTER);

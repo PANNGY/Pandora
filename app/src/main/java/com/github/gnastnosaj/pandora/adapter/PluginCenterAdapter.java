@@ -59,8 +59,8 @@ public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAd
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         Plugin plugin = pluginList.get(position);
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.plugin = plugin;
 
+        holder.plugin = plugin;
         plugin.icon(context, holder.icon);
         holder.title.setText(plugin.name);
     }
