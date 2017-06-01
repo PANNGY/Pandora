@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
@@ -18,6 +17,7 @@ import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PluginCenterAdapter;
 import com.github.gnastnosaj.pandora.datasource.MyPluginsDataSource;
 import com.github.gnastnosaj.pandora.datasource.PluginCenterDataSource;
+import com.github.gnastnosaj.pandora.datasource.service.PluginService;
 import com.github.gnastnosaj.pandora.event.PluginEvent;
 import com.github.gnastnosaj.pandora.model.Plugin;
 import com.shizhefei.mvc.ILoadViewFactory;
@@ -110,12 +110,7 @@ public class PluginCenterActivity extends BaseActivity {
                                 }
                             });
                         } else {
-                            if (plugin.type == Plugin.TYPE_JSOUP_GALLERY) {
-                                startActivity(new Intent(PluginCenterActivity.this, SimpleViewPagerActivity.class)
-                                        .putExtra(SimpleViewPagerActivity.EXTRA_TITLE, plugin.name)
-                                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, plugin.reference + "-tab")
-                                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
-                            }
+                            PluginService.start(PluginCenterActivity.this, plugin);
                         }
                     }
                     return true;
@@ -190,7 +185,6 @@ public class PluginCenterActivity extends BaseActivity {
         myPluginsMVCHelper.setAdapter(myPluginsDataAdapter);
         myPluginsMVCHelper.refresh();
 
-
         GridLayoutManager pluginCenterLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount)) {
 
             @Override
@@ -243,12 +237,7 @@ public class PluginCenterActivity extends BaseActivity {
                                 }
                             });
                         } else {
-                            if (plugin.type == Plugin.TYPE_JSOUP_GALLERY) {
-                                startActivity(new Intent(PluginCenterActivity.this, SimpleViewPagerActivity.class)
-                                        .putExtra(SimpleViewPagerActivity.EXTRA_TITLE, plugin.name)
-                                        .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, plugin.reference + "-tab")
-                                        .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
-                            }
+                            PluginService.start(PluginCenterActivity.this, plugin);
                         }
                     }
                     return true;
@@ -341,7 +330,7 @@ public class PluginCenterActivity extends BaseActivity {
                 onBackPressed();
                 return true;
             case R.id.action_manage:
-                if(pluginCenterDataAdapter.isEmpty()) {
+                if (pluginCenterDataAdapter.isEmpty()) {
                     return true;
                 }
                 if (item.getTitle().toString().equals(getResources().getString(R.string.plugin_center_manage))) {
