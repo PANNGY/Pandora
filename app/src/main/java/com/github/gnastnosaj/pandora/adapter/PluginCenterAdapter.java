@@ -59,16 +59,73 @@ public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAd
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         Plugin plugin = pluginList.get(position);
         ViewHolder holder = (ViewHolder) viewHolder;
+        if (holder.stateDisposable == null || holder.stateDisposable.isDisposed()) {
+            if (type == TYPE_MY_PLUGINS) {
+                holder.stateDisposable = PluginEvent.observable
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(pluginEvent -> {
+                            if (pluginEvent.type == PluginEvent.TYPE_MANAGE) {
+                                holder.itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
+                                holder.remove.setVisibility(View.VISIBLE);
+                            } else if (pluginEvent.type == PluginEvent.TYPE_COMPLETE) {
+                                holder.itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
+                                holder.remove.setVisibility(View.INVISIBLE);
+                            } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
+                                holder.plugin = pluginEvent.plugin;
+                                holder.plugin.icon(context, holder.icon);
+                            }
+                        }, throwable -> Timber.e(throwable, "stateDisposable exception"));
+            } else if (type == TYPE_PLUGIN_CENTER) {
+                holder.stateDisposable = PluginEvent.observable
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(pluginEvent -> {
+                            if (pluginEvent.type == PluginEvent.TYPE_MANAGE) {
+                                holder.itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
+                                Realm realm = Realm.getDefaultInstance();
+                                RealmResults realmResults = realm.where(Plugin.class).equalTo("id", plugin.id).findAll();
+                                if (realmResults.isEmpty()) {
+                                    holder.add.setVisibility(View.VISIBLE);
+                                } else {
+                                    holder.added.setVisibility(View.VISIBLE);
+                                }
+                                realm.close();
+                            } else if (pluginEvent.type == PluginEvent.TYPE_COMPLETE) {
+                                holder.itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
+                                holder.add.setVisibility(View.INVISIBLE);
+                                holder.added.setVisibility(View.INVISIBLE);
+                            } else if (pluginEvent.type == PluginEvent.TYPE_REFRESH) {
+                                if (pluginEvent.plugin.id.equals(plugin.id)) {
+                                    if (holder.add.getVisibility() == View.VISIBLE) {
+                                        holder.add.setVisibility(View.INVISIBLE);
+                                        holder.added.setVisibility(View.VISIBLE);
+                                    } else if (holder.added.getVisibility() == View.VISIBLE) {
+                                        holder.added.setVisibility(View.INVISIBLE);
+                                        holder.add.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
+                                holder.plugin = pluginEvent.plugin;
+                                holder.plugin.icon(context, holder.icon);
+                            }
+                        }, throwable -> Timber.e(throwable, "stateDisposable exception"));
+            }
+        }
 
         holder.plugin = plugin;
         plugin.icon(context, holder.icon);
         holder.title.setText(plugin.name);
+
+        if (type == TYPE_MY_PLUGINS && state == STATE_MANAGE) {
+            holder.itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
+            holder.remove.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onViewRecycled(RecyclerView.ViewHolder viewHolder) {
         try {
             ViewHolder holder = (ViewHolder) viewHolder;
+            holder.plugin = null;
             holder.stateDisposable.dispose();
         } catch (Exception e) {
             Timber.e(e, "onViewRecycled exception");
@@ -126,61 +183,6 @@ public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAd
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-
-            if (type == TYPE_MY_PLUGINS) {
-                if (state == STATE_MANAGE) {
-                    itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
-                    remove.setVisibility(View.VISIBLE);
-                }
-
-                stateDisposable = PluginEvent.observable
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(pluginEvent -> {
-                            if (pluginEvent.type == PluginEvent.TYPE_MANAGE) {
-                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
-                                remove.setVisibility(View.VISIBLE);
-                            } else if (pluginEvent.type == PluginEvent.TYPE_COMPLETE) {
-                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
-                                remove.setVisibility(View.INVISIBLE);
-                            } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
-                                plugin = pluginEvent.plugin;
-                                plugin.icon(context, icon);
-                            }
-                        }, throwable -> Timber.e(throwable, "stateDisposable exception"));
-            } else if (type == TYPE_PLUGIN_CENTER) {
-                stateDisposable = PluginEvent.observable
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(pluginEvent -> {
-                            if (pluginEvent.type == PluginEvent.TYPE_MANAGE) {
-                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
-                                Realm realm = Realm.getDefaultInstance();
-                                RealmResults realmResults = realm.where(Plugin.class).equalTo("id", plugin.id).findAll();
-                                if (realmResults.isEmpty()) {
-                                    add.setVisibility(View.VISIBLE);
-                                } else {
-                                    added.setVisibility(View.VISIBLE);
-                                }
-                                realm.close();
-                            } else if (pluginEvent.type == PluginEvent.TYPE_COMPLETE) {
-                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
-                                add.setVisibility(View.INVISIBLE);
-                                added.setVisibility(View.INVISIBLE);
-                            } else if (pluginEvent.type == PluginEvent.TYPE_REFRESH) {
-                                if (pluginEvent.plugin.id.equals(plugin.id)) {
-                                    if (add.getVisibility() == View.VISIBLE) {
-                                        add.setVisibility(View.INVISIBLE);
-                                        added.setVisibility(View.VISIBLE);
-                                    } else if (added.getVisibility() == View.VISIBLE) {
-                                        added.setVisibility(View.INVISIBLE);
-                                        add.setVisibility(View.VISIBLE);
-                                    }
-                                }
-                            } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
-                                plugin = pluginEvent.plugin;
-                                plugin.icon(context, icon);
-                            }
-                        }, throwable -> Timber.e(throwable, "stateDisposable exception"));
-            }
         }
     }
 }

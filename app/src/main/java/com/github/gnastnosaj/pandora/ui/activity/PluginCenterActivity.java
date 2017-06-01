@@ -68,7 +68,6 @@ public class PluginCenterActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-
         GridLayoutManager myPluginsLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount));
         myPlugins.setLayoutManager(myPluginsLayoutManager);
 
@@ -342,6 +341,9 @@ public class PluginCenterActivity extends BaseActivity {
                 onBackPressed();
                 return true;
             case R.id.action_manage:
+                if(pluginCenterDataAdapter.isEmpty()) {
+                    return true;
+                }
                 if (item.getTitle().toString().equals(getResources().getString(R.string.plugin_center_manage))) {
                     item.setTitle(R.string.plugin_center_complete);
                     myPluginsDataAdapter.state = PluginCenterAdapter.STATE_MANAGE;
