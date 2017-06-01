@@ -74,7 +74,7 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
                     for (Plugin plugin : plugins) {
                         Realm realm = Realm.getInstance(realmConfiguration);
                         Plugin result = realm.where(Plugin.class).equalTo("id", plugin.id).findFirst();
-                        if (result == null || plugin.versionCode > result.versionCode || pluginData.force) {
+                        if (result == null || plugin.versionCode > result.versionCode || pluginData.force || (plugin.type == Plugin.TYPE_PYTHON_VIDEO && !plugin.getPluginDirectory(context).exists())) {
                             Realm.getInstance(realmConfiguration).executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(plugin));
                             Realm.getDefaultInstance().executeTransactionAsync(bgRealm -> {
                                 RealmResults<Plugin> results = bgRealm.where(Plugin.class).equalTo("id", plugin.id).findAll();

@@ -28,7 +28,8 @@
                 android:layout_marginTop="15dp"
                 app:layout_aspectRatio="100%"
                 app:layout_widthPercent="50%"
-                fresco:actualImageScaleType="fitCenter" />
+                fresco:actualImageScaleType="fitCenter"
+                fresco:placeholderImage="@drawable/ic_source_pandora" />
 
             <com.mikepenz.iconics.view.IconicsTextView
                 android:id="@+id/add"
