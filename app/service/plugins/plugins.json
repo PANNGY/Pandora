@@ -71,7 +71,30 @@
       "icon": "http://www.nanrencd.cc/favicon.ico",
       "versionCode": 1,
       "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.javlib",
+      "name": "javlib.com",
+      "desc": "javlib.com, nsw",
+      "type": 1,
+      "reference": "javlib",
+      "args": "{\"model\": \"true\"}",
+      "icon": "https://javlib.com/favicon.ico",
+      "versionCode": 1,
+      "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.avsox",
+      "name": "avso.pw",
+      "desc": "avso.pw, nsw",
+      "type": 1,
+      "reference": "avsox",
+      "args": "{\"model\": \"true\"}",
+      "icon": "https://avso.pw/favicon.ico",
+      "versionCode": 1,
+      "versionName": "1.0.0"
     }
   ],
   "force": false
 }
+

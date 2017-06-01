@@ -107,6 +107,8 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
                                                 RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_UPDATE, plugin));
                                             }
                                         });
+                            } else {
+                                RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_UPDATE, plugin));
                             }
                         }
                         realm.close();
