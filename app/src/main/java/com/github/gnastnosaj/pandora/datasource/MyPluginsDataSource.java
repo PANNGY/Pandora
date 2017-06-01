@@ -38,7 +38,7 @@ public class MyPluginsDataSource implements IDataSource<List<Plugin>>, IDataCach
         boolean nsw = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Pandora.PRE_PRO_VERSION, false);
         for (Plugin plugin : results) {
             if (nsw || !plugin.desc.contains(Plugin.NSW)) {
-                plugins.add(plugin);
+                plugins.add(plugin.clone());
             }
         }
         realm.close();

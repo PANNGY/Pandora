@@ -98,7 +98,7 @@ public class Plugin extends RealmObject {
     }
 
     @Override
-    protected Plugin clone() {
+    public Plugin clone() {
         Plugin plugin = new Plugin();
         plugin.id = id;
         plugin.name = name;
