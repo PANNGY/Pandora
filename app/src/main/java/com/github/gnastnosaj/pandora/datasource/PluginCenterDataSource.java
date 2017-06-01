@@ -1,6 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 
 import com.alipay.euler.andfix.util.FileUtil;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
@@ -70,8 +71,11 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
 
         Observable<List<Plugin>> refresh = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getPluginData()
                 .flatMap(pluginData -> {
-                    plugins.addAll(pluginData.plugins);
-                    for (Plugin plugin : plugins) {
+                    boolean nsw = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Pandora.PRE_PRO_VERSION, false);
+                    for (Plugin plugin : pluginData.plugins) {
+                        if (nsw || !plugin.desc.contains(Plugin.NSW)) {
+                            plugins.add(plugin);
+                        }
                         Realm realm = Realm.getInstance(realmConfiguration);
                         Plugin result = realm.where(Plugin.class).equalTo("id", plugin.id).findFirst();
                         if (result == null || plugin.versionCode > result.versionCode || pluginData.force || (plugin.type == Plugin.TYPE_PYTHON_VIDEO && !plugin.getPluginDirectory(context).exists())) {

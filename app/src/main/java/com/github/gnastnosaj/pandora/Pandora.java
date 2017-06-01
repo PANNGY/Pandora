@@ -1,10 +1,8 @@
 package com.github.gnastnosaj.pandora;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.SystemClock;
-import android.preference.PreferenceManager;
 
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpNetworkFetcher;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
@@ -33,7 +31,6 @@ import timber.log.Timber;
 public class Pandora extends Application {
     public final static String PRE_PRO_VERSION = "PRO_VERSION";
 
-    public static boolean pro;
     private static RealmMigration realmMigration;
 
     @Override
@@ -89,9 +86,6 @@ public class Pandora extends Application {
             }
             Timber.w(e, "Undeliverable exception received, not sure what to do");
         });
-
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        pro = sharedPreferences.getBoolean(PRE_PRO_VERSION, true);
 
         Realm.init(this);
 

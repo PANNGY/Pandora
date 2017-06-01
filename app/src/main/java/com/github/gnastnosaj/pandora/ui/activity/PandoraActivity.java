@@ -22,6 +22,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
+import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
 import com.github.gnastnosaj.pandora.datasource.service.PluginService;
@@ -79,6 +80,7 @@ public class PandoraActivity extends BaseActivity {
 
     Drawer drawer;
 
+    private SharedPreferences sharedPreferences;
     private Observable<TabEvent> tabEventObservable;
 
     @Override
@@ -90,6 +92,7 @@ public class PandoraActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         tabEventObservable = RxBus.getInstance().register(TabEvent.TAG_PANDORA_TAB, TabEvent.class);
 
         initDrawer();
@@ -192,8 +195,11 @@ public class PandoraActivity extends BaseActivity {
                         new SecondaryDrawerItem().withName(R.string.drawer_item_open_source).withIdentifier(R.string.drawer_item_open_source).withIcon(MaterialDesignIconic.Icon.gmi_github).withSelectable(false),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_terminal).withIdentifier(R.string.drawer_item_terminal).withIcon(Octicons.Icon.oct_terminal).withSelectable(false),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIdentifier(R.string.drawer_item_settings).withIcon(MaterialDesignIconic.Icon.gmi_settings).withSelectable(false),
-                        new SwitchDrawerItem().withName(R.string.drawer_item_nsw).withIdentifier(R.string.drawer_item_nsw).withIcon(Octicons.Icon.oct_eye).withSelectable(false).withChecked(false).withOnCheckedChangeListener((drawerItem, buttonView, isChecked) -> {
-
+                        new SwitchDrawerItem().withName(R.string.drawer_item_nsw).withIdentifier(R.string.drawer_item_nsw).withIcon(Octicons.Icon.oct_eye).withSelectable(false).withChecked(sharedPreferences.getBoolean(Pandora.PRE_PRO_VERSION, false)).withOnCheckedChangeListener((drawerItem, buttonView, isChecked) -> {
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putBoolean(Pandora.PRE_PRO_VERSION, isChecked);
+                            editor.apply();
+                            updateDrawer();
                         })
                 )
                 .withOnDrawerNavigationListener((clickedView) -> {
@@ -236,10 +242,13 @@ public class PandoraActivity extends BaseActivity {
                             drawer.removeItemByPosition(drawer.getPosition(R.string.drawer_item_section_plugins) + 1);
                         }
                         for (Plugin plugin : plugins) {
-                            drawer.addItemAtPosition(new SecondaryDrawerItem().withIdentifier(plugin.id.hashCode()).withName(plugin.name).withIcon(new ImageHolder(plugin.getIconUri(this))).withSelectable(false).withOnDrawerItemClickListener((view, position, drawerItem) -> {
-                                PluginService.start(this, plugin);
-                                return false;
-                            }), drawer.getPosition(R.string.drawer_item_section_plugins) + 1);
+                            boolean nsw = sharedPreferences.getBoolean(Pandora.PRE_PRO_VERSION, false);
+                            if (nsw || !plugin.desc.contains(Plugin.NSW)) {
+                                drawer.addItemAtPosition(new SecondaryDrawerItem().withIdentifier(plugin.id.hashCode()).withName(plugin.name).withIcon(new ImageHolder(plugin.getIconUri(this))).withSelectable(false).withOnDrawerItemClickListener((view, position, drawerItem) -> {
+                                    PluginService.start(this, plugin);
+                                    return false;
+                                }), drawer.getPosition(R.string.drawer_item_section_plugins) + 1);
+                            }
                         }
                     });
         });

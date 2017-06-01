@@ -21,6 +21,8 @@ import timber.log.Timber;
  */
 
 public class Plugin extends RealmObject {
+    public final static String NSW = "nsw";
+
     public final static int TYPE_PYTHON_VIDEO = 0;
     public final static int TYPE_JSOUP_GALLERY = 1;
 
