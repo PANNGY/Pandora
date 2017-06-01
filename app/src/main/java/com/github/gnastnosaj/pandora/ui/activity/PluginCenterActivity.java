@@ -113,6 +113,7 @@ public class PluginCenterActivity extends BaseActivity {
                         } else {
                             if (plugin.type == Plugin.TYPE_JSOUP_GALLERY) {
                                 startActivity(new Intent(PluginCenterActivity.this, SimpleViewPagerActivity.class)
+                                        .putExtra(SimpleViewPagerActivity.EXTRA_TITLE, plugin.name)
                                         .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, plugin.reference + "-tab")
                                         .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
                             }
@@ -245,6 +246,7 @@ public class PluginCenterActivity extends BaseActivity {
                         } else {
                             if (plugin.type == Plugin.TYPE_JSOUP_GALLERY) {
                                 startActivity(new Intent(PluginCenterActivity.this, SimpleViewPagerActivity.class)
+                                        .putExtra(SimpleViewPagerActivity.EXTRA_TITLE, plugin.name)
                                         .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, plugin.reference + "-tab")
                                         .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
                             }
