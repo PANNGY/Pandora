@@ -6,8 +6,12 @@ import android.net.Uri;
 import com.facebook.drawee.view.SimpleDraweeView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.RealmObject;
+import io.realm.RealmResults;
+import io.realm.annotations.PrimaryKey;
 import timber.log.Timber;
 
 /**
@@ -15,9 +19,10 @@ import timber.log.Timber;
  */
 
 public class Plugin extends RealmObject {
-    public final static int PLUGIN_TYPE_PYTHON_VIDEO = 0;
-    public final static int PLUGIN_TYPE_JSOUP_GALLERY = 1;
+    public final static int TYPE_PYTHON_VIDEO = 0;
+    public final static int TYPE_JSOUP_GALLERY = 1;
 
+    @PrimaryKey
     public String id;
     public String name;
     public String desc;
@@ -32,8 +37,16 @@ public class Plugin extends RealmObject {
     public String licenseUrl;
 
     public File getPluginDirectory(Context context) {
-        if (type == PLUGIN_TYPE_PYTHON_VIDEO) {
-            return new File(context.getFilesDir(), "plugins/python/" + reference);
+        if (type == TYPE_PYTHON_VIDEO) {
+            File plugins = new File(context.getFilesDir(), "plugins");
+            if (!plugins.exists()) {
+                plugins.mkdir();
+            }
+            File python = new File(plugins, "python");
+            if (!python.exists()) {
+                python.mkdir();
+            }
+            return new File(python, reference);
         } else {
             return null;
         }
@@ -50,5 +63,31 @@ public class Plugin extends RealmObject {
         } catch (Exception e) {
             Timber.e(e, "plugin icon exception");
         }
+    }
+
+    @Override
+    protected Plugin clone() {
+        Plugin plugin = new Plugin();
+        plugin.id = id;
+        plugin.name = name;
+        plugin.desc = desc;
+        plugin.type = type;
+        plugin.reference = reference;
+        plugin.icon = icon;
+        plugin.args = args;
+        plugin.versionCode = versionCode;
+        plugin.versionName = versionName;
+        plugin.author = author;
+        plugin.license = license;
+        plugin.licenseUrl = licenseUrl;
+        return plugin;
+    }
+
+    public static List<Plugin> from(RealmResults<Plugin> results) {
+        List<Plugin> plugins = new ArrayList<>();
+        for (Plugin plugin : results) {
+            plugins.add(plugin.clone());
+        }
+        return plugins;
     }
 }

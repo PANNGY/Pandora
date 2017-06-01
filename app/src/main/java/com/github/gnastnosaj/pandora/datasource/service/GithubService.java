@@ -1,7 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource.service;
 
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
-import com.github.gnastnosaj.pandora.model.Plugin;
+import com.github.gnastnosaj.pandora.model.PluginData;
 import com.github.gnastnosaj.pandora.model.UpdateData;
 import com.github.gnastnosaj.pandora.network.Request;
 
@@ -49,7 +49,7 @@ public interface GithubService {
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/plugins/plugins.json")
-    Observable<List<Plugin>> getPlugins();
+    Observable<PluginData> getPluginData();
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/request-enhancer.json")

@@ -139,11 +139,6 @@ public class PandoraTabFragment extends Fragment {
             public boolean onSingleTapUp(MotionEvent e) {
                 return true;
             }
-
-            @Override
-            public void onLongPress(MotionEvent e) {
-                super.onLongPress(e);
-            }
         });
 
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {

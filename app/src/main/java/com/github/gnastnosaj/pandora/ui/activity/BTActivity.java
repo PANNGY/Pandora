@@ -186,16 +186,14 @@ public class BTActivity extends BaseActivity {
             @Override
             public void onLongPress(MotionEvent event) {
                 super.onLongPress(event);
-                try {
-                    View childView = recyclerView.findChildViewUnder(event.getX(), event.getY());
-                    int childPosition = recyclerView.getChildAdapterPosition(childView);
+                View childView = recyclerView.findChildViewUnder(event.getX(), event.getY());
+                int childPosition = recyclerView.getChildAdapterPosition(childView);
+                if (-1 < childPosition && childPosition < btAdapter.getData().size()) {
                     JSoupData jsoupData = btAdapter.getData().get(childPosition);
                     ClipData clipData = ClipData.newPlainText("Magnet Link", jsoupData.getAttr("magnet"));
                     ClipboardManager clipboardManager = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     clipboardManager.setPrimaryClip(clipData);
                     Snackbar.make(recyclerView, R.string.copy_magnet_success, Snackbar.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    Timber.e(e, "onLongPress exception");
                 }
             }
         });

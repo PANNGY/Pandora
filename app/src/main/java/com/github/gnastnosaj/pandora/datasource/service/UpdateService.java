@@ -32,7 +32,7 @@ public class UpdateService {
                             AppUpdater appUpdater = new AppUpdater(baseActivity)
                                     .setDisplay(Display.DIALOG)
                                     .setUpdateFrom(UpdateFrom.JSON)
-                                    .setUpdateJSON(baseActivity.getResources().getString(R.string.update_url))
+                                    .setUpdateJSON(baseActivity.getResources().getString(R.string.url_update))
                                     .setButtonUpdateClickListener((dialog, which) ->
                                             Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
                                                     .getUpdateData()

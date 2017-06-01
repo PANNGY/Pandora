@@ -60,6 +60,17 @@
       "icon": "https://girl-atlas.com/favicon.ico",
       "versionCode": 1,
       "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.nanrencd",
+      "name": "www.nanrencd.com",
+      "desc": "www.nanrencd.com, nsw",
+      "type": 1,
+      "reference": "nanrencd",
+      "args": "{\"model\": \"false\"}",
+      "icon": "http://www.nanrencd.com/favicon.ico",
+      "versionCode": 1,
+      "versionName": "1.0.0"
     }
   ],
   "force": false

@@ -24,6 +24,7 @@ import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.PandoraAdapter;
+import com.github.gnastnosaj.pandora.adapter.PluginCenterAdapter;
 import com.github.gnastnosaj.pandora.datasource.service.SearchService;
 import com.github.gnastnosaj.pandora.datasource.service.SplashService;
 import com.github.gnastnosaj.pandora.datasource.service.UpdateService;
@@ -193,6 +194,9 @@ public class PandoraActivity extends BaseActivity {
                     if (drawerItem != null) {
                         Intent i = null;
                         switch ((int) drawerItem.getIdentifier()) {
+                            case R.string.drawer_item_plugin_center:
+                                i = new Intent(this, PluginCenterActivity.class);
+                                break;
                             case R.string.drawer_item_help:
                                 i = new Intent(this, WebViewActivity.class);
                                 i.putExtra(WebViewActivity.EXTRA_TITLE, getResources().getString(R.string.drawer_item_help));
@@ -200,6 +204,7 @@ public class PandoraActivity extends BaseActivity {
                                 break;
                             case R.string.drawer_item_open_source:
                                 i = new Intent(this, OpenSourceActivity.class);
+                                break;
                         }
                         if (i != null) {
                             startActivity(i);

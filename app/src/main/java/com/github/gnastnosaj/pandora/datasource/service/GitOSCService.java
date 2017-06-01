@@ -1,7 +1,7 @@
 package com.github.gnastnosaj.pandora.datasource.service;
 
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
-import com.github.gnastnosaj.pandora.model.Plugin;
+import com.github.gnastnosaj.pandora.model.PluginData;
 import com.github.gnastnosaj.pandora.model.UpdateData;
 import com.github.gnastnosaj.pandora.network.Request;
 
@@ -16,7 +16,7 @@ import retrofit2.http.Path;
  * Created by jasontsang on 4/23/17.
  */
 
-public interface GitOSCService extends GithubService{
+public interface GitOSCService extends GithubService {
     String BASE_URL = "https://git.oschina.net/";
 
     @Headers("Cache-Control: public, max-age=3600")
@@ -29,7 +29,7 @@ public interface GitOSCService extends GithubService{
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/plugins/plugins.json")
-    Observable<List<Plugin>> getPlugins();
+    Observable<PluginData> getPluginData();
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/jasontsang/Pandora/raw/master/app/service/request-enhancer.json")

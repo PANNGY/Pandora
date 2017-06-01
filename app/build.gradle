@@ -35,6 +35,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:+'
     compile 'com.github.javiersantos:AppUpdater:+'
     compile 'cn.trinea.android.common:trinea-android-common:+'
+    compile 'org.zeroturnaround:zt-zip:+'
     compile('com.mikepenz:materialdrawer:+@aar') {
         transitive = true
     }

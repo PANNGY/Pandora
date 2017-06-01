@@ -19,7 +19,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.realm.Realm;
+import io.realm.RealmResults;
 import timber.log.Timber;
 
 /**
@@ -28,13 +31,22 @@ import timber.log.Timber;
 
 public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAdapter<List<Plugin>> {
 
+    public final static int TYPE_MY_PLUGINS = 0;
+    public final static int TYPE_PLUGIN_CENTER = 1;
+
+    public final static int STATE_COMPLETE = 0;
+    public final static int STATE_MANAGE = 1;
+
     private Context context;
+    public int type = TYPE_MY_PLUGINS;
+
     private List<Plugin> pluginList = new ArrayList<>();
 
-    public int state = 0;
+    public int state = STATE_COMPLETE;
 
-    public PluginCenterAdapter(Context context) {
+    public PluginCenterAdapter(Context context, int type) {
         this.context = context;
+        this.type = type;
     }
 
     @Override
@@ -115,22 +127,58 @@ public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAd
             super(itemView);
             ButterKnife.bind(this, itemView);
 
-            if (state == 1) {
-                itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
-                remove.setVisibility(View.VISIBLE);
-            }
-
-            stateDisposable = PluginEvent.observable.subscribe(pluginEvent -> {
-                if (pluginEvent.type == 0) {
+            if (type == TYPE_MY_PLUGINS) {
+                if (state == STATE_MANAGE) {
                     itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
                     remove.setVisibility(View.VISIBLE);
-                } else if (pluginEvent.type == 1) {
-                    itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
-                    remove.setVisibility(View.INVISIBLE);
-                } else if (pluginEvent.type == 3) {
-                    plugin.icon(context, icon);
                 }
-            }, throwable -> Timber.e(throwable, "stateDisposable exception"));
+
+                stateDisposable = PluginEvent.observable
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(pluginEvent -> {
+                            if (pluginEvent.type == PluginEvent.TYPE_MANAGE) {
+                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
+                                remove.setVisibility(View.VISIBLE);
+                            } else if (pluginEvent.type == PluginEvent.TYPE_COMPLETE) {
+                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
+                                remove.setVisibility(View.INVISIBLE);
+                            } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
+
+                            }
+                        }, throwable -> Timber.e(throwable, "stateDisposable exception"));
+            } else if (type == TYPE_PLUGIN_CENTER) {
+                stateDisposable = PluginEvent.observable
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(pluginEvent -> {
+                            if (pluginEvent.type == PluginEvent.TYPE_MANAGE) {
+                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_border);
+                                Realm realm = Realm.getDefaultInstance();
+                                RealmResults realmResults = realm.where(Plugin.class).equalTo("id", plugin.id).findAll();
+                                if (realmResults.isEmpty()) {
+                                    add.setVisibility(View.VISIBLE);
+                                } else {
+                                    added.setVisibility(View.VISIBLE);
+                                }
+                                realm.close();
+                            } else if (pluginEvent.type == PluginEvent.TYPE_COMPLETE) {
+                                itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
+                                add.setVisibility(View.INVISIBLE);
+                                added.setVisibility(View.INVISIBLE);
+                            } else if (pluginEvent.type == PluginEvent.TYPE_REFRESH) {
+                                if (pluginEvent.plugin.id.equals(plugin.id)) {
+                                    if (add.getVisibility() == View.VISIBLE) {
+                                        add.setVisibility(View.INVISIBLE);
+                                        added.setVisibility(View.VISIBLE);
+                                    } else if (added.getVisibility() == View.VISIBLE) {
+                                        added.setVisibility(View.INVISIBLE);
+                                        add.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
+
+                            }
+                        }, throwable -> Timber.e(throwable, "stateDisposable exception"));
+            }
         }
     }
 }
