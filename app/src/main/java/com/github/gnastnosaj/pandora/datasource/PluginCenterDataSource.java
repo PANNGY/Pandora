@@ -108,6 +108,7 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
                                                 }
                                                 File file = files[0];
                                                 ZipUtil.unpack(file, dir);
+                                                file.delete();
                                                 RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_UPDATE, plugin));
                                             }
                                         });

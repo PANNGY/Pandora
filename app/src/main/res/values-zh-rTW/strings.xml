@@ -101,6 +101,8 @@
     <string name="plugin_center_my_plugins">我的應用</string>
     <string name="plugin_center_manage">管理</string>
     <string name="plugin_center_complete">完成</string>
+    <string name="plugin_center_python_initialize">正在初始化挿件，請稍等喲～</string>
+    <string name="plugin_center_python_initialize_fail">挿件初始化失敗，請重新試試吧…</string>
 
     <string name="adult_warning">包含僅供18歲以上的成人相關題材，點擊繼續代表您已達到合法年齡並且符合當地的相關法律。</string>
     <string name="adult_warning_continue">繼續</string>

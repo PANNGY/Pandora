@@ -71,8 +71,10 @@ public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAd
                                 holder.itemPlugin.setBackgroundResource(R.drawable.item_plugin_selector);
                                 holder.remove.setVisibility(View.INVISIBLE);
                             } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
-                                holder.plugin = pluginEvent.plugin;
-                                holder.plugin.icon(context, holder.icon);
+                                if (holder.plugin.id == pluginEvent.plugin.id) {
+                                    holder.plugin = pluginEvent.plugin;
+                                    holder.plugin.icon(context, holder.icon);
+                                }
                             }
                         }, throwable -> Timber.e(throwable, "stateDisposable exception"));
             } else if (type == TYPE_PLUGIN_CENTER) {
@@ -104,8 +106,10 @@ public class PluginCenterAdapter extends RecyclerView.Adapter implements IDataAd
                                     }
                                 }
                             } else if (pluginEvent.type == PluginEvent.TYPE_UPDATE) {
-                                holder.plugin = pluginEvent.plugin;
-                                holder.plugin.icon(context, holder.icon);
+                                if (holder.plugin.id == pluginEvent.plugin.id) {
+                                    holder.plugin = pluginEvent.plugin;
+                                    holder.plugin.icon(context, holder.icon);
+                                }
                             }
                         }, throwable -> Timber.e(throwable, "stateDisposable exception"));
             }
