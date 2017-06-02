@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora;
 
-import android.app.Application;
 import android.net.Uri;
 import android.os.SystemClock;
 
@@ -9,6 +8,7 @@ import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.mvchelper.LoadViewFactory;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
+import com.googlecode.android_scripting.BaseApplication;
 import com.shizhefei.mvc.MVCHelper;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import timber.log.Timber;
  * Created by jasontsang on 4/21/17.
  */
 
-public class Pandora extends Application {
+public class Pandora extends BaseApplication {
     public final static String PRE_PRO_VERSION = "PRO_VERSION";
 
     private static RealmMigration realmMigration;

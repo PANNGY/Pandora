@@ -1,12 +1,18 @@
 package com.github.gnastnosaj.pandora.datasource.service;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 
+import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.Plugin;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleViewPagerActivity;
+import com.github.gnastnosaj.pythonforandroid.PythonForAndroid;
+import com.googlecode.android_scripting.BaseApplication;
+import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +49,13 @@ public class PluginService {
                     .putExtra(SimpleViewPagerActivity.EXTRA_TITLE, plugin.name)
                     .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, plugin.reference + "-tab")
                     .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
+        } else if (plugin.type == Plugin.TYPE_PYTHON_VIDEO) {
+            new RxPermissions((Activity) context).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET)
+                    .subscribe(granted -> {
+                        if (granted) {
+                            PythonForAndroid.initialize((BaseApplication) Boilerplate.getInstance());
+                        }
+                    });
         }
     }
 }
