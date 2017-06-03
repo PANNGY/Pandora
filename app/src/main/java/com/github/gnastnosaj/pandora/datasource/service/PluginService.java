@@ -10,7 +10,9 @@ import android.support.design.widget.Snackbar;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.PythonVideoDataSource;
 import com.github.gnastnosaj.pandora.model.Plugin;
+import com.github.gnastnosaj.pandora.ui.activity.SimpleVideoInfoActivity;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleViewPagerActivity;
 import com.github.gnastnosaj.pythonforandroid.PythonForAndroid;
 
@@ -20,8 +22,8 @@ import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -60,8 +62,7 @@ public class PluginService {
                     .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
         } else if (plugin.type == Plugin.TYPE_PYTHON_VIDEO) {
             if (PythonForAndroid.isInitialized()) {
-                Snackbar.make(((Activity) context).findViewById(android.R.id.content), "正在打开PYTHON插件，请稍候...", Snackbar.LENGTH_SHORT).show();
-                JCVideoPlayerStandard.startFullscreen(context, JCVideoPlayerStandard.class, "http://2449.vod.myqcloud.com/2449_22ca37a6ea9011e5acaaf51d105342e3.f20.mp4", "嫂子辛苦了");
+                startPythonPlugin(context, plugin);
             } else {
                 Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.plugin_center_python_initialize, Snackbar.LENGTH_SHORT).show();
                 Observable<Boolean> initialize = new RxPermissions((Activity) context).request(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.INTERNET)
@@ -84,9 +85,22 @@ public class PluginService {
                         .subscribe(success -> {
                             if (!success) {
                                 Snackbar.make(((Activity) context).findViewById(android.R.id.content), R.string.plugin_center_python_initialize_fail, Snackbar.LENGTH_SHORT).show();
+                            } else {
+                                Observable.timer(1, TimeUnit.SECONDS).subscribeOn(Schedulers.newThread()).subscribe(aLong -> {
+                                    if (PythonForAndroid.isInitialized()) {
+                                        startPythonPlugin(context, plugin);
+                                    }
+                                });
                             }
                         });
             }
         }
+    }
+
+    public static void startPythonPlugin(Context context, Plugin plugin) {
+        Intent i = new Intent(context, SimpleVideoInfoActivity.class);
+        i.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
+        i.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_CATEGORY);
+        context.startActivity(i);
     }
 }

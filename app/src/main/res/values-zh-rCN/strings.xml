@@ -107,4 +107,6 @@
     <string name="adult_warning">包含仅供18岁以上的成人相关题材，点击继续代表您已达到合法年龄并且符合当地的相关法律。</string>
     <string name="adult_warning_continue">继续</string>
     <string name="adult_warning_not_18">未满18周岁</string>
+
+    <string name="video_player_error">播放当前资源存在错误，请稍后重试</string>
 </resources>

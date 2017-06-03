@@ -72,7 +72,7 @@ public class SimpleVideoInfoActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_recycler_view_with_swipe_refresh);
+        setContentView(R.layout.layout_coordinator_with_recycler_view);
         ButterKnife.bind(this);
 
         createDynamicBox(findViewById(R.id.swipe_refresh_layout));
@@ -94,6 +94,8 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         }
 
         videoEventObservable = RxBus.getInstance().register(title, VideoEvent.class);
+
+        initContentView();
     }
 
     private void initContentView() {
@@ -165,6 +167,22 @@ public class SimpleVideoInfoActivity extends BaseActivity {
                                 dismissDynamicBox(SimpleVideoInfoActivity.this);
                                 Timber.e(throwable, "videoSourceDataSource exception");
                             });
+                        }
+                    } else if (type == PythonVideoDataSource.TYPE_VIDEO_INFO) {
+                        if (videoInfo.url.startsWith("stack://")) {
+                            title = videoInfo.title;
+                            String[] urls = videoInfo.url.substring(8).split(" , ");
+                            SimpleVideoInfoActivity.this.urls = new LinkedList<>();
+                            SimpleVideoInfoActivity.this.urls.addAll(Arrays.asList(urls));
+                            url = SimpleVideoInfoActivity.this.urls.pop();
+                            VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, url, title);
+                        } else if (videoInfo.url.startsWith("https")) {
+                            Intent intent = new Intent(SimpleVideoInfoActivity.this, WebVideoViewActivity.class);
+                            intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoInfo.title);
+                            intent.putExtra(WebVideoViewActivity.EXTRA_HREF, videoInfo.url);
+                            startActivity(intent);
+                        } else {
+                            VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, videoInfo.url, videoInfo.title);
                         }
                     }
                     return true;
