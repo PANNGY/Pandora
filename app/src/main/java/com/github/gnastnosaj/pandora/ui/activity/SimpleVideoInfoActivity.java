@@ -83,14 +83,12 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         plugin = getIntent().getParcelableExtra(EXTRA_PLUGIN);
         type = getIntent().getIntExtra(EXTRA_TYPE, PythonVideoDataSource.TYPE_CATEGORY);
         videoInfo = getIntent().getParcelableExtra(EXTRA_VIDEO_INFO);
+
         title = videoInfo == null ? plugin.name : videoInfo.title;
         setTitle(title);
-        if (videoInfo != null) {
-            setTitle(videoInfo.title);
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         videoEventObservable = RxBus.getInstance().register(title, VideoEvent.class);

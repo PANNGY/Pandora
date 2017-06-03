@@ -39,7 +39,7 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
                     .inflate(R.layout.layout_thumbnail_title_rank, parent, false);
         } else {
             v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_video_title, parent, false);
+                    .inflate(R.layout.item_title, parent, false);
         }
         return new ViewHolder(v);
     }

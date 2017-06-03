@@ -48,6 +48,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
         this.context = context;
         this.plugin = plugin;
         this.type = type;
+        this.id = id;
         if (type == TYPE_CATEGORY) {
             cmd = CMD_LIST_CATEGORIES;
         } else if (type == TYPE_VIDEO) {
@@ -68,7 +69,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
         List<String> args = new ArrayList<>();
         args.add(plugin.getPluginEntry(context).getAbsolutePath());
         args.add(cmd);
-        if (TextUtils.isEmpty(id)) {
+        if (!TextUtils.isEmpty(id)) {
             args.add(id);
         }
 
