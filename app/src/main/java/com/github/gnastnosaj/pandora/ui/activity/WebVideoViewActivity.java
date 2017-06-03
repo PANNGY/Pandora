@@ -56,6 +56,7 @@ import timber.log.Timber;
 public class WebVideoViewActivity extends BaseActivity {
     public static final String EXTRA_KEYWORD = "keyword";
     public static final String EXTRA_TITLE = "title";
+    public static final String EXTRA_HREF = "href";
 
     public static final String BASE_URL = "https://apiv.ga/magnet/";
     public static final String HACK_CSS_DIR = "hack_css/";
@@ -100,6 +101,7 @@ public class WebVideoViewActivity extends BaseActivity {
 
         keyword = getIntent().getStringExtra(EXTRA_KEYWORD);
         title = getIntent().getStringExtra(EXTRA_TITLE);
+        href = getIntent().getStringExtra(EXTRA_HREF);
         magnet = getIntent().getDataString();
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);

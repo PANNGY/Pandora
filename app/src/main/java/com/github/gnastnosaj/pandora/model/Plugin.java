@@ -2,6 +2,8 @@ package com.github.gnastnosaj.pandora.model;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.bilibili.socialize.share.download.IImageDownloader;
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -20,7 +22,7 @@ import timber.log.Timber;
  * Created by jasontsang on 12/10/16.
  */
 
-public class Plugin extends RealmObject {
+public class Plugin extends RealmObject implements Parcelable {
     public final static String NSW = "nsw";
 
     public final static int TYPE_PYTHON_VIDEO = 0;
@@ -131,4 +133,55 @@ public class Plugin extends RealmObject {
         }
         return plugins;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.name);
+        dest.writeString(this.desc);
+        dest.writeInt(this.type);
+        dest.writeString(this.reference);
+        dest.writeString(this.icon);
+        dest.writeString(this.args);
+        dest.writeInt(this.versionCode);
+        dest.writeString(this.versionName);
+        dest.writeString(this.author);
+        dest.writeString(this.license);
+        dest.writeString(this.licenseUrl);
+    }
+
+    public Plugin() {
+    }
+
+    protected Plugin(Parcel in) {
+        this.id = in.readString();
+        this.name = in.readString();
+        this.desc = in.readString();
+        this.type = in.readInt();
+        this.reference = in.readString();
+        this.icon = in.readString();
+        this.args = in.readString();
+        this.versionCode = in.readInt();
+        this.versionName = in.readString();
+        this.author = in.readString();
+        this.license = in.readString();
+        this.licenseUrl = in.readString();
+    }
+
+    public static final Parcelable.Creator<Plugin> CREATOR = new Parcelable.Creator<Plugin>() {
+        @Override
+        public Plugin createFromParcel(Parcel source) {
+            return new Plugin(source);
+        }
+
+        @Override
+        public Plugin[] newArray(int size) {
+            return new Plugin[size];
+        }
+    };
 }
