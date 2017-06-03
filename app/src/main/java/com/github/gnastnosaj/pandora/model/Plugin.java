@@ -56,6 +56,16 @@ public class Plugin extends RealmObject {
         }
     }
 
+    public File getPluginEntry(Context context) {
+        File pluginDirectory = getPluginDirectory(context);
+        File pluginEntry = new File(pluginDirectory, reference + ".py");
+        if (pluginEntry.exists()) {
+            return pluginEntry;
+        } else {
+            return null;
+        }
+    }
+
     public File getIcon(Context context) {
         if (icon.startsWith("http")) {
             File file = new File(ShareHelper.configuration.getImageCachePath(context), String.valueOf(icon.hashCode()));
