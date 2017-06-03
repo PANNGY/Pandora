@@ -3,6 +3,7 @@ package com.github.gnastnosaj.pandora.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.github.gnastnosaj.boilerplate.mvchelper.LoadViewFactory;
 import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
@@ -23,17 +25,20 @@ import com.github.gnastnosaj.pandora.model.Plugin;
 import com.github.gnastnosaj.pandora.model.VideoInfo;
 import com.github.gnastnosaj.pandora.ui.widget.VideoPlayer;
 import com.shizhefei.mvc.ILoadViewFactory;
+import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 /**
@@ -47,6 +52,9 @@ public class SimpleVideoInfoActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+
+    @BindView(R.id.swipe_refresh_layout)
+    SwipeRefreshLayout swipeRefreshLayout;
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
@@ -104,57 +112,60 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         });
         recyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                if (gestureDetector.onTouchEvent(e)) {
-                    try {
-                        View childView = rv.findChildViewUnder(e.getX(), e.getY());
-                        int childPosition = rv.getChildAdapterPosition(childView);
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent event) {
+                if (gestureDetector.onTouchEvent(event)) {
+                    View childView = rv.findChildViewUnder(event.getX(), event.getY());
+                    int childPosition = rv.getChildAdapterPosition(childView);
+                    if (-1 < childPosition && childPosition < videoInfoAdapter.getData().size()) {
                         VideoInfo videoInfo = videoInfoAdapter.getData().get(childPosition);
-                        if (videoInfo != null) {
-                            showDynamicBoxCustomView(BaseActivity.DYNAMIC_BOX_BALLPULSE);
-                            Observable.create(subscriber -> {
+                        if (type == PythonVideoDataSource.TYPE_CATEGORY) {
+                            Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
+                            intent.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
+                            intent.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO);
+                            intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
+                            startActivity(intent);
+                        } else if (type == PythonVideoDataSource.TYPE_VIDEO) {
+                            showDynamicBoxCustomView(BaseActivity.DYNAMIC_BOX_AV_BALLGRIDPULSE, SimpleVideoInfoActivity.this);
+                            Observable.<List<VideoInfo>>create(subscriber -> {
                                 try {
-                                    VideoSourceDataSource videoSourceDataSource = new VideoSourceDataSource(plugin, videoInfo);
-                                    List<VideoSource> videoSourceList = videoSourceDataSource.refresh();
+                                    PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(SimpleVideoInfoActivity.this, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
+                                    List<VideoInfo> videoSourceList = videoSourceDataSource.refresh();
                                     subscriber.onNext(videoSourceList);
-                                } catch (Exception e1) {
-                                    subscriber.onError(e1);
-                                    Timber.e(e1, "VideoInfoActivity videoSourceDataSource error");
+                                } catch (Exception e) {
+                                    subscriber.onError(e);
+                                    Timber.e(e, "videoSourceDataSource exception");
                                 }
-                            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(data -> {
-                                dimissDynamicBox();
-                                List<VideoSource> videoSourceList = (List<VideoSource>) data;
+                            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(videoSourceList -> {
+                                dismissDynamicBox(SimpleVideoInfoActivity.this);
                                 if (videoSourceList.size() == 1) {
-                                    VideoSource videoSource = videoSourceList.get(0);
-                                    if (videoSource.getUrl().startsWith("stack://")) {
-                                        title = videoSource.getTitle();
-                                        String[] urls = videoSource.getUrl().substring(8).split(" , ");
-                                        VideoInfoActivity.this.urls = new LinkedList<>();
-                                        VideoInfoActivity.this.urls.addAll(Arrays.asList(urls));
-                                        url = VideoInfoActivity.this.urls.pop();
-                                        VideoPlayer.startFullscreen(VideoInfoActivity.this, VideoPlayer.class, url, title);
-                                    } else if (videoSource.getUrl().startsWith("https")) {
-                                        Intent intent = new Intent(VideoInfoActivity.this, WebVideoViewActivity.class);
-                                        intent.putExtra(WebVideoViewActivity.EXTRA_URL, videoSource.getUrl());
-                                        intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoSource.getTitle());
+                                    VideoInfo videoSource = videoSourceList.get(0);
+                                    if (videoSource.url.startsWith("stack://")) {
+                                        title = videoSource.title;
+                                        String[] urls = videoSource.url.substring(8).split(" , ");
+                                        SimpleVideoInfoActivity.this.urls = new LinkedList<>();
+                                        SimpleVideoInfoActivity.this.urls.addAll(Arrays.asList(urls));
+                                        url = SimpleVideoInfoActivity.this.urls.pop();
+                                        VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, url, title);
+                                    } else if (videoSource.url.startsWith("https")) {
+                                        Intent intent = new Intent(SimpleVideoInfoActivity.this, WebVideoViewActivity.class);
+                                        intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoSource.title);
+                                        intent.putExtra(WebVideoViewActivity.EXTRA_HREF, videoSource.url);
                                         startActivity(intent);
                                     } else {
-                                        VideoPlayer.startFullscreen(VideoInfoActivity.this, VideoPlayer.class, videoSource.getUrl(), videoSource.getTitle());
+                                        VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, videoSource.url, videoSource.title);
                                     }
                                 } else if (videoSourceList.size() > 1) {
-                                    Intent intent = new Intent(VideoInfoActivity.this, VideoSourceActivity.class);
-                                    intent.putExtra(VideoSourceActivity.EXTRA_PLUGIN, plugin);
-                                    intent.putExtra(VideoSourceActivity.EXTRA_VIDEO_INFO, videoInfo);
+                                    Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
+                                    intent.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
+                                    intent.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO_INFO);
+                                    intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
                                     startActivity(intent);
                                 }
                             }, throwable -> {
-                                dimissDynamicBox();
-                                Timber.e(throwable, "VideoInfoActivity videoSourceDataSource error");
+                                dismissDynamicBox(SimpleVideoInfoActivity.this);
+                                Timber.e(throwable, "videoSourceDataSource exception");
                             });
                         }
-                    } catch (Exception e2) {
-                        dimissDynamicBox();
-                        Timber.e(e2, "VideoInfoActivity recyclerView touch error");
                     }
                     return true;
                 }
@@ -181,15 +192,14 @@ public class SimpleVideoInfoActivity extends BaseActivity {
             @Override
             public void showLoading() {
                 if (videoInfoAdapter.getData().size() == 0) {
-                    showDynamicBoxCustomView(BaseActivity.DYNAMIC_BOX_BALLPULSE);
+                    showDynamicBoxCustomView(BaseActivity.DYNAMIC_BOX_AV_BALLGRIDPULSE, SimpleVideoInfoActivity.this);
                 } else {
-                    refreshView.setRefreshing(true);
+                    swipeRefreshLayout.setRefreshing(true);
                 }
             }
 
             @Override
             public void showFail(Exception e) {
-                showErrorView();
             }
 
             @Override
@@ -203,15 +213,15 @@ public class SimpleVideoInfoActivity extends BaseActivity {
 
             @Override
             public void restore() {
-                if (refreshView.isRefreshing()) {
-                    refreshView.setRefreshing(false);
+                if (swipeRefreshLayout.isRefreshing()) {
+                    swipeRefreshLayout.setRefreshing(false);
                 } else {
-                    dimissDynamicBox();
+                    dismissDynamicBox(SimpleVideoInfoActivity.this);
                 }
             }
         };
 
-        mvcHelper = new MVCSwipeRefreshHelper<>(refreshView, loadView, new LoadViewFactory().madeLoadMoreView());
+        MVCHelper mvcHelper = new MVCSwipeRefreshHelper(swipeRefreshLayout, loadView, new LoadViewFactory().madeLoadMoreView());
         mvcHelper.setDataSource(videoInfoDataSource);
         mvcHelper.setAdapter(videoInfoAdapter);
 
