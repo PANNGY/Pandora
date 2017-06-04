@@ -93,10 +93,10 @@
     <string name="about_version">Pandora %1$s</string>
     <string name="about_copyright">Copyright &#169; %1$s Jason Tsang.\nAll Rights Reserved.</string>
 
-    <string name="url_update">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
-    <string name="url_features">https://github.com/gnastnosaj/Pandora/wiki</string>
-    <string name="url_help_and_feedback">https://github.com/gnastnosaj/Pandora/issues</string>
-    <string name="url_python_plugin">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/plugins/python/%1$s.zip</string>
+    <string name="url_update">https://git.oschina.net/jasontsang/Pandora/raw/master/app/service/update.json</string>
+    <string name="url_features">http://git.oschina.net/jasontsang/Pandora/wikis</string>
+    <string name="url_help_and_feedback">http://git.oschina.net/jasontsang/Pandora/issues</string>
+    <string name="url_python_plugin">https://git.oschina.net/jasontsang/Pandora/raw/master/app/service/plugins/python/%1$s.zip</string>
 
     <string name="plugin_center_my_plugins">我的应用</string>
     <string name="plugin_center_manage">管理</string>

@@ -33,7 +33,7 @@ import io.realm.RealmResults;
 public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSource.Model>>, IDataCacheLoader<List<PandoraHomeDataSource.Model>> {
     private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_HOME").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
-    private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+    private GithubService githubService = Retrofit.newGithubService();
 
     private Context context;
 

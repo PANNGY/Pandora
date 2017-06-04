@@ -2,40 +2,32 @@ package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.github.gnastnosaj.boilerplate.mvchelper.LoadViewFactory;
-import com.github.gnastnosaj.boilerplate.rxbus.RxBus;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.SimpleVideoInfoAdapter;
 import com.github.gnastnosaj.pandora.datasource.PythonVideoDataSource;
-import com.github.gnastnosaj.pandora.event.VideoEvent;
 import com.github.gnastnosaj.pandora.model.Plugin;
 import com.github.gnastnosaj.pandora.model.VideoInfo;
-import com.github.gnastnosaj.pandora.ui.widget.VideoPlayer;
 import com.shizhefei.mvc.ILoadViewFactory;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -64,11 +56,6 @@ public class SimpleVideoInfoActivity extends BaseActivity {
     private VideoInfo videoInfo;
     private String title;
 
-    private Observable<VideoEvent> videoEventObservable;
-
-    private String url;
-    private LinkedList<String> urls;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,8 +77,6 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        videoEventObservable = RxBus.getInstance().register(title, VideoEvent.class);
 
         initContentView();
     }
@@ -142,17 +127,13 @@ public class SimpleVideoInfoActivity extends BaseActivity {
                                     if (videoSource.url.startsWith("stack://")) {
                                         title = videoSource.title;
                                         String[] urls = videoSource.url.substring(8).split(" , ");
-                                        SimpleVideoInfoActivity.this.urls = new LinkedList<>();
-                                        SimpleVideoInfoActivity.this.urls.addAll(Arrays.asList(urls));
-                                        url = SimpleVideoInfoActivity.this.urls.pop();
-                                        VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, url, title);
                                     } else if (videoSource.url.startsWith("https")) {
                                         Intent intent = new Intent(SimpleVideoInfoActivity.this, WebVideoViewActivity.class);
                                         intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoSource.title);
                                         intent.putExtra(WebVideoViewActivity.EXTRA_HREF, videoSource.url);
                                         startActivity(intent);
                                     } else {
-                                        VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, videoSource.url, videoSource.title);
+
                                     }
                                 } else if (videoSourceList.size() > 1) {
                                     Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
@@ -169,17 +150,13 @@ public class SimpleVideoInfoActivity extends BaseActivity {
                             if (videoInfo.url.startsWith("stack://")) {
                                 title = videoInfo.title;
                                 String[] urls = videoInfo.url.substring(8).split(" , ");
-                                SimpleVideoInfoActivity.this.urls = new LinkedList<>();
-                                SimpleVideoInfoActivity.this.urls.addAll(Arrays.asList(urls));
-                                url = SimpleVideoInfoActivity.this.urls.pop();
-                                VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, url, title);
                             } else if (videoInfo.url.startsWith("https")) {
                                 Intent intent = new Intent(SimpleVideoInfoActivity.this, WebVideoViewActivity.class);
                                 intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoInfo.title);
                                 intent.putExtra(WebVideoViewActivity.EXTRA_HREF, videoInfo.url);
                                 startActivity(intent);
                             } else {
-                                VideoPlayer.startFullscreen(SimpleVideoInfoActivity.this, VideoPlayer.class, videoInfo.url, videoInfo.title);
+
                             }
                         }
                     }
@@ -242,47 +219,6 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         mvcHelper.setAdapter(videoInfoAdapter);
 
         mvcHelper.refresh();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        VideoPlayer.pause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        RxBus.getInstance().unregister(title, videoEventObservable);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        videoEventObservable.compose(bindToLifecycle()).subscribe(videoEvent -> {
-            if (videoEvent.type == VideoEvent.TYPE_ON_AUTO_COMPLETION) {
-                if (!ListUtils.isEmpty(urls)) {
-                    url = urls.pop();
-                    if (!TextUtils.isEmpty(url)) {
-                        VideoPlayer.startFullscreen(this, VideoPlayer.class, url, title);
-                    }
-                }
-            } else if (videoEvent.type == VideoEvent.TYPE_ON_FULLSCREEN) {
-                VideoPlayer.destroy();
-                Snackbar.make(recyclerView, R.string.video_player_error, Snackbar.LENGTH_SHORT).show();
-            } else if (videoEvent.type == VideoEvent.TYPE_ON_ERROR) {
-                VideoPlayer.destroy();
-            }
-        }, throwable -> Timber.e(throwable, "videoEventObservable exception"));
-        VideoPlayer.resume();
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (VideoPlayer.destroy()) {
-            return;
-        }
-        super.onBackPressed();
     }
 
     @Override

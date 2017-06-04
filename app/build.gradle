@@ -54,5 +54,5 @@ dependencies {
     compile 'me.relex:photodraweeview:+'
     compile 'com.github.kingideayou:tagcloudview:+'
     compile 'org.jsoup:jsoup:+'
-    compile 'fm.jiecao:jiecaovideoplayer:5.5.4'
+    compile 'com.shuyu:GSYVideoPlayer:1.6.6'
 }

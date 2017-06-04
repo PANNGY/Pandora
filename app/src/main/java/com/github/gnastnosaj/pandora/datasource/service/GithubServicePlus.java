@@ -16,19 +16,20 @@ import retrofit2.http.Path;
  */
 
 public class GithubServicePlus implements GithubService {
-    private int timeout = 5;
+    public final static long DEFAULT_TIMEOUT = 5;
+
     private GithubService githubService;
     private GitOSCService gitOSCService;
+    private long timeout;
 
-    public GithubServicePlus(int timeout, GithubService githubService, GitOSCService gitOSCService) {
-        this.timeout = timeout;
+    public GithubServicePlus(GithubService githubService, GitOSCService gitOSCService, long timeout) {
         this.githubService = githubService;
         this.gitOSCService = gitOSCService;
+        this.timeout = timeout;
     }
 
     public GithubServicePlus(GithubService githubService, GitOSCService gitOSCService) {
-        this.githubService = githubService;
-        this.gitOSCService = gitOSCService;
+        this(githubService, gitOSCService, DEFAULT_TIMEOUT);
     }
 
     @Override

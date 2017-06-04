@@ -34,7 +34,7 @@ public class UpdateService {
                                     .setUpdateFrom(UpdateFrom.JSON)
                                     .setUpdateJSON(baseActivity.getResources().getString(R.string.url_update))
                                     .setButtonUpdateClickListener((dialog, which) ->
-                                            Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
+                                            Retrofit.newGithubService()
                                                     .getUpdateData()
                                                     .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
                                                     .compose(baseActivity.bindUntilEvent(ActivityEvent.DESTROY))

@@ -10,7 +10,6 @@ import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.event.PluginEvent;
 import com.github.gnastnosaj.pandora.model.Plugin;
@@ -69,7 +68,7 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
 
         List<Plugin> plugins = new ArrayList<>();
 
-        Observable<List<Plugin>> refresh = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class).getPluginData()
+        Observable<List<Plugin>> refresh = Retrofit.newGithubService().getPluginData()
                 .flatMap(pluginData -> {
                     boolean nsw = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Pandora.PRE_PRO_VERSION, false);
                     for (Plugin plugin : pluginData.plugins) {

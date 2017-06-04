@@ -3,6 +3,7 @@ package com.github.gnastnosaj.pandora.datasource.service;
 import android.support.annotation.NonNull;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
+import com.github.gnastnosaj.pandora.R;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,16 +42,30 @@ public class Retrofit {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        T service = retrofit.create(baseService);
-
-//        if (service instanceof GithubService) {
-//            service = (T) new GithubServicePlus((GithubService) service, newSimpleService(GitOSCService.BASE_URL, GitOSCService.class, timeout));
-//        }
-
-        return service;
+        return retrofit.create(baseService);
     }
 
     public static <T> T newSimpleService(@NonNull String baseUrl, @NonNull Class<T> baseService) {
         return newSimpleService(baseUrl, baseService, DEFAULT_TIMEOUT);
+    }
+
+    public static GithubService newGithubService(long timeout) {
+        if (Boilerplate.getInstance().getResources().getString(R.string.area).equals("cn")) {
+            return newSimpleService(GitOSCService.BASE_URL, GitOSCService.class, timeout);
+        } else {
+            return newSimpleService(GithubService.BASE_URL, GithubService.class, timeout);
+        }
+    }
+
+    public static GithubService newGithubService() {
+        return newGithubService(DEFAULT_TIMEOUT);
+    }
+
+    public static GithubService newGithubServicePlus(long timeout) {
+        return new GithubServicePlus(newSimpleService(GithubService.BASE_URL, GithubService.class, timeout), newSimpleService(GitOSCService.BASE_URL, GitOSCService.class, timeout));
+    }
+
+    public static GithubService newGithubServicePlus() {
+        return newGithubServicePlus(DEFAULT_TIMEOUT);
     }
 }

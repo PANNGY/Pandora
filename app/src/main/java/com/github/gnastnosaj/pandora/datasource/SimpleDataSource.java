@@ -33,7 +33,7 @@ import io.realm.RealmResults;
 
 public class SimpleDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
 
-    private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+    private GithubService githubService = Retrofit.newGithubService();
 
     private RealmConfiguration realmConfig;
 

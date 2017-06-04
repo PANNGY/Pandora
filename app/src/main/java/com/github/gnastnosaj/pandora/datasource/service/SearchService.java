@@ -102,7 +102,7 @@ public class SearchService {
             Snackbar.make(((BaseActivity) context).findViewById(android.R.id.content), R.string.searching, Snackbar.LENGTH_LONG).show();
         }
 
-        GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+        GithubService githubService = Retrofit.newGithubService();
 
         searchDataSource = null;
 
