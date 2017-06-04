@@ -57,61 +57,49 @@ public class Retrofit {
     }
 
     public static GithubService newGithubServicePlus() {
-        return new GithubServicePlus();
-    }
+        return new GithubService() {
+            public final static int TYPE_GITHUB = 0;
+            public final static int TYPE_GITOSC = 1;
 
-    private final static class GithubServicePlus implements GithubService {
-        public final static int TYPE_GITHUB = 0;
-        public final static int TYPE_GITOSC = 1;
+            private int type = Boilerplate.getInstance().getResources().getString(R.string.area).equals("cn") ? TYPE_GITOSC : TYPE_GITHUB;
+            private GithubService githubService = type == TYPE_GITHUB ? Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class) : null;
+            private GitOSCService gitOSCService = type == TYPE_GITOSC ? Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class) : null;
 
-        private int type;
-        private GithubService githubService;
-        private GitOSCService gitOSCService;
-
-        private GithubServicePlus() {
-            if (Boilerplate.getInstance().getResources().getString(R.string.area).equals("cn")) {
-                type = TYPE_GITOSC;
-                gitOSCService = Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class);
-            } else {
-                type = TYPE_GITHUB;
-                githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+            @Override
+            public Observable<UpdateData> getUpdateData() {
+                if (type == TYPE_GITHUB) {
+                    return githubService.getUpdateData();
+                } else {
+                    return gitOSCService.getUpdateData();
+                }
             }
-        }
 
-        @Override
-        public Observable<UpdateData> getUpdateData() {
-            if (type == TYPE_GITHUB) {
-                return githubService.getUpdateData();
-            } else {
-                return gitOSCService.getUpdateData();
+            @Override
+            public Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label) {
+                if (type == TYPE_GITHUB) {
+                    return githubService.getJSoupDataSource(label);
+                } else {
+                    return gitOSCService.getJSoupDataSource(label);
+                }
             }
-        }
 
-        @Override
-        public Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label) {
-            if (type == TYPE_GITHUB) {
-                return githubService.getJSoupDataSource(label);
-            } else {
-                return gitOSCService.getJSoupDataSource(label);
+            @Override
+            public Observable<PluginData> getPluginData() {
+                if (type == TYPE_GITHUB) {
+                    return githubService.getPluginData();
+                } else {
+                    return gitOSCService.getPluginData();
+                }
             }
-        }
 
-        @Override
-        public Observable<PluginData> getPluginData() {
-            if (type == TYPE_GITHUB) {
-                return githubService.getPluginData();
-            } else {
-                return gitOSCService.getPluginData();
+            @Override
+            public Observable<List<Request.Enhancer>> getRequestConfigs() {
+                if (type == TYPE_GITHUB) {
+                    return githubService.getRequestConfigs();
+                } else {
+                    return gitOSCService.getRequestConfigs();
+                }
             }
-        }
-
-        @Override
-        public Observable<List<Request.Enhancer>> getRequestConfigs() {
-            if (type == TYPE_GITHUB) {
-                return githubService.getRequestConfigs();
-            } else {
-                return gitOSCService.getRequestConfigs();
-            }
-        }
+        };
     }
 }
