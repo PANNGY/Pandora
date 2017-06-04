@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora.network;
 
-import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 
 import java.net.InetAddress;
@@ -27,7 +26,7 @@ public class Request {
 
     static {
         countDownLatch = new CountDownLatch(1);
-        Retrofit.newGithubService()
+        Retrofit.newGithubServicePlus()
                 .getRequestConfigs()
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(data -> {

@@ -27,7 +27,7 @@ public class SplashService {
     }
 
     public static Single<String> girlAtlasSingle() {
-        GithubService girlAtlasService = Retrofit.newGithubService();
+        GithubService girlAtlasService = Retrofit.newGithubServicePlus();
         return girlAtlasService.getJSoupDataSource(GithubService.DATE_SOURCE_GIRL_ATLAS_TAB)
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
@@ -38,7 +38,7 @@ public class SplashService {
     }
 
     public static Single<String> nanrencdSingle() {
-        GithubService nanrencdService = Retrofit.newGithubService();
+        GithubService nanrencdService = Retrofit.newGithubServicePlus();
         return nanrencdService.getJSoupDataSource(GithubService.DATE_SOURCE_NANRENCD_TAB)
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))
@@ -57,7 +57,7 @@ public class SplashService {
     }
 
     public static Single<String> javlibSingle() {
-        GithubService javlibService = Retrofit.newGithubService();
+        GithubService javlibService = Retrofit.newGithubServicePlus();
         return javlibService.getJSoupDataSource(GithubService.DATE_SOURCE_JAVLIB_TAB)
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData())
                 .map(data -> data.get(new Random().nextInt(data.size() - 1)).getAttr("url"))

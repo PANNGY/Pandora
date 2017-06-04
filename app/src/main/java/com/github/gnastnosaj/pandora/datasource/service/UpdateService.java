@@ -33,7 +33,7 @@ public class UpdateService {
                                     .setUpdateFrom(UpdateFrom.JSON)
                                     .setUpdateJSON(baseActivity.getResources().getString(R.string.url_update))
                                     .setButtonUpdateClickListener((dialog, which) ->
-                                            Retrofit.newGithubService()
+                                            Retrofit.newGithubServicePlus()
                                                     .getUpdateData()
                                                     .compose(baseActivity.bindUntilEvent(ActivityEvent.DESTROY))
                                                     .subscribeOn(Schedulers.newThread())

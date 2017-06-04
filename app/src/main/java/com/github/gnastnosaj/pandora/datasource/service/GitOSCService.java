@@ -16,7 +16,7 @@ import retrofit2.http.Path;
  * Created by jasontsang on 4/23/17.
  */
 
-public interface GitOSCService extends GithubService {
+public interface GitOSCService {
     String BASE_URL = "https://git.oschina.net/";
 
     @Headers("Cache-Control: public, max-age=3600")

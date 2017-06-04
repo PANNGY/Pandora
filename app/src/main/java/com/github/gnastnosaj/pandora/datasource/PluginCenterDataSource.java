@@ -68,7 +68,7 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
 
         List<Plugin> plugins = new ArrayList<>();
 
-        Observable<List<Plugin>> refresh = Retrofit.newGithubService().getPluginData()
+        Observable<List<Plugin>> refresh = Retrofit.newGithubServicePlus().getPluginData()
                 .flatMap(pluginData -> {
                     boolean nsw = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Pandora.PRE_PRO_VERSION, false);
                     for (Plugin plugin : pluginData.plugins) {

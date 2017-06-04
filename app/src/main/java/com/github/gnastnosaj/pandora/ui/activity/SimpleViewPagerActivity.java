@@ -85,7 +85,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
     private static Map<String, List> catalogMap = new HashMap<>();
     private static Map<String, List<JSoupLink>> tabMap = new HashMap<>();
 
-    private GithubService githubService = Retrofit.newGithubService();
+    private GithubService githubService = Retrofit.newGithubServicePlus();
     private RealmConfiguration tabCacheRealmConfig;
     private RealmConfiguration catalogCacheRealmConfig;
 

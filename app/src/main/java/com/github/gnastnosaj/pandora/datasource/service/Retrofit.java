@@ -4,14 +4,21 @@ import android.support.annotation.NonNull;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
+import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
+import com.github.gnastnosaj.pandora.model.PluginData;
+import com.github.gnastnosaj.pandora.model.UpdateData;
+import com.github.gnastnosaj.pandora.network.Request;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Path;
 
 /**
  * Created by jasontsang on 4/23/17.
@@ -49,23 +56,62 @@ public class Retrofit {
         return newSimpleService(baseUrl, baseService, DEFAULT_TIMEOUT);
     }
 
-    public static GithubService newGithubService(long timeout) {
-        if (Boilerplate.getInstance().getResources().getString(R.string.area).equals("cn")) {
-            return newSimpleService(GitOSCService.BASE_URL, GitOSCService.class, timeout);
-        } else {
-            return newSimpleService(GithubService.BASE_URL, GithubService.class, timeout);
-        }
-    }
-
-    public static GithubService newGithubService() {
-        return newGithubService(DEFAULT_TIMEOUT);
-    }
-
-    public static GithubService newGithubServicePlus(long timeout) {
-        return new GithubServicePlus(newSimpleService(GithubService.BASE_URL, GithubService.class, timeout), newSimpleService(GitOSCService.BASE_URL, GitOSCService.class, timeout));
-    }
-
     public static GithubService newGithubServicePlus() {
-        return newGithubServicePlus(DEFAULT_TIMEOUT);
+        return new GithubServicePlus();
+    }
+
+    private final static class GithubServicePlus implements GithubService {
+        public final static int TYPE_GITHUB = 0;
+        public final static int TYPE_GITOSC = 1;
+
+        private int type;
+        private GithubService githubService;
+        private GitOSCService gitOSCService;
+
+        private GithubServicePlus() {
+            if (Boilerplate.getInstance().getResources().getString(R.string.area).equals("cn")) {
+                type = TYPE_GITOSC;
+                gitOSCService = Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class);
+            } else {
+                type = TYPE_GITHUB;
+                githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+            }
+        }
+
+        @Override
+        public Observable<UpdateData> getUpdateData() {
+            if (type == TYPE_GITHUB) {
+                return githubService.getUpdateData();
+            } else {
+                return gitOSCService.getUpdateData();
+            }
+        }
+
+        @Override
+        public Observable<JSoupDataSource> getJSoupDataSource(@Path("label") String label) {
+            if (type == TYPE_GITHUB) {
+                return githubService.getJSoupDataSource(label);
+            } else {
+                return gitOSCService.getJSoupDataSource(label);
+            }
+        }
+
+        @Override
+        public Observable<PluginData> getPluginData() {
+            if (type == TYPE_GITHUB) {
+                return githubService.getPluginData();
+            } else {
+                return gitOSCService.getPluginData();
+            }
+        }
+
+        @Override
+        public Observable<List<Request.Enhancer>> getRequestConfigs() {
+            if (type == TYPE_GITHUB) {
+                return githubService.getRequestConfigs();
+            } else {
+                return gitOSCService.getRequestConfigs();
+            }
+        }
     }
 }

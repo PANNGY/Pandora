@@ -28,7 +28,7 @@ import io.realm.RealmResults;
  */
 
 public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
-    private GithubService githubService = Retrofit.newGithubService();
+    private GithubService githubService = Retrofit.newGithubServicePlus();
 
     private RealmConfiguration realmConfig;
 
