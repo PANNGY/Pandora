@@ -3,6 +3,7 @@ package com.github.gnastnosaj.pandora.adapter;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,10 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.VideoInfo;
 import com.shizhefei.mvc.IDataAdapter;
+import com.shuyu.gsyvideoplayer.GSYVideoManager;
+import com.shuyu.gsyvideoplayer.listener.StandardVideoAllCallBack;
+import com.shuyu.gsyvideoplayer.utils.Debuger;
+import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +39,12 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
         View v;
-        if (i == 0) {
-            v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.layout_thumbnail_title_rank, parent, false);
+        if (i == 2) {
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_video_player, parent, false);
+        } else if (i == 1) {
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_thumbnail_title_rank, parent, false);
         } else {
-            v = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_title, parent, false);
+            v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_title, parent, false);
         }
         return new ViewHolder(v);
     }
@@ -48,7 +53,38 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
     public void onBindViewHolder(final RecyclerView.ViewHolder viewHolder, final int position) {
         VideoInfo videoInfo = videoInfoList.get(position);
         ViewHolder holder = (ViewHolder) viewHolder;
-        if (getItemViewType(position) == 0) {
+        if (getItemViewType(position) == 2) {
+            holder.videoPlayer.setUp(videoInfo.url, true, null, videoInfo.title);
+            holder.videoPlayer.getBackButton().setVisibility(View.GONE);
+            holder.videoPlayer.getFullscreenButton().setOnClickListener(view -> holder.videoPlayer.startWindowFullscreen(context, true, true));
+            holder.videoPlayer.setRotateViewAuto(true);
+            holder.videoPlayer.setLockLand(true);
+            holder.videoPlayer.setShowFullAnimation(true);
+            holder.videoPlayer.setNeedLockFull(true);
+            holder.videoPlayer.setStandardVideoAllCallBack(new VideoAllCallBack() {
+                @Override
+                public void onPrepared(String url, Object... objects) {
+                    super.onPrepared(url, objects);
+                    Debuger.printfLog("onPrepared");
+                    if (!holder.videoPlayer.isIfCurrentIsFullscreen()) {
+                        GSYVideoManager.instance().setNeedMute(true);
+                    }
+
+                }
+
+                @Override
+                public void onQuitFullscreen(String url, Object... objects) {
+                    super.onQuitFullscreen(url, objects);
+                    GSYVideoManager.instance().setNeedMute(true);
+                }
+
+                @Override
+                public void onEnterFullscreen(String url, Object... objects) {
+                    super.onEnterFullscreen(url, objects);
+                    GSYVideoManager.instance().setNeedMute(false);
+                }
+            });
+        } else if (getItemViewType(position) == 1) {
             holder.title.setText(videoInfo.title);
             holder.thumbnail.setImageURI(videoInfo.thumbnail);
         } else {
@@ -58,7 +94,9 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
 
     @Override
     public int getItemViewType(int position) {
-        if (videoInfoList.get(position).thumbnail == null) {
+        if (!TextUtils.isEmpty(videoInfoList.get(position).url) && !videoInfoList.get(position).url.startsWith("stack://")) {
+            return 2;
+        } else if (!TextUtils.isEmpty(videoInfoList.get(position).thumbnail)) {
             return 1;
         } else {
             return 0;
@@ -94,12 +132,124 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
         @BindView(R.id.thumbnail)
         SimpleDraweeView thumbnail;
 
+        @Nullable
         @BindView(R.id.title)
         TextView title;
+
+        @Nullable
+        @BindView(R.id.video_player)
+        StandardGSYVideoPlayer videoPlayer;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    public class VideoAllCallBack implements StandardVideoAllCallBack {
+
+        @Override
+        public void onClickStartIcon(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickStartError(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickStop(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickStopFullscreen(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickResume(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickResumeFullscreen(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickSeekbar(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickSeekbarFullscreen(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onAutoComplete(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onEnterFullscreen(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onQuitFullscreen(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onQuitSmallWidget(String url, Object... objects) {
+        }
+
+        @Override
+        public void onEnterSmallWidget(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onTouchScreenSeekVolume(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onTouchScreenSeekPosition(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onTouchScreenSeekLight(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickStartThumb(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickBlank(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onClickBlankFullscreen(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onPrepared(String url, Object... objects) {
+
+        }
+
+        @Override
+        public void onPlayError(String url, Object... objects) {
+
         }
     }
 }

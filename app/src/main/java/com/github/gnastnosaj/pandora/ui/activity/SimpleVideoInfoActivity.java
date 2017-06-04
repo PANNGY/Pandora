@@ -59,7 +59,7 @@ public class SimpleVideoInfoActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_coordinator_with_recycler_view);
+        setContentView(R.layout.activity_simple_video_info);
         ButterKnife.bind(this);
 
         createDynamicBox(findViewById(R.id.swipe_refresh_layout));
