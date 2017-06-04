@@ -85,7 +85,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
     private static Map<String, List> catalogMap = new HashMap<>();
     private static Map<String, List<JSoupLink>> tabMap = new HashMap<>();
 
-    private GithubService githubService = Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class);
+    private GithubService githubService = Retrofit.newGithubService();
     private RealmConfiguration tabCacheRealmConfig;
     private RealmConfiguration catalogCacheRealmConfig;
 
@@ -180,7 +180,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
 
     private Observable<List<JSoupLink>> initTabs() {
         List<JSoupLink> tabs = tabMap.containsKey(tabDataSource) ? tabMap.get(tabDataSource) : new ArrayList<>();
-        if(!tabMap.containsKey(tabDataSource)) {
+        if (!tabMap.containsKey(tabDataSource)) {
             tabMap.put(tabDataSource, tabs);
         }
         if (ListUtils.isEmpty(tabs)) {
@@ -220,7 +220,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
 
     private Observable<List> initCatalog() {
         List catalog = catalogMap.containsKey(tabDataSource) ? catalogMap.get(tabDataSource) : new ArrayList<>();
-        if(!catalogMap.containsKey(tabDataSource)) {
+        if (!catalogMap.containsKey(tabDataSource)) {
             catalogMap.put(tabDataSource, catalog);
         }
 

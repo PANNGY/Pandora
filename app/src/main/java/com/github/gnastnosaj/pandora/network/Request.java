@@ -27,7 +27,7 @@ public class Request {
 
     static {
         countDownLatch = new CountDownLatch(1);
-        Retrofit.newSimpleService(GithubService.BASE_URL, GithubService.class)
+        Retrofit.newGithubService()
                 .getRequestConfigs()
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(data -> {

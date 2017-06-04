@@ -12,7 +12,6 @@ import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.io.File;
-import java.util.concurrent.TimeUnit;
 
 import cn.trinea.android.common.util.PackageUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -36,7 +35,6 @@ public class UpdateService {
                                     .setButtonUpdateClickListener((dialog, which) ->
                                             Retrofit.newGithubService()
                                                     .getUpdateData()
-                                                    .timeout(5, TimeUnit.SECONDS, Retrofit.newSimpleService(GitOSCService.BASE_URL, GitOSCService.class).getUpdateData())
                                                     .compose(baseActivity.bindUntilEvent(ActivityEvent.DESTROY))
                                                     .subscribeOn(Schedulers.newThread())
                                                     .subscribe(updateData -> RxDownload.getInstance(Boilerplate.getInstance())
