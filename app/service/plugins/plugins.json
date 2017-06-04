@@ -53,7 +53,7 @@
     {
       "id": "com.github.gnastnosaj.pandora.plugin.girlatlas",
       "name": "girl-atlas.com",
-      "desc": "girl-atlas.com, nsw",
+      "desc": "girl-atlas.com",
       "type": 1,
       "reference": "girl-atlas",
       "args": "{\"model\": \"false\"}",
@@ -64,7 +64,7 @@
     {
       "id": "com.github.gnastnosaj.pandora.plugin.nanrencd",
       "name": "nanrencd.com",
-      "desc": "nanrencd.com, nsw",
+      "desc": "nanrencd.com",
       "type": 1,
       "reference": "nanrencd",
       "args": "{\"model\": \"false\"}",
