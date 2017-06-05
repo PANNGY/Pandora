@@ -16,6 +16,7 @@ import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.ui.activity.BTActivity;
 import com.github.gnastnosaj.pandora.ui.activity.GalleryActivity;
+import com.github.gnastnosaj.pandora.ui.activity.PandoraTabActivity;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleTabActivity;
 import com.github.gnastnosaj.pandora.ui.activity.SimpleViewPagerActivity;
 import com.trello.rxlifecycle2.android.ActivityEvent;
@@ -230,6 +231,13 @@ public class SearchService {
                                                 i.putParcelableArrayListExtra(BTActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                 context.startActivity(i);
                                             }
+                                        } else {
+                                            Intent i = new Intent(context, PandoraTabActivity.class);
+                                            i.putExtra(PandoraTabActivity.EXTRA_TYPE, PandoraTabActivity.TYPE_DEFAULT);
+                                            i.putExtra(PandoraTabActivity.EXTRA_TITLE, keyword);
+                                            i.putExtra(PandoraTabActivity.EXTRA_KEYWORD, keyword);
+                                            i.putParcelableArrayListExtra(PandoraTabActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                            context.startActivity(i);
                                         }
                                         dialog.dismiss();
                                     }).setCancelable(false).show();
