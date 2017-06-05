@@ -42,6 +42,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
     private int pageSize = 6;
 
     private boolean remote;
+    private boolean checkSource;
     private VideoInfo next;
 
     public PythonVideoDataSource(Context context, Plugin plugin, int type, @Nullable String id) {
@@ -81,14 +82,14 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
                     VideoInfo videoInfo;
                     try {
                         videoInfo = new Gson().fromJson(str, VideoInfo.class);
+                        if (videoInfo.title.equals("next")) {
+                            next = videoInfo;
+                        } else {
+                            videoInfoList.add(videoInfo);
+                        }
                     } catch (Exception e) {
                         Timber.e(e, "videoInfo data parse exception");
                         continue;
-                    }
-                    if (videoInfo.title.equals("next")) {
-                        next = videoInfo;
-                    } else {
-                        videoInfoList.add(videoInfo);
                     }
                 }
                 latch.countDown();
@@ -107,7 +108,10 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
 
         if (next != null) {
             remote = true;
-            if (type == TYPE_VIDEO) {
+            if (type == TYPE_VIDEO && videoInfoList.size() <= 10) {
+                checkSource = true;
+            }
+            if (checkSource) {
                 for (VideoInfo videoInfo : videoInfoList) {
                     try {
                         PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(context, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
@@ -122,6 +126,9 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
             }
             return videoInfoList;
         } else {
+            if (type == TYPE_VIDEO && videoInfoList.size() <= 30) {
+                checkSource = true;
+            }
             return loadMore();
         }
     }
@@ -136,7 +143,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
                 List<String> args = new ArrayList<>();
                 args.add(plugin.getPluginEntry(context).getAbsolutePath());
                 args.add(cmd);
-                if (TextUtils.isEmpty(next.id)) {
+                if (!TextUtils.isEmpty(next.id)) {
                     args.add(next.id);
                 }
 
@@ -148,14 +155,14 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
                             VideoInfo videoInfo;
                             try {
                                 videoInfo = new Gson().fromJson(str, VideoInfo.class);
+                                if (videoInfo.title.equals("next")) {
+                                    next = videoInfo;
+                                } else {
+                                    videoInfoList.add(videoInfo);
+                                }
                             } catch (Exception e) {
                                 Timber.e(e, "videoInfo data parse error");
                                 continue;
-                            }
-                            if (videoInfo.title.equals("next")) {
-                                next = videoInfo;
-                            } else {
-                                videoInfoList.add(videoInfo);
                             }
                         }
                         latch.countDown();
@@ -184,7 +191,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
             Timber.e(e, "PythonVideoDataSource loadMore error");
         }
 
-        if (type == TYPE_VIDEO) {
+        if (checkSource) {
             for (VideoInfo videoInfo : videoInfoList) {
                 try {
                     PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(context, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
