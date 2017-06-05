@@ -154,6 +154,9 @@ public class PandoraTabFragment extends Fragment {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < pandoraTabAdapter.getData().size()) {
                         JSoupData data = pandoraTabAdapter.getData().get(childPosition);
+                        Intent i = new Intent(getContext(), PandoraDetailActivity.class);
+                        i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
+                        startActivity(i);
                     }
                     return true;
                 }

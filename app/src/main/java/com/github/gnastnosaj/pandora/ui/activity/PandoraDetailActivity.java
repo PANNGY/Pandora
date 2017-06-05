@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bilibili.socialize.share.core.shareparam.ShareParamText;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.interfaces.DraweeController;
@@ -30,12 +31,14 @@ import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.github.gnastnosaj.pandora.ui.widget.RatioImageView;
+import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -117,6 +120,11 @@ public class PandoraDetailActivity extends BaseActivity {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             init(href);
+            Observable.timer(500, TimeUnit.MILLISECONDS)
+                    .subscribeOn(Schedulers.computation())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe((l) ->
+                            swipeRefreshLayout.setRefreshing(false));
         });
     }
 
@@ -134,6 +142,7 @@ public class PandoraDetailActivity extends BaseActivity {
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupDataSource -> {
                     jsoupDataSource.loadData(href)
+                            .retry(3)
                             .compose(bindUntilEvent(ActivityEvent.DESTROY))
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(data -> {
@@ -169,6 +178,7 @@ public class PandoraDetailActivity extends BaseActivity {
                                 dismissDynamicBox(this);
                             }, throwable -> dismissDynamicBox(this));
                     jsoupDataSource.loadCatalogs(href)
+                            .retry(3)
                             .compose(bindUntilEvent(ActivityEvent.DESTROY))
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(data -> {
@@ -210,6 +220,27 @@ public class PandoraDetailActivity extends BaseActivity {
                 .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                 .color(Color.WHITE).sizeDp(18));
 
+        Observable.<Boolean>create(subscriber -> {
+            Realm realm = Realm.getInstance(favouriteRealmConfiguration);
+            RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
+            for (JSoupData result : results) {
+                if (href.equals(result.getAttr("href"))) {
+                    favourite = true;
+                    break;
+                }
+            }
+            subscriber.onNext(favourite);
+            subscriber.onComplete();
+        }).compose(bindUntilEvent(ActivityEvent.DESTROY))
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(favourite -> {
+                    if (favourite) {
+                        menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
+                                .icon(MaterialDesignIconic.Icon.gmi_label_heart)
+                                .color(getResources().getColor(R.color.colorAccent)).sizeDp(18));
+                    }
+                });
         return true;
     }
 
@@ -220,6 +251,7 @@ public class PandoraDetailActivity extends BaseActivity {
                 onBackPressed();
                 return true;
             case R.id.action_share:
+                ShareHelper.share(this, new ShareParamText(title, href));
                 return true;
             case R.id.action_search:
                 SearchService.search(title, title, SearchService.TYPE_MAGNET, this, new SearchService.SearchListener() {
