@@ -80,6 +80,7 @@
       "cssQuery": "div.main div.ct-c dl dd",
       "selectors": [
         {
+          "global": true,
           "cssQuery": "div.main div.ct-c dl dt",
           "filter": {
             "notQuery": ".name"
