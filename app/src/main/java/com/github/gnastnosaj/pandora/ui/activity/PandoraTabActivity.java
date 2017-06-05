@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,8 +16,12 @@ import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.adapter.SimpleTabAdapter;
 import com.github.gnastnosaj.pandora.datasource.FavouriteDataSource;
+import com.github.gnastnosaj.pandora.datasource.PandoraTabDataSource;
+import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,8 +30,16 @@ import butterknife.ButterKnife;
  * Created by jasontsang on 5/26/17.
  */
 
-public class PandoraFavouriteActivity extends BaseActivity {
+public class PandoraTabActivity extends BaseActivity {
     public final static String DATA_SOURCE = "PANDORA";
+
+    public final static String EXTRA_TYPE = "type";
+    public final static String EXTRA_TITLE = "title";
+    public final static String EXTRA_KEYWORD = "keyword";
+    public final static String EXTRA_CACHE = "cache";
+
+    public final static int TYPE_DEFAULT = 0;
+    public final static int TYPE_FAVOURITE = 1;
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -36,6 +49,11 @@ public class PandoraFavouriteActivity extends BaseActivity {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
+
+    private int type;
+    private String title;
+    private String keyword;
+    private List<JSoupData> cache;
 
     @Override
     protected void onDestroy() {
@@ -51,7 +69,12 @@ public class PandoraFavouriteActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         initSystemBar();
 
-        setTitle(R.string.action_favourite);
+        type = getIntent().getIntExtra(EXTRA_TYPE, TYPE_DEFAULT);
+        title = getIntent().getStringExtra(EXTRA_TITLE);
+        keyword = getIntent().getStringExtra(EXTRA_KEYWORD);
+        cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
+
+        setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -109,8 +132,14 @@ public class PandoraFavouriteActivity extends BaseActivity {
         });
 
         MVCHelper mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
-        FavouriteDataSource favouriteDataSource = new FavouriteDataSource(DATA_SOURCE);
-        mvcHelper.setDataSource(favouriteDataSource);
+        if (type == TYPE_DEFAULT) {
+            PandoraTabDataSource pandoraTabDataSource = new PandoraTabDataSource(this, keyword);
+            pandoraTabDataSource.setCache(cache);
+            mvcHelper.setDataSource(pandoraTabDataSource);
+        } else if (type == TYPE_FAVOURITE) {
+            FavouriteDataSource favouriteDataSource = new FavouriteDataSource(DATA_SOURCE);
+            mvcHelper.setDataSource(favouriteDataSource);
+        }
         mvcHelper.setAdapter(simpleTabAdapter);
         mvcHelper.refresh();
     }

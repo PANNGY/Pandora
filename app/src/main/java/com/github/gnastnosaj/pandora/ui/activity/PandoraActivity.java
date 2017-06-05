@@ -141,6 +141,9 @@ public class PandoraActivity extends BaseActivity {
                 ShareHelper.share(this, new ShareParamText(getResources().getString(R.string.action_share), getResources().getString(R.string.share_pandora)));
                 return true;
             case R.id.action_favourite:
+                Intent i = new Intent(this, PandoraTabActivity.class);
+                i.putExtra(PandoraTabActivity.EXTRA_TYPE, PandoraTabActivity.TYPE_FAVOURITE);
+                startActivity(i);
                 return true;
             case R.id.action_about:
                 startActivity(new Intent(this, AboutActivity.class));
