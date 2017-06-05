@@ -143,6 +143,7 @@ public class PandoraActivity extends BaseActivity {
             case R.id.action_favourite:
                 Intent i = new Intent(this, PandoraTabActivity.class);
                 i.putExtra(PandoraTabActivity.EXTRA_TYPE, PandoraTabActivity.TYPE_FAVOURITE);
+                i.putExtra(PandoraTabActivity.EXTRA_TITLE, getResources().getString(R.string.action_favourite));
                 startActivity(i);
                 return true;
             case R.id.action_about:
