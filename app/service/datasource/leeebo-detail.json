@@ -1,0 +1,56 @@
+{
+  "id": "leeebo-detail",
+  "baseUrl": "http://m.leeebo.com",
+  "pages": [
+    "/",
+    "/vod-type-id-1-pg-1.html",
+    "/vod-type-id-2-pg-1.html",
+    "/vod-type-id-3-pg-1.html",
+    "/vod-type-id-16-pg-1.html",
+    "",
+    "/vod-type-id-20-pg-1.html",
+    "/index.php?m=vod-search"
+  ],
+  "dataSelector": {
+    "attrSelectors": [
+      {
+        "label": "thumbnail",
+        "global": true,
+        "cssQuery": "section.page-hd img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ],
+          "regexp": {
+            "pattern": "^/",
+            "format": "{baseUrl}%s"
+          }
+        }
+      },
+      {
+        "label": "intro",
+        "global": true,
+        "cssQuery": "article.detail-con",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "href",
+        "global": true,
+        "cssQuery": "section.page-bd div.page-btn a",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      },
+      {
+        "label": "desc",
+        "placeholder": "intro"
+      }
+    ]
+  }
+}

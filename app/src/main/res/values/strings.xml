@@ -109,4 +109,7 @@
     <string name="adult_warning_not_18">I AM NOT 18 YEARS OLD</string>
 
     <string name="video_player_error">Something error happened, please try again later!</string>
+
+    <string name="detail_resource">Resource</string>
+    <string name="detail_intro">Intro</string>
 </resources>
