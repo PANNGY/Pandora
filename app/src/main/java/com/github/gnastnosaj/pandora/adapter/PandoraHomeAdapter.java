@@ -41,9 +41,7 @@ import cn.trinea.android.common.util.ListUtils;
  * Created by Jason on 7/17/2015.
  */
 public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAdapter<List<Model>> {
-    public final static String SLIDE_BUNDLE_TITILE = "title";
-    public final static String SLIDE_BUNDLE_THUMBNAIL = "thumbnail";
-    public final static String SLIDE_BUNDLE_HREF = "href";
+    public final static String SLIDE_BUNDLE_DATA = "data";
 
     private Context context;
 
@@ -81,12 +79,9 @@ public class PandoraHomeAdapter extends RecyclerView.Adapter implements IDataAda
             for (JSoupData data : (List<JSoupData>) model.data) {
                 String title = data.getAttr("title");
                 String thumbnail = data.getAttr("thumbnail");
-                String href = data.getAttr("href");
 
                 Bundle bundle = new Bundle();
-                bundle.putString(SLIDE_BUNDLE_TITILE, title);
-                bundle.putString(SLIDE_BUNDLE_THUMBNAIL, thumbnail);
-                bundle.putString(SLIDE_BUNDLE_HREF, href);
+                bundle.putParcelable(SLIDE_BUNDLE_DATA, data);
 
                 TextSliderView textSliderView = new TextSliderView(context);
                 textSliderView.description(title).image(thumbnail).bundle(bundle)

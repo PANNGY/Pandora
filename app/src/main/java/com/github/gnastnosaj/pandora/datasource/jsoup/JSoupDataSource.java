@@ -52,13 +52,14 @@ public class JSoupDataSource {
     private String keyword;
 
     public Observable<List<JSoupLink>> loadTabs() {
+        return loadTabs(null);
+    }
+
+    public Observable<List<JSoupLink>> loadTabs(String href) {
         return Observable.create(subscriber -> {
             try {
-                if (TextUtils.isEmpty(tabSelector.url)) {
-                    tabSelector.url = nextPage;
-                }
-                if (TextUtils.isEmpty(tabSelector.url)) {
-                    tabSelector.url = baseUrl;
+                if (!TextUtils.isEmpty(href)) {
+                    tabSelector.url = href;
                 }
                 tabSelector.url = betterData(tabSelector.url);
                 Document document = tabSelector.loadDocument();
@@ -87,13 +88,14 @@ public class JSoupDataSource {
     }
 
     public Observable<List> loadCatalogs() {
+        return loadCatalogs(null);
+    }
+
+    public Observable<List> loadCatalogs(String href) {
         return Observable.create(subscriber -> {
             try {
-                if (TextUtils.isEmpty(catalogSelector.url)) {
-                    catalogSelector.url = nextPage;
-                }
-                if (TextUtils.isEmpty(catalogSelector.url)) {
-                    catalogSelector.url = baseUrl;
+                if (!TextUtils.isEmpty(href)) {
+                    catalogSelector.url = href;
                 }
                 catalogSelector.url = betterData(catalogSelector.url);
                 Document document = catalogSelector.loadDocument();

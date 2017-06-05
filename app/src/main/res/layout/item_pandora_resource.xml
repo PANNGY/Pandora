@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <FrameLayout
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/detail_resource_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical" />
+    </FrameLayout>
+    <me.next.tagview.TagCloudView
+        android:id="@+id/detail_resource_cloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tcvItemBorderHorizontal="8dp"
+        app:tcvItemBorderVertical="6dp"
+        app:tcvBorder="8dp"
+        app:tcvBackground="@color/colorAccent"
+        app:tcvTextColor="@color/white"
+        app:tcvTextSize="6sp"
+        app:tcvCanTagClick="true"
+        android:layout_gravity="bottom" />
+</LinearLayout>

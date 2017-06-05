@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,6 +23,7 @@ import com.github.gnastnosaj.pandora.datasource.PandoraHomeDataSource.Model;
 import com.github.gnastnosaj.pandora.datasource.PandoraTabDataSource;
 import com.github.gnastnosaj.pandora.event.TabEvent;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.github.gnastnosaj.pandora.ui.activity.PandoraDetailActivity;
 import com.github.gnastnosaj.pandora.ui.widget.PinnedHeaderDecoration;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
@@ -94,8 +96,10 @@ public class PandoraTabFragment extends Fragment {
                         Model model = pandoraHomeAdapter.getData().get(childPosition);
                         if (model.type == Model.TYPE_VALUE_SLIDE) {
                             Bundle bundle = ((SliderLayout) childView).getCurrentSlider().getBundle();
-                            String title = bundle.getString(PandoraHomeAdapter.SLIDE_BUNDLE_TITILE);
-                            String href = bundle.getString(PandoraHomeAdapter.SLIDE_BUNDLE_HREF);
+                            JSoupData data = bundle.getParcelable(PandoraHomeAdapter.SLIDE_BUNDLE_DATA);
+                            Intent i = new Intent(getContext(), PandoraDetailActivity.class);
+                            i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
+                            startActivity(i);
                         } else if (model.type == Model.TYPE_VALUE_GROUP) {
                             String[] groups = pandoraHomeDataSource.getGroups();
                             for (int i = 0; i < groups.length; i++) {
@@ -107,8 +111,9 @@ public class PandoraTabFragment extends Fragment {
                             }
                         } else if (model.type == Model.TYPE_VALUE_DATA) {
                             JSoupData data = (JSoupData) model.data;
-                            String title = data.getAttr("title");
-                            String href = data.getAttr("href");
+                            Intent i = new Intent(getContext(), PandoraDetailActivity.class);
+                            i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
+                            startActivity(i);
                         }
                     }
                     return true;
