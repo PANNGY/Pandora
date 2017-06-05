@@ -123,6 +123,10 @@
             android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|screenSize|smallestScreenSize"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".ui.activity.PandoraTabActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenLayout|screenSize|smallestScreenSize"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
