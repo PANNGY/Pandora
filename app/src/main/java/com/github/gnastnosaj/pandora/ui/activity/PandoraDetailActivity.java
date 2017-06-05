@@ -104,6 +104,7 @@ public class PandoraDetailActivity extends BaseActivity {
         initSystemBar();
 
         data = getIntent().getParcelableExtra(EXTRA_DATA);
+        data.group = null;
         href = data.getAttr("href");
         title = data.getAttr("title");
 

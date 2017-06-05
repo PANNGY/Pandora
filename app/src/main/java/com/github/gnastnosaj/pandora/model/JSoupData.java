@@ -36,7 +36,7 @@ public class JSoupData extends RealmObject implements Parcelable {
     }
 
     @Override
-    protected JSoupData clone() {
+    public JSoupData clone() {
         JSoupData data = new JSoupData();
         if (group != null) {
             data.group = group.clone();

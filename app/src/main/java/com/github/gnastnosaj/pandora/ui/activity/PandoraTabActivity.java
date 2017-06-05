@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -115,7 +116,10 @@ public class PandoraTabActivity extends BaseActivity {
                     View childView = rv.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
-
+                        JSoupData data = simpleTabAdapter.getData().get(childPosition);
+                        Intent i = new Intent(PandoraTabActivity.this, PandoraDetailActivity.class);
+                        i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
+                        startActivity(i);
                     }
                     return true;
                 }
