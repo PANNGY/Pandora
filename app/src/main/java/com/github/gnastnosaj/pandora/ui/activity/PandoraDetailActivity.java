@@ -75,7 +75,6 @@ public class PandoraDetailActivity extends BaseActivity {
     private boolean favourite;
 
     private RealmConfiguration favouriteRealmConfiguration;
-    private RealmConfiguration archiveRealmConfiguration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +98,6 @@ public class PandoraDetailActivity extends BaseActivity {
         }
 
         favouriteRealmConfiguration = new RealmConfiguration.Builder().name(DATA_SOURCE + "_FAVOURITE_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
-        archiveRealmConfiguration = new RealmConfiguration.Builder().name(DATA_SOURCE + "_ARCHIVE_CACHE").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         showDynamicBoxCustomView(DYNAMIC_BOX_AV_BALLGRIDPULSE, this);
         init(href);
@@ -110,20 +108,30 @@ public class PandoraDetailActivity extends BaseActivity {
     }
 
     private void init(String href) {
-        Retrofit.newGithubServicePlus().getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_DETAIL)
+        GithubService githubService = Retrofit.newGithubServicePlus();
+        githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_DETAIL)
                 .switchMap(jsoupDataSource -> {
                     if (href.startsWith(jsoupDataSource.baseUrl)) {
                         return Observable.just(jsoupDataSource);
                     } else {
-                        return Retrofit.newGithubServicePlus().getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_DETAIL);
+                        return githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_DETAIL);
                     }
                 })
                 .compose(bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(jsoupDataSource -> {
-                    jsoupDataSource.loadData().observeOn(AndroidSchedulers.mainThread())
+                    jsoupDataSource.loadData()
+                            .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                            .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(data -> {
                                 thumbnail.setImageURI(data.get(0).getAttr("thumbnail"));
+                                dismissDynamicBox(this);
+                            }, throwable -> dismissDynamicBox(this));
+                    jsoupDataSource.loadCatalogs()
+                            .compose(bindUntilEvent(ActivityEvent.DESTROY))
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(data -> {
+
                             });
                 });
     }

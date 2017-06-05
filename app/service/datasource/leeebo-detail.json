@@ -11,6 +11,26 @@
     "/vod-type-id-20-pg-1.html",
     "/index.php?m=vod-search"
   ],
+  "catalogSelector": {
+    "cssQuery": "section.mod div.mod-bd div.numList",
+    "tagSelector": {
+      "cssQuery": "li a.bd",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      },
+      "urlSelector": {
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ],
+          "format": "{baseUrl}%s"
+        }
+      }
+    }
+  },
   "dataSelector": {
     "attrSelectors": [
       {

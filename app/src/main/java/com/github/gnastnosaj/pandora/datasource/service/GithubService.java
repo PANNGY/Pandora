@@ -36,12 +36,10 @@ public interface GithubService {
     String DATE_SOURCE_K8DY_HOME = "k8dy-home";
     String DATE_SOURCE_K8DY_TAB = "k8dy-tab";
     String DATE_SOURCE_K8DY_DETAIL = "k8dy-detail";
-    String DATE_SOURCE_K8DY_RESOURCE = "k8dy-resource";
     String DATE_SOURCE_LEEEBO_SLIDE = "leeebo-slide";
     String DATE_SOURCE_LEEEBO_HOME = "leeebo-home";
     String DATE_SOURCE_LEEEBO_TAB = "leeebo-tab";
     String DATE_SOURCE_LEEEBO_DETAIL = "leeebo-detail";
-    String DATE_SOURCE_LEEEBO_RESOURCE = "leeebo-resource";
 
     @Headers("Cache-Control: public, max-age=3600")
     @GET("/gnastnosaj/Pandora/master/app/service/update.json")
