@@ -20,7 +20,6 @@ import com.github.gnastnosaj.pandora.datasource.PluginCenterDataSource;
 import com.github.gnastnosaj.pandora.datasource.service.PluginService;
 import com.github.gnastnosaj.pandora.event.PluginEvent;
 import com.github.gnastnosaj.pandora.model.Plugin;
-import com.github.gnastnosaj.pandora.ui.widget.WrappableGridLayoutManager;
 import com.shizhefei.mvc.ILoadViewFactory;
 import com.shizhefei.mvc.MVCNormalHelper;
 
@@ -69,7 +68,7 @@ public class PluginCenterActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        GridLayoutManager myPluginsLayoutManager = new WrappableGridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount));
+        GridLayoutManager myPluginsLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount));
         myPlugins.setLayoutManager(myPluginsLayoutManager);
 
         myPluginsDataAdapter = new PluginCenterAdapter(this, PluginCenterAdapter.TYPE_MY_PLUGINS);
@@ -186,7 +185,7 @@ public class PluginCenterActivity extends BaseActivity {
         myPluginsMVCHelper.setAdapter(myPluginsDataAdapter);
         myPluginsMVCHelper.refresh();
 
-        GridLayoutManager pluginCenterLayoutManager = new WrappableGridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount));
+        GridLayoutManager pluginCenterLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.pluginCenterSpanCount));
         pluginCenter.setLayoutManager(pluginCenterLayoutManager);
 
         pluginCenterDataAdapter = new PluginCenterAdapter(this, PluginCenterAdapter.TYPE_PLUGIN_CENTER);
