@@ -82,7 +82,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
                     try {
                         videoInfo = new Gson().fromJson(str, VideoInfo.class);
                     } catch (Exception e) {
-                        Timber.e(e, "videoInfo data parse error");
+                        Timber.e(e, "videoInfo data parse exception");
                         continue;
                     }
                     if (videoInfo.title.equals("next")) {
@@ -98,9 +98,23 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
             public void onTimeout() {
                 latch.countDown();
             }
-        }, 30000);
+        }, 5000);
 
         latch.await();
+
+        if (type == TYPE_VIDEO) {
+            for (VideoInfo videoInfo : videoInfoList) {
+                try {
+                    PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(context, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
+                    List<VideoInfo> videoSourceList = videoSourceDataSource.refresh();
+                    if (videoSourceList.size() == 1) {
+                        videoInfo.url = videoSourceList.get(0).url;
+                    }
+                } catch (Exception e) {
+                    Timber.e(e, "check videoSource exception");
+                }
+            }
+        }
 
         pages = videoInfoList.size() / pageSize + (videoInfoList.size() % pageSize == 0 ? 0 : 1);
         currentPage = 1;
@@ -152,7 +166,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
                     public void onTimeout() {
                         latch.countDown();
                     }
-                }, 30000);
+                }, 5000);
 
                 latch.await();
             } else {
@@ -169,6 +183,20 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
             }
         } catch (Exception e) {
             Timber.e(e, "PythonVideoDataSource loadMore error");
+        }
+
+        if (type == TYPE_VIDEO) {
+            for (VideoInfo videoInfo : videoInfoList) {
+                try {
+                    PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(context, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
+                    List<VideoInfo> videoSourceList = videoSourceDataSource.refresh();
+                    if (videoSourceList.size() == 1) {
+                        videoInfo.url = videoSourceList.get(0).url;
+                    }
+                } catch (Exception e) {
+                    Timber.e(e, "check videoSource exception");
+                }
+            }
         }
         return videoInfoList;
     }

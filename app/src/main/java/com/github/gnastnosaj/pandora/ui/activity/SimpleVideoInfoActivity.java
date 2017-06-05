@@ -1,12 +1,15 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -22,16 +25,13 @@ import com.github.gnastnosaj.pandora.model.VideoInfo;
 import com.shizhefei.mvc.ILoadViewFactory;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
+import com.shuyu.gsyvideoplayer.GSYVideoManager;
+import com.shuyu.gsyvideoplayer.GSYVideoPlayer;
+import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import timber.log.Timber;
 
 /**
  * Created by jasontsang on 12/26/16.
@@ -56,10 +56,21 @@ public class SimpleVideoInfoActivity extends BaseActivity {
     private VideoInfo videoInfo;
     private String title;
 
+    private boolean isFull;
+    private boolean isSmall;
+
+    @Override
+    public void onBackPressed() {
+        if (StandardGSYVideoPlayer.backFromWindowFull(this)) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_simple_video_info);
+        setContentView(R.layout.layout_coordinator_with_recycler_view);
         ButterKnife.bind(this);
 
         createDynamicBox(findViewById(R.id.swipe_refresh_layout));
@@ -81,6 +92,34 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         initContentView();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        GSYVideoManager.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        GSYVideoManager.onPause();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation != ActivityInfo.SCREEN_ORIENTATION_USER) {
+            isFull = false;
+        } else {
+            isFull = true;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        GSYVideoPlayer.releaseAllVideos();
+    }
+
     private void initContentView() {
         PythonVideoDataSource videoInfoDataSource = new PythonVideoDataSource(this, plugin, type, videoInfo == null ? null : videoInfo.id);
         SimpleVideoInfoAdapter videoInfoAdapter = new SimpleVideoInfoAdapter(this);
@@ -88,7 +127,7 @@ public class SimpleVideoInfoActivity extends BaseActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).build());
+        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).size(1).build());
         GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
@@ -110,54 +149,17 @@ public class SimpleVideoInfoActivity extends BaseActivity {
                             intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
                             startActivity(intent);
                         } else if (type == PythonVideoDataSource.TYPE_VIDEO) {
-                            showDynamicBoxCustomView(BaseActivity.DYNAMIC_BOX_AV_BALLGRIDPULSE, SimpleVideoInfoActivity.this);
-                            Observable.<List<VideoInfo>>create(subscriber -> {
-                                try {
-                                    PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(SimpleVideoInfoActivity.this, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
-                                    List<VideoInfo> videoSourceList = videoSourceDataSource.refresh();
-                                    subscriber.onNext(videoSourceList);
-                                } catch (Exception e) {
-                                    subscriber.onError(e);
-                                    Timber.e(e, "videoSourceDataSource exception");
-                                }
-                            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(videoSourceList -> {
-                                dismissDynamicBox(SimpleVideoInfoActivity.this);
-                                if (videoSourceList.size() == 1) {
-                                    VideoInfo videoSource = videoSourceList.get(0);
-                                    if (videoSource.url.startsWith("stack://")) {
-                                        title = videoSource.title;
-                                        String[] urls = videoSource.url.substring(8).split(" , ");
-                                    } else if (videoSource.url.startsWith("https")) {
-                                        Intent intent = new Intent(SimpleVideoInfoActivity.this, WebVideoViewActivity.class);
-                                        intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoSource.title);
-                                        intent.putExtra(WebVideoViewActivity.EXTRA_HREF, videoSource.url);
-                                        startActivity(intent);
-                                    } else {
-
-                                    }
-                                } else if (videoSourceList.size() > 1) {
-                                    Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
-                                    intent.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
-                                    intent.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO_INFO);
-                                    intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
-                                    startActivity(intent);
-                                }
-                            }, throwable -> {
-                                dismissDynamicBox(SimpleVideoInfoActivity.this);
-                                Timber.e(throwable, "videoSourceDataSource exception");
-                            });
-                        } else if (type == PythonVideoDataSource.TYPE_VIDEO_INFO) {
-                            if (videoInfo.url.startsWith("stack://")) {
-                                title = videoInfo.title;
-                                String[] urls = videoInfo.url.substring(8).split(" , ");
-                            } else if (videoInfo.url.startsWith("https")) {
-                                Intent intent = new Intent(SimpleVideoInfoActivity.this, WebVideoViewActivity.class);
-                                intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, videoInfo.title);
-                                intent.putExtra(WebVideoViewActivity.EXTRA_HREF, videoInfo.url);
+                            if (TextUtils.isEmpty(videoInfo.url)) {
+                                Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
+                                intent.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
+                                intent.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO_INFO);
+                                intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
                                 startActivity(intent);
                             } else {
-
+                                return false;
                             }
+                        } else if (type == PythonVideoDataSource.TYPE_VIDEO_INFO) {
+                            return false;
                         }
                     }
                     return true;
@@ -173,6 +175,31 @@ public class SimpleVideoInfoActivity extends BaseActivity {
             @Override
             public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
+            }
+        });
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            int firstVisibleItem, lastVisibleItem;
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+                lastVisibleItem = layoutManager.findLastVisibleItemPosition();
+                if (GSYVideoManager.instance().getPlayPosition() >= 0 && GSYVideoManager.instance().getPlayTag().equals(SimpleVideoInfoAdapter.PLAY_TAG)) {
+                    int position = GSYVideoManager.instance().getPlayPosition();
+                    if ((position < firstVisibleItem || position > lastVisibleItem)) {
+                        if (!isFull) {
+                            GSYVideoPlayer.releaseAllVideos();
+                        }
+                    }
+                }
             }
         });
 

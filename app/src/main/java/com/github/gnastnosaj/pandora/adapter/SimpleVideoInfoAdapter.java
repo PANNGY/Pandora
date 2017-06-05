@@ -15,7 +15,6 @@ import com.github.gnastnosaj.pandora.model.VideoInfo;
 import com.shizhefei.mvc.IDataAdapter;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
 import com.shuyu.gsyvideoplayer.listener.StandardVideoAllCallBack;
-import com.shuyu.gsyvideoplayer.utils.Debuger;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
 
 import java.util.ArrayList;
@@ -28,6 +27,7 @@ import butterknife.ButterKnife;
  * Created by Jason on 7/17/2015.
  */
 public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDataAdapter<List<VideoInfo>> {
+    public final static String PLAY_TAG = "simple_video";
 
     private Context context;
     private List<VideoInfo> videoInfoList = new ArrayList<>();
@@ -54,7 +54,18 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
         VideoInfo videoInfo = videoInfoList.get(position);
         ViewHolder holder = (ViewHolder) viewHolder;
         if (getItemViewType(position) == 2) {
-            holder.videoPlayer.setUp(videoInfo.url, true, null, videoInfo.title);
+            SimpleDraweeView thumbnail = new SimpleDraweeView(context);
+            thumbnail.setImageURI(videoInfo.thumbnail);
+            thumbnail.getHierarchy().setPlaceholderImage(R.drawable.ic_source_pandora_light);
+            holder.videoPlayer.setThumbImageView(thumbnail);
+            if (videoInfo.url.startsWith("stack://")) {
+                String[] urls = videoInfo.url.substring(8).split(" , ");
+                for (String url : urls) {
+                    holder.videoPlayer.setUp(url, true, null, videoInfo.title);
+                }
+            } else {
+                holder.videoPlayer.setUp(videoInfo.url, true, null, videoInfo.title);
+            }
             holder.videoPlayer.getBackButton().setVisibility(View.GONE);
             holder.videoPlayer.getFullscreenButton().setOnClickListener(view -> holder.videoPlayer.startWindowFullscreen(context, true, true));
             holder.videoPlayer.setRotateViewAuto(true);
@@ -65,7 +76,6 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
                 @Override
                 public void onPrepared(String url, Object... objects) {
                     super.onPrepared(url, objects);
-                    Debuger.printfLog("onPrepared");
                     if (!holder.videoPlayer.isIfCurrentIsFullscreen()) {
                         GSYVideoManager.instance().setNeedMute(true);
                     }
@@ -94,7 +104,7 @@ public class SimpleVideoInfoAdapter extends RecyclerView.Adapter implements IDat
 
     @Override
     public int getItemViewType(int position) {
-        if (!TextUtils.isEmpty(videoInfoList.get(position).url) && !videoInfoList.get(position).url.startsWith("stack://")) {
+        if (!TextUtils.isEmpty(videoInfoList.get(position).url)) {
             return 2;
         } else if (!TextUtils.isEmpty(videoInfoList.get(position).thumbnail)) {
             return 1;
