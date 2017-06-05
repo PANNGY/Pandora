@@ -71,14 +71,14 @@
         "label": "desc",
         "placeholder": "intro"
       }
-    ]
-  },
-  "tagSelector": {
-    "global": true,
-    "cssQuery": "section.page-bd div.desc_item",
-    "titleSelector": {
-      "analyzer": {
-        "method": 0
+    ],
+    "tagSelector": {
+      "global": true,
+      "cssQuery": "section.page-bd div.desc_item",
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
       }
     }
   }
