@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.Map;
 
+import cn.trinea.android.common.util.ArrayUtils;
 import cn.trinea.android.common.util.MapUtils;
 
 /**
@@ -35,6 +36,7 @@ public class JSoupSelector {
     public String placeholder;
     public JSoupPreTreat preTreat;
     public String cssQuery;
+    public JSoupSelector[] selectors;
     public JSoupFilter filter;
     public JSoupAnalyzer analyzer;
     public boolean autoLoad;
@@ -48,6 +50,26 @@ public class JSoupSelector {
     }
 
     public Elements call(Document document, Element element) {
+        Elements elements = _call(document, element);
+        if (!ArrayUtils.isEmpty(selectors)) {
+            for (JSoupSelector selector : selectors) {
+                elements.addAll(selector.call(document, element));
+            }
+        }
+        return elements;
+    }
+
+    public Elements call(Document document) {
+        Elements elements = _call(document);
+        if (!ArrayUtils.isEmpty(selectors)) {
+            for (JSoupSelector selector : selectors) {
+                elements.addAll(selector.call(document));
+            }
+        }
+        return elements;
+    }
+
+    public Elements _call(Document document, Element element) {
         Element el = global ? document : element;
         if (preTreat != null) {
             el = preTreat.treat(el);
@@ -63,7 +85,7 @@ public class JSoupSelector {
         }
     }
 
-    public Elements call(Document document) {
+    public Elements _call(Document document) {
         Element el = document;
         if (preTreat != null) {
             el = preTreat.treat(el);

@@ -74,6 +74,23 @@
         "label": "desc",
         "placeholder": "intro"
       }
-    ]
+    ],
+    "tagSelector": {
+      "global": true,
+      "cssQuery": "div.main div.ct-c dl dd",
+      "selectors": [
+        {
+          "cssQuery": "div.main div.ct-c dl dt",
+          "filter": {
+            "notQuery": ".name"
+          }
+        }
+      ],
+      "titleSelector": {
+        "analyzer": {
+          "method": 0
+        }
+      }
+    }
   }
 }

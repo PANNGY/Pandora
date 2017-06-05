@@ -155,6 +155,16 @@ public class PandoraDetailActivity extends BaseActivity {
                                     thumbnail.setController(draweeController);
                                     intro.setText(data.get(0).getAttr("intro"));
                                     play = data.get(0).getAttr("href");
+
+                                    descContainer.removeAllViews();
+                                    if (!ListUtils.isEmpty(data.get(0).tags)) {
+                                        for (JSoupLink link : data.get(0).tags) {
+                                            TextView textView = new TextView(this);
+                                            textView.setText(link.title);
+                                            textView.setTextSize(15);
+                                            descContainer.addView(textView);
+                                        }
+                                    }
                                 }
                                 dismissDynamicBox(this);
                             }, throwable -> dismissDynamicBox(this));
