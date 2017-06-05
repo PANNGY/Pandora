@@ -39,7 +39,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
     private List<VideoInfo> videoInfoList;
     private int pages;
     private int currentPage = 1;
-    private int pageSize = 10;
+    private int pageSize = 6;
 
     private boolean remote;
     private VideoInfo next;
@@ -102,25 +102,24 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
 
         latch.await();
 
-        if (type == TYPE_VIDEO) {
-            for (VideoInfo videoInfo : videoInfoList) {
-                try {
-                    PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(context, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
-                    List<VideoInfo> videoSourceList = videoSourceDataSource.refresh();
-                    if (videoSourceList.size() == 1) {
-                        videoInfo.url = videoSourceList.get(0).url;
-                    }
-                } catch (Exception e) {
-                    Timber.e(e, "check videoSource exception");
-                }
-            }
-        }
-
         pages = videoInfoList.size() / pageSize + (videoInfoList.size() % pageSize == 0 ? 0 : 1);
         currentPage = 1;
 
         if (next != null) {
             remote = true;
+            if (type == TYPE_VIDEO) {
+                for (VideoInfo videoInfo : videoInfoList) {
+                    try {
+                        PythonVideoDataSource videoSourceDataSource = new PythonVideoDataSource(context, plugin, PythonVideoDataSource.TYPE_VIDEO_INFO, videoInfo.id);
+                        List<VideoInfo> videoSourceList = videoSourceDataSource.refresh();
+                        if (videoSourceList.size() == 1) {
+                            videoInfo.url = videoSourceList.get(0).url;
+                        }
+                    } catch (Exception e) {
+                        Timber.e(e, "check videoSource exception");
+                    }
+                }
+            }
             return videoInfoList;
         } else {
             return loadMore();
