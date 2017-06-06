@@ -71,6 +71,14 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
     private String frameSrc;
 
     @Override
+    public void onBackPressed() {
+        if (StandardGSYVideoPlayer.backFromWindowFull(this)) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pandora_web_video_view);
@@ -152,12 +160,6 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
         }
         GSYVideoManager.onPause();
     }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
-
 
     @Override
     protected void onDestroy() {

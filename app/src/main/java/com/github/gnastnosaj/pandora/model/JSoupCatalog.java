@@ -44,7 +44,7 @@ public class JSoupCatalog extends RealmObject implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.link, flags);
-        dest.writeTypedList(this.tags);
+        dest.writeList(this.tags);
     }
 
     public JSoupCatalog() {
