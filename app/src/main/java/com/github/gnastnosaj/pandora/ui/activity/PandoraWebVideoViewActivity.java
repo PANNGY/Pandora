@@ -330,6 +330,7 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
                     videoPlayer.setLockLand(true);
                     videoPlayer.setShowFullAnimation(true);
                     videoPlayer.setNeedLockFull(true);
+                    videoPlayer.findViewById(R.id.start).performClick();
                     dismissDynamicBox(PandoraWebVideoViewActivity.this);
                 } else {
                     webView.loadUrl(videoSrc);

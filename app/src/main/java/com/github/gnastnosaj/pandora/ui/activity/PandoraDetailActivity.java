@@ -6,6 +6,7 @@ import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -90,6 +91,7 @@ public class PandoraDetailActivity extends BaseActivity {
     private String href;
 
     private String play;
+    private List<JSoupCatalog> resource;
     private boolean favourite;
 
     private RealmConfiguration favouriteRealmConfiguration;
@@ -185,6 +187,7 @@ public class PandoraDetailActivity extends BaseActivity {
                             .compose(bindUntilEvent(ActivityEvent.DESTROY))
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe(data -> {
+                                resource = data;
                                 resourceContainer.removeAllViews();
                                 for (int i = 0; i < data.size(); i++) {
                                     JSoupCatalog catalog = (JSoupCatalog) data.get(i);
@@ -223,7 +226,7 @@ public class PandoraDetailActivity extends BaseActivity {
                 .icon(MaterialDesignIconic.Icon.gmi_share)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_play).setIcon(new IconicsDrawable(this)
-                .icon(MaterialDesignIconic.Icon.gmi_cloud)
+                .icon(MaterialDesignIconic.Icon.gmi_youtube_play)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_label_heart)
@@ -281,6 +284,21 @@ public class PandoraDetailActivity extends BaseActivity {
                 });
                 return true;
             case R.id.action_play:
+                try {
+                    String url = TextUtils.isEmpty(play) ? resource.get(0).tags.get(0).url : play;
+                    if (!TextUtils.isEmpty(url)) {
+                        Intent intent = new Intent(this, PandoraWebVideoViewActivity.class);
+                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url);
+                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title);
+                        intent.putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) resource);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                        startActivity(intent);
+                    } else {
+                        Snackbar.make(swipeRefreshLayout, R.string.search_result_not_found, Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Snackbar.make(swipeRefreshLayout, R.string.search_result_not_found, Snackbar.LENGTH_SHORT).show();
+                }
                 return true;
             case R.id.action_favourite:
                 if (data != null) {
