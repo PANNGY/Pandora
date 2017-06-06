@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.next.tagview.TagCloudView;
 
 /**
@@ -73,6 +74,7 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pandora_web_video_view);
+        ButterKnife.bind(this);
 
         createDynamicBox(findViewById(R.id.video_container));
 
@@ -187,7 +189,7 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
                 onBackPressed();
                 return true;
             case R.id.action_share:
-                ShareHelper.share(this, new ShareParamText(title, href));
+                ShareHelper.share(this, new ShareParamText(title, TextUtils.isEmpty(videoHref) ? href : videoHref));
                 return true;
             case R.id.action_open_with_browser:
                 if (!TextUtils.isEmpty(href)) {
