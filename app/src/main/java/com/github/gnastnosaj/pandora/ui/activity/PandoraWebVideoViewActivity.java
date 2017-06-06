@@ -194,7 +194,11 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
                 ShareHelper.share(this, new ShareParamText(title, TextUtils.isEmpty(videoHref) ? href : videoHref));
                 return true;
             case R.id.action_open_with_browser:
-                if (!TextUtils.isEmpty(href)) {
+                if (!TextUtils.isEmpty(videoHref)) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(videoHref));
+                    startActivity(intent);
+                } else if (!TextUtils.isEmpty(href)) {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(href));
                     startActivity(intent);
