@@ -109,4 +109,7 @@
     <string name="adult_warning_not_18">私は18歳ではない</string>
 
     <string name="video_player_error">現在の資源放送存在ミスを後にしてくださいリトライ</string>
+
+    <string name="detail_resource">資源</string>
+    <string name="detail_intro">映画の紹介</string>
 </resources>

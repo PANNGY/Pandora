@@ -109,4 +109,7 @@
     <string name="adult_warning_not_18">未滿18周歲</string>
 
     <string name="video_player_error">播放當前資源存在錯誤，請稍後重試</string>
+
+    <string name="detail_resource">資源</string>
+    <string name="detail_intro">內容介紹</string>
 </resources>
