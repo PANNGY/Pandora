@@ -1,10 +1,8 @@
 {
   "latestVersion": "1.0.0",
   "latestVersionCode": 1,
-  "url": "https://staticlive.douyucdn.cn/upload/client/douyu_client_1_0v2_4_8_1.apk",
+  "url": "https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/app-release.apk",
   "releaseNotes": [
-    "- First evolution",
-    "- Second evolution",
-    "- Bug fixes"
+    "- The New IMAX+"
   ]
 }
