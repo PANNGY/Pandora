@@ -1,8 +1,10 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -196,6 +198,12 @@ public class PandoraDetailActivity extends BaseActivity {
                                     resourceCloudView.setTags(tagList);
                                     resourceCloudView.setOnTagClickListener((item) -> {
                                         String url = catalog.tags.get(item).url;
+                                        Intent intent = new Intent(this, PandoraWebVideoViewActivity.class);
+                                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url);
+                                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title);
+                                        intent.putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) data);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                        startActivity(intent);
                                     });
                                     resourceContainer.addView(resourceView);
                                 }

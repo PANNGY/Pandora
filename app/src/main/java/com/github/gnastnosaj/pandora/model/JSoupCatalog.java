@@ -1,5 +1,8 @@
 package com.github.gnastnosaj.pandora.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +13,7 @@ import io.realm.RealmObject;
  * Created by jasontsang on 5/2/17.
  */
 
-public class JSoupCatalog extends RealmObject {
+public class JSoupCatalog extends RealmObject implements Parcelable {
     public JSoupLink link;
     public RealmList<JSoupLink> tags;
 
@@ -32,4 +35,36 @@ public class JSoupCatalog extends RealmObject {
         }
         return catalog;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.link, flags);
+        dest.writeTypedList(this.tags);
+    }
+
+    public JSoupCatalog() {
+    }
+
+    protected JSoupCatalog(Parcel in) {
+        this.link = in.readParcelable(JSoupLink.class.getClassLoader());
+        this.tags = new RealmList<>();
+        in.readList(this.tags, JSoupLink.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<JSoupCatalog> CREATOR = new Parcelable.Creator<JSoupCatalog>() {
+        @Override
+        public JSoupCatalog createFromParcel(Parcel source) {
+            return new JSoupCatalog(source);
+        }
+
+        @Override
+        public JSoupCatalog[] newArray(int size) {
+            return new JSoupCatalog[size];
+        }
+    };
 }
