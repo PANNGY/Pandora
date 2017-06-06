@@ -1,6 +1,6 @@
 <resources>
     <string name="area">en</string>
-    <string name="app_name">Pandora</string>
+    <string name="app_name">IMAX+</string>
 
     <string name="application_info_title">Application Info</string>
     <string name="application_info_text" formatted="false">
@@ -46,7 +46,7 @@
 
     <string name="splash_slogan">It was a time filled with wonder that I\'ll always remember.</string>
     <string name="splash_version">V %1$s</string>
-    <string name="splash_copyright">Copyright &#169; %1$s Pandora All Rights Reserved\nPower by Jason Tsang</string>
+    <string name="splash_copyright">Copyright &#169; %1$s IMAX+ All Rights Reserved\nPower by Jason Tsang</string>
 
     <string name="drawer_item_plugin_center">Plugin Center</string>
     <string name="drawer_item_section_plugins">Section Plugins</string>
@@ -76,7 +76,7 @@
     <string name="search_result_not_found">⊙﹏⊙‖∣°Tragedy, no resources available. Please try again...</string>
     <string name="search_result_found">＾(￣）￣)《(￣）￣)＾Hey, found that available resources, driving safety attention yo～</string>
 
-    <string name="share_pandora">Found a welfare App "Pandora", free to watch popular movies, more hidden benefits and so you come to dig, recommendation ~:http://fir.im/vrbx is great!</string>
+    <string name="share_pandora">Found a welfare App "IMAX+", free to watch popular movies, more hidden benefits and so you come to dig, recommendation ~:http://fir.im/vrbx is great!</string>
 
     <string name="save_to_phone">Saving to phone?</string>
     <string name="save_do">Saving</string>
@@ -90,7 +90,7 @@
     <string name="about_features">Features</string>
     <string name="about_help_and_feedback">Help &#038; Feedback</string>
     <string name="about_check_for_updates">Check for Updates</string>
-    <string name="about_version">Pandora %1$s</string>
+    <string name="about_version">IMAX+ %1$s</string>
     <string name="about_copyright">Copyright &#169; %1$s Jason Tsang.\nAll Rights Reserved.</string>
 
     <string name="url_update">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>

@@ -199,8 +199,8 @@ public class PandoraActivity extends BaseActivity {
                 .addStickyDrawerItems(
                         new SecondaryDrawerItem().withName(R.string.drawer_item_help).withIdentifier(R.string.drawer_item_help).withIcon(MaterialDesignIconic.Icon.gmi_help).withSelectable(false),
                         new SecondaryDrawerItem().withName(R.string.drawer_item_open_source).withIdentifier(R.string.drawer_item_open_source).withIcon(MaterialDesignIconic.Icon.gmi_github).withSelectable(false),
-                        new SecondaryDrawerItem().withName(R.string.drawer_item_terminal).withIdentifier(R.string.drawer_item_terminal).withIcon(Octicons.Icon.oct_terminal).withSelectable(false),
-                        new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIdentifier(R.string.drawer_item_settings).withIcon(MaterialDesignIconic.Icon.gmi_settings).withSelectable(false),
+                        //new SecondaryDrawerItem().withName(R.string.drawer_item_terminal).withIdentifier(R.string.drawer_item_terminal).withIcon(Octicons.Icon.oct_terminal).withSelectable(false),
+                        //new SecondaryDrawerItem().withName(R.string.drawer_item_settings).withIdentifier(R.string.drawer_item_settings).withIcon(MaterialDesignIconic.Icon.gmi_settings).withSelectable(false),
                         new SwitchDrawerItem().withName(R.string.drawer_item_nsw).withIdentifier(R.string.drawer_item_nsw).withIcon(Octicons.Icon.oct_eye).withSelectable(false).withChecked(sharedPreferences.getBoolean(Pandora.PRE_PRO_VERSION, false)).withOnCheckedChangeListener((drawerItem, buttonView, isChecked) -> {
                             SharedPreferences.Editor editor = sharedPreferences.edit();
                             editor.putBoolean(Pandora.PRE_PRO_VERSION, isChecked);

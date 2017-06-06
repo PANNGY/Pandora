@@ -1,6 +1,6 @@
 <resources>
     <string name="area">ja</string>
-    <string name="app_name">Pandora</string>
+    <string name="app_name">IMAX</string>
 
     <string name="application_info_title">Application Info</string>
     <string name="application_info_text" formatted="false">
@@ -46,7 +46,7 @@
 
     <string name="splash_slogan">秋には名山に歩行者がまばらに、常にドライバーが高低を競う。今は車道があり、当時の運転手は見ない</string>
     <string name="splash_version">V %1$s</string>
-    <string name="splash_copyright">Copyright &#169; %1$s Pandora All Rights Reserved\nPower by Jason Tsang</string>
+    <string name="splash_copyright">Copyright &#169; %1$s IMAX+ All Rights Reserved\nPower by Jason Tsang</string>
 
     <string name="drawer_item_plugin_center">拡張機能</string>
     <string name="drawer_item_section_plugins">アプリ</string>
@@ -76,7 +76,7 @@
     <string name="search_result_not_found">⊙﹏⊙‖∣° 悲劇、未利用の資源を探し当てて、再試して下さい...</string>
     <string name="search_result_found">＾(￣）￣)《(￣）￣)＾へへへ、資源、車で安全に注意を注意することを発見することを発見します～</string>
 
-    <string name="share_pandora">発見した一本の福祉アプリ「Pandora」、性感美女写真唯美の大本営が隠し福祉待って発掘し、かっこよかった！推薦～：http://fir.im/vrbx</string>
+    <string name="share_pandora">発見した一本の福祉アプリ「IMAX+」、性感美女写真唯美の大本営が隠し福祉待って発掘し、かっこよかった！推薦～：http://fir.im/vrbx</string>
 
     <string name="save_to_phone">アルバムに保存してある？</string>
     <string name="save_do">保存</string>
@@ -90,7 +90,7 @@
     <string name="about_features">機能</string>
     <string name="about_help_and_feedback">助け &#038; フィードバック</string>
     <string name="about_check_for_updates">更新のチェック</string>
-    <string name="about_version">Pandora %1$s</string>
+    <string name="about_version">IMAX+ %1$s</string>
     <string name="about_copyright">Copyright &#169; %1$s Jason Tsang.\nAll Rights Reserved.</string>
 
     <string name="url_update">https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/service/update.json</string>
