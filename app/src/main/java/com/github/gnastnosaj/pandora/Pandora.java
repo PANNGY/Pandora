@@ -9,8 +9,6 @@ import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.mvchelper.LoadViewFactory;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
 import com.googlecode.android_scripting.BaseApplication;
-import com.mikepenz.glyphter_typeface_library.Glyphter;
-import com.mikepenz.iconics.Iconics;
 import com.shizhefei.mvc.MVCHelper;
 
 import java.io.IOException;
