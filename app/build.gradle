@@ -41,7 +41,9 @@ dependencies {
     }
     compile('com.github.gnastnosaj:Boilerplate:6708157') {
         exclude group: 'com.android.support'
+        exclude group: 'com.google.code.gson'
     }
+    compile 'com.google.code.gson:gson:+'
     compile 'com.jakewharton:butterknife:+'
     annotationProcessor 'com.jakewharton:butterknife-compiler:+'
     compile 'com.github.javiersantos:AppUpdater:+'
