@@ -112,4 +112,6 @@
 
     <string name="detail_resource">資源</string>
     <string name="detail_intro">映画の紹介</string>
+
+    <string name="define_font_Glyphter">com.mikepenz.glyphter_typeface_library.Glyphter</string>
 </resources>

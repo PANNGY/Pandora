@@ -29,6 +29,7 @@ import com.github.gnastnosaj.pandora.model.JSoupCatalog;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
 import com.github.gnastnosaj.pandora.util.ShareHelper;
+import com.mikepenz.glyphter_typeface_library.Glyphter;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.trello.rxlifecycle2.android.ActivityEvent;
@@ -60,6 +61,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
     public final static String EXTRA_TITLE = "title";
     public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
     public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
+    public final static String EXTRA_MODEL_DATASOURCE = "model_datasource";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -81,6 +83,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
     private String title;
     private String tabDataSource;
     private String galleryDataSource;
+    private String modelDataSource;
 
     private static Map<String, List> catalogMap = new HashMap<>();
     private static Map<String, List<JSoupLink>> tabMap = new HashMap<>();
@@ -112,6 +115,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
         title = getIntent().getStringExtra(EXTRA_TITLE);
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
         galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
+        modelDataSource = getIntent().getStringExtra(EXTRA_MODEL_DATASOURCE);
 
         setTitle(TextUtils.isEmpty(title) ? "" : title);
         ActionBar actionBar = getSupportActionBar();
@@ -131,6 +135,9 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_share).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_share)
+                .color(Color.WHITE).sizeDp(18));
+        menu.findItem(R.id.action_model).setIcon(new IconicsDrawable(this)
+                .icon(Glyphter.Icon.gly_noun_25619_cc)
                 .color(Color.WHITE).sizeDp(18));
         menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_label_heart)
