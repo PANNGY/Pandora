@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import android.text.TextUtils;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
@@ -20,6 +21,8 @@ import com.googlecode.android_scripting.BaseApplication;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Created by jasontsang on 6/1/17.
@@ -56,10 +60,21 @@ public class PluginService {
 
     public static void startPlugin(Context context, Plugin plugin) {
         if (plugin.type == Plugin.TYPE_JSOUP_GALLERY) {
-            context.startActivity(new Intent(context, SimpleViewPagerActivity.class)
+            Intent i = new Intent(context, SimpleViewPagerActivity.class)
                     .putExtra(SimpleViewPagerActivity.EXTRA_TITLE, plugin.name)
                     .putExtra(SimpleViewPagerActivity.EXTRA_TAB_DATASOURCE, plugin.reference + "-tab")
-                    .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery"));
+                    .putExtra(SimpleViewPagerActivity.EXTRA_GALLERY_DATASOURCE, plugin.reference + "-gallery");
+            if (!TextUtils.isEmpty(plugin.args)) {
+                try {
+                    JSONObject args = new JSONObject(plugin.args);
+                    if (args.getBoolean("model")) {
+                        i = i.putExtra(SimpleViewPagerActivity.EXTRA_MODEL_DATASOURCE, plugin.reference + "-model");
+                    }
+                } catch (Exception e) {
+                    Timber.e(e);
+                }
+            }
+            context.startActivity(i);
         } else if (plugin.type == Plugin.TYPE_PYTHON_VIDEO) {
             if (PythonForAndroid.isInitialized()) {
                 startPythonPlugin(context, plugin);
