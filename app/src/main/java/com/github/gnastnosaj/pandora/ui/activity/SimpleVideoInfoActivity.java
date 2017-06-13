@@ -143,18 +143,16 @@ public class SimpleVideoInfoActivity extends BaseActivity {
                     if (-1 < childPosition && childPosition < videoInfoAdapter.getData().size()) {
                         VideoInfo videoInfo = videoInfoAdapter.getData().get(childPosition);
                         if (type == PythonVideoDataSource.TYPE_CATEGORY) {
-                            Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
-                            intent.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
-                            intent.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO);
-                            intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
-                            startActivity(intent);
+                            startActivity(new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class)
+                                    .putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin)
+                                    .putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO)
+                                    .putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo));
                         } else if (type == PythonVideoDataSource.TYPE_VIDEO) {
                             if (TextUtils.isEmpty(videoInfo.url)) {
-                                Intent intent = new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class);
-                                intent.putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin);
-                                intent.putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO_INFO);
-                                intent.putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo);
-                                startActivity(intent);
+                                startActivity(new Intent(SimpleVideoInfoActivity.this, SimpleVideoInfoActivity.class)
+                                        .putExtra(SimpleVideoInfoActivity.EXTRA_PLUGIN, plugin)
+                                        .putExtra(SimpleVideoInfoActivity.EXTRA_TYPE, PythonVideoDataSource.TYPE_VIDEO_INFO)
+                                        .putExtra(SimpleVideoInfoActivity.EXTRA_VIDEO_INFO, videoInfo));
                             } else {
                                 return false;
                             }

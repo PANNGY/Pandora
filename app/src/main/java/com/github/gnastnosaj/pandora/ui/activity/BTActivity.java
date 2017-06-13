@@ -36,7 +36,6 @@ import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 import java.util.List;
 
 import br.com.mauker.materialsearchview.MaterialSearchView;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
@@ -132,7 +131,7 @@ public class BTActivity extends BaseActivity {
         });
         searchView.setOnItemClickListener((adapterView, view, i, l) -> {
             try {
-                ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+                ListView suggestionsListView = searchView.findViewById(R.id.suggestion_list);
                 if (suggestionsListView.getHeaderViewsCount() > 0) {
                     if (i == 0) {
                         searchView.clearAll();
@@ -155,7 +154,7 @@ public class BTActivity extends BaseActivity {
             }
         });
         try {
-            ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+            ListView suggestionsListView = searchView.findViewById(R.id.suggestion_list);
             if (suggestionsListView.getHeaderViewsCount() == 0) {
                 View deleteIconView = getLayoutInflater().inflate(R.layout.view_search_delete, null);
                 suggestionsListView.addHeaderView(deleteIconView);
@@ -207,10 +206,9 @@ public class BTActivity extends BaseActivity {
                     if (-1 < childPosition && childPosition < btAdapter.getData().size()) {
                         JSoupData jsoupData = btAdapter.getData().get(childPosition);
                         Uri uri = Uri.parse(jsoupData.getAttr("magnet"));
-                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                        intent.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword);
-                        intent.putExtra(WebVideoViewActivity.EXTRA_TITLE, jsoupData.getAttr("title"));
-                        startActivity(intent);
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri)
+                                .putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword)
+                                .putExtra(WebVideoViewActivity.EXTRA_TITLE, jsoupData.getAttr("title")));
                     }
                     return true;
                 } else {

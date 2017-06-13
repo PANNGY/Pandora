@@ -97,9 +97,8 @@ public class PandoraTabFragment extends Fragment {
                         if (model.type == Model.TYPE_VALUE_SLIDE) {
                             Bundle bundle = ((SliderLayout) childView).getCurrentSlider().getBundle();
                             JSoupData data = bundle.getParcelable(PandoraHomeAdapter.SLIDE_BUNDLE_DATA);
-                            Intent i = new Intent(getContext(), PandoraDetailActivity.class);
-                            i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
-                            startActivity(i);
+                            startActivity(new Intent(getContext(), PandoraDetailActivity.class)
+                                    .putExtra(PandoraDetailActivity.EXTRA_DATA, data));
                         } else if (model.type == Model.TYPE_VALUE_GROUP) {
                             String[] groups = pandoraHomeDataSource.getGroups();
                             for (int i = 0; i < groups.length; i++) {
@@ -111,9 +110,8 @@ public class PandoraTabFragment extends Fragment {
                             }
                         } else if (model.type == Model.TYPE_VALUE_DATA) {
                             JSoupData data = (JSoupData) model.data;
-                            Intent i = new Intent(getContext(), PandoraDetailActivity.class);
-                            i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
-                            startActivity(i);
+                            startActivity(new Intent(getContext(), PandoraDetailActivity.class)
+                                    .putExtra(PandoraDetailActivity.EXTRA_DATA, data));
                         }
                     }
                     return true;
@@ -154,9 +152,8 @@ public class PandoraTabFragment extends Fragment {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < pandoraTabAdapter.getData().size()) {
                         JSoupData data = pandoraTabAdapter.getData().get(childPosition);
-                        Intent i = new Intent(getContext(), PandoraDetailActivity.class);
-                        i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
-                        startActivity(i);
+                        startActivity(new Intent(getContext(), PandoraDetailActivity.class)
+                                .putExtra(PandoraDetailActivity.EXTRA_DATA, data));
                     }
                     return true;
                 }

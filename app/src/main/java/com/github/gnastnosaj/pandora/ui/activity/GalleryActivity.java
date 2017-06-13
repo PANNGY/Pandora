@@ -141,12 +141,11 @@ public class GalleryActivity extends BaseActivity {
                     }
                     tagCloudView.setTags(tags);
                     tagCloudView.setOnTagClickListener(position -> {
-                        Intent intent = new Intent(this, SimpleTabActivity.class);
-                        intent.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
-                        intent.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                        intent.putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position));
-                        intent.putExtra(SimpleTabActivity.EXTRA_HREF, tagEvent.tags.get(position).url);
-                        startActivity(intent);
+                        startActivity(new Intent(this, SimpleTabActivity.class)
+                                .putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                                .putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource)
+                                .putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position))
+                                .putExtra(SimpleTabActivity.EXTRA_HREF, tagEvent.tags.get(position).url));
                     });
                 });
 
@@ -271,10 +270,9 @@ public class GalleryActivity extends BaseActivity {
                         .subscribe(archiveEvent -> {
                             if (archiveEvent != null) {
                                 Uri uri = Uri.parse(archiveEvent.magnet);
-                                Intent i = new Intent(Intent.ACTION_VIEW, uri);
-                                i.putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword);
-                                i.putExtra(WebVideoViewActivity.EXTRA_TITLE, title);
-                                startActivity(i);
+                                startActivity(new Intent(Intent.ACTION_VIEW, uri)
+                                        .putExtra(WebVideoViewActivity.EXTRA_KEYWORD, keyword)
+                                        .putExtra(WebVideoViewActivity.EXTRA_TITLE, title));
                             }
                         });
                 return true;
@@ -307,10 +305,9 @@ public class GalleryActivity extends BaseActivity {
                 }
                 return true;
             case R.id.action_mosaic:
-                Intent i = new Intent(this, MosaicActivity.class);
-                i.putExtra(MosaicActivity.EXTRA_TITLE, title);
-                i.putExtra(MosaicActivity.EXTRA_URL, galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail"));
-                startActivity(i);
+                startActivity(new Intent(this, MosaicActivity.class)
+                        .putExtra(MosaicActivity.EXTRA_TITLE, title)
+                        .putExtra(MosaicActivity.EXTRA_URL, galleryAdapter.getData().get(viewPager.getCurrentItem()).getAttr("thumbnail")));
                 return true;
         }
         return super.onOptionsItemSelected(item);

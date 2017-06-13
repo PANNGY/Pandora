@@ -132,12 +132,11 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
             resourceCloudView.setTags(tagList);
             resourceCloudView.setOnTagClickListener((item) -> {
                 String url = catalog.tags.get(item).url;
-                Intent intent = new Intent(this, PandoraWebVideoViewActivity.class);
-                intent.putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url);
-                intent.putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title);
-                intent.putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) resource);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(intent);
+                startActivity(new Intent(this, PandoraWebVideoViewActivity.class)
+                        .putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url)
+                        .putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title)
+                        .putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) resource)
+                        .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
             });
             resourceContainer.addView(resourceView);
         }
@@ -195,13 +194,11 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
                 return true;
             case R.id.action_open_with_browser:
                 if (!TextUtils.isEmpty(videoHref)) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(videoHref));
-                    startActivity(intent);
+                    startActivity(new Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(videoHref)));
                 } else if (!TextUtils.isEmpty(href)) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(href));
-                    startActivity(intent);
+                    startActivity(new Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(href)));
                 }
                 return true;
         }

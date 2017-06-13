@@ -141,10 +141,9 @@ public class PandoraActivity extends BaseActivity {
                 ShareHelper.share(this, new ShareParamText(getResources().getString(R.string.action_share), getResources().getString(R.string.share_pandora)));
                 return true;
             case R.id.action_favourite:
-                Intent i = new Intent(this, PandoraTabActivity.class);
-                i.putExtra(PandoraTabActivity.EXTRA_TYPE, PandoraTabActivity.TYPE_FAVOURITE);
-                i.putExtra(PandoraTabActivity.EXTRA_TITLE, getResources().getString(R.string.action_favourite));
-                startActivity(i);
+                startActivity(new Intent(this, PandoraTabActivity.class)
+                        .putExtra(PandoraTabActivity.EXTRA_TYPE, PandoraTabActivity.TYPE_FAVOURITE)
+                        .putExtra(PandoraTabActivity.EXTRA_TITLE, getResources().getString(R.string.action_favourite)));
                 return true;
             case R.id.action_about:
                 startActivity(new Intent(this, AboutActivity.class));
@@ -162,10 +161,9 @@ public class PandoraActivity extends BaseActivity {
             drawer.closeDrawer();
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_BACK) {
-            Intent i = new Intent(Intent.ACTION_MAIN);
-            i.addCategory(Intent.CATEGORY_HOME);
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
+            startActivity(new Intent(Intent.ACTION_MAIN)
+                    .addCategory(Intent.CATEGORY_HOME)
+                    .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             return true;
         }
 

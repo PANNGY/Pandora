@@ -288,14 +288,13 @@ public class SimpleViewPagerActivity extends BaseActivity {
                         tags.add(link.title);
                     }
                     tagCloudView.setTags(tags);
-                    tagCloudView.setOnTagClickListener(position -> {
-                        Intent intent = new Intent(this, SimpleTabActivity.class);
-                        intent.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
-                        intent.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                        intent.putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position));
-                        intent.putExtra(SimpleTabActivity.EXTRA_HREF, jsoupCatalog.tags.get(position).url);
-                        startActivity(intent);
-                    });
+                    tagCloudView.setOnTagClickListener(position ->
+                            startActivity(new Intent(this, SimpleTabActivity.class)
+                                    .putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                                    .putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource)
+                                    .putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position))
+                                    .putExtra(SimpleTabActivity.EXTRA_HREF, jsoupCatalog.tags.get(position).url))
+                    );
                     suggestionsListView.addFooterView(tagGroupView);
                 }
             } else {
@@ -308,14 +307,13 @@ public class SimpleViewPagerActivity extends BaseActivity {
                     tags.add(link.title);
                 }
                 tagCloudView.setTags(tags);
-                tagCloudView.setOnTagClickListener(position -> {
-                    Intent intent = new Intent(this, SimpleTabActivity.class);
-                    intent.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
-                    intent.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                    intent.putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position));
-                    intent.putExtra(SimpleTabActivity.EXTRA_HREF, catalog.get(position).url);
-                    startActivity(intent);
-                });
+                tagCloudView.setOnTagClickListener(position ->
+                        startActivity(new Intent(this, SimpleTabActivity.class)
+                                .putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                                .putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource)
+                                .putExtra(SimpleTabActivity.EXTRA_TITLE, tags.get(position))
+                                .putExtra(SimpleTabActivity.EXTRA_HREF, catalog.get(position).url))
+                );
                 suggestionsListView.addFooterView(tagGroupView);
             }
         }

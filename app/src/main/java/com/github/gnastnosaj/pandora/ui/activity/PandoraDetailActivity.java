@@ -201,12 +201,11 @@ public class PandoraDetailActivity extends BaseActivity {
                                     resourceCloudView.setTags(tagList);
                                     resourceCloudView.setOnTagClickListener((item) -> {
                                         String url = catalog.tags.get(item).url;
-                                        Intent intent = new Intent(this, PandoraWebVideoViewActivity.class);
-                                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url);
-                                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title);
-                                        intent.putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) data);
-                                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                                        startActivity(intent);
+                                        startActivity(new Intent(this, PandoraWebVideoViewActivity.class)
+                                                .putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url)
+                                                .putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title)
+                                                .putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) data)
+                                                .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
                                     });
                                     resourceContainer.addView(resourceView);
                                 }
@@ -287,12 +286,11 @@ public class PandoraDetailActivity extends BaseActivity {
                 try {
                     String url = TextUtils.isEmpty(play) ? resource.get(0).tags.get(0).url : play;
                     if (!TextUtils.isEmpty(url)) {
-                        Intent intent = new Intent(this, PandoraWebVideoViewActivity.class);
-                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url);
-                        intent.putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title);
-                        intent.putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) resource);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                        startActivity(intent);
+                        startActivity(new Intent(this, PandoraWebVideoViewActivity.class)
+                                .putExtra(PandoraWebVideoViewActivity.EXTRA_HREF, url)
+                                .putExtra(PandoraWebVideoViewActivity.EXTRA_TITLE, title)
+                                .putParcelableArrayListExtra(PandoraWebVideoViewActivity.EXTRA_RESOURCE, (ArrayList<? extends Parcelable>) resource)
+                                .setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
                     } else {
                         Snackbar.make(swipeRefreshLayout, R.string.search_result_not_found, Snackbar.LENGTH_SHORT).show();
                     }

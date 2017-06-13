@@ -1,5 +1,6 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
@@ -28,6 +29,7 @@ import butterknife.ButterKnife;
 
 public class ModelActivity extends BaseActivity {
     public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
+    public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
     public final static String EXTRA_MODEL_DATASOURCE = "model_datasource";
 
     @BindView(R.id.toolbar)
@@ -40,6 +42,7 @@ public class ModelActivity extends BaseActivity {
     RecyclerView recyclerView;
 
     private String tabDataSource;
+    private String galleryDataSource;
     private String modelDataSource;
 
 
@@ -53,6 +56,7 @@ public class ModelActivity extends BaseActivity {
         initSystemBar();
 
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
+        galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
         modelDataSource = getIntent().getStringExtra(EXTRA_MODEL_DATASOURCE);
 
         setTitle(R.string.action_model);
@@ -97,7 +101,11 @@ public class ModelActivity extends BaseActivity {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < modelAdapter.getData().size()) {
                         JSoupData data = modelAdapter.getData().get(childPosition);
-
+                        startActivity(new Intent(ModelActivity.this, SimpleTabActivity.class)
+                                .putExtra(SimpleTabActivity.EXTRA_TITLE, data.getAttr("title"))
+                                .putExtra(SimpleTabActivity.EXTRA_HREF, data.getAttr("href"))
+                                .putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                                .putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource));
                     }
                     return true;
                 }

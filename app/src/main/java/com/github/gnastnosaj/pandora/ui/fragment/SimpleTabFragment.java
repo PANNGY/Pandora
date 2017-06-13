@@ -84,11 +84,10 @@ public class SimpleTabFragment extends Fragment {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
                         JSoupData data = simpleTabAdapter.getData().get(childPosition);
-                        Intent i = new Intent(getContext(), GalleryActivity.class);
-                        i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
-                        i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                        i.putExtra(GalleryActivity.EXTRA_DATA, data);
-                        startActivity(i);
+                        startActivity(new Intent(getContext(), GalleryActivity.class)
+                                .putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                                .putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource)
+                                .putExtra(GalleryActivity.EXTRA_DATA, data));
                     }
                     return true;
                 }

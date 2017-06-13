@@ -27,7 +27,7 @@ public class ModelAdapter extends RecyclerView.Adapter implements IDataAdapter<L
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_card_contains_ratio_image, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_thumbnail_title_rank, parent, false);
         return new ViewHolder(v);
     }
 

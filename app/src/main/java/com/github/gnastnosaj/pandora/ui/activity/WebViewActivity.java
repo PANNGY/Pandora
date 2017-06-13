@@ -196,9 +196,8 @@ public class WebViewActivity extends BaseActivity {
                 return true;
             case R.id.action_open_with_browser:
                 if (!TextUtils.isEmpty(href)) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(href));
-                    startActivity(intent);
+                    startActivity(new Intent(Intent.ACTION_VIEW)
+                            .setData(Uri.parse(href)));
                 }
                 return true;
         }

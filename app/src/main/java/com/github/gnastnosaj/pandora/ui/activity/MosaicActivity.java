@@ -154,8 +154,7 @@ public class MosaicActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(filePath -> {
                     Snackbar.make(mosaicView, getResources().getString(R.string.save_picture_success, filePath), Snackbar.LENGTH_SHORT).show();
-                    Intent scannerIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(filePath)));
-                    sendBroadcast(scannerIntent);
+                    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(filePath))));
                 });
     }
 }

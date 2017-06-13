@@ -75,16 +75,14 @@ public class AboutActivity extends BaseActivity implements View.OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.about_features:
-                Intent featuresIntent = new Intent(this, WebViewActivity.class);
-                featuresIntent.putExtra(WebViewActivity.EXTRA_TITLE, getResources().getString(R.string.about_features));
-                featuresIntent.putExtra(WebViewActivity.EXTRA_HREF, getResources().getString(R.string.url_features));
-                startActivity(featuresIntent);
+                startActivity(new Intent(this, WebViewActivity.class)
+                        .putExtra(WebViewActivity.EXTRA_TITLE, getResources().getString(R.string.about_features))
+                        .putExtra(WebViewActivity.EXTRA_HREF, getResources().getString(R.string.url_features)));
                 break;
             case R.id.about_help_and_feedback:
-                Intent helpIntent = new Intent(this, WebViewActivity.class);
-                helpIntent.putExtra(WebViewActivity.EXTRA_TITLE, getResources().getString(R.string.about_help_and_feedback));
-                helpIntent.putExtra(WebViewActivity.EXTRA_HREF, getResources().getString(R.string.url_help_and_feedback));
-                startActivity(helpIntent);
+                startActivity(new Intent(this, WebViewActivity.class)
+                        .putExtra(WebViewActivity.EXTRA_TITLE, getResources().getString(R.string.about_help_and_feedback))
+                        .putExtra(WebViewActivity.EXTRA_HREF, getResources().getString(R.string.url_help_and_feedback)));
                 break;
             case R.id.about_check_for_updates:
                 UpdateService.checkForUpdate(this);

@@ -100,9 +100,8 @@ public class OpenSourceActivity extends BaseActivity implements View.OnTouchList
 
             if (link.length != 0) {
                 if (action == MotionEvent.ACTION_UP) {
-                    Intent i = new Intent(this, WebViewActivity.class);
-                    i.putExtra(WebViewActivity.EXTRA_HREF, link[0].getURL());
-                    startActivity(i);
+                    startActivity(new Intent(this, WebViewActivity.class)
+                            .putExtra(WebViewActivity.EXTRA_HREF, link[0].getURL()));
                 }
                 return true;
             }

@@ -117,9 +117,8 @@ public class PandoraTabActivity extends BaseActivity {
                     int childPosition = rv.getChildAdapterPosition(childView);
                     if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
                         JSoupData data = simpleTabAdapter.getData().get(childPosition);
-                        Intent i = new Intent(PandoraTabActivity.this, PandoraDetailActivity.class);
-                        i.putExtra(PandoraDetailActivity.EXTRA_DATA, data);
-                        startActivity(i);
+                        startActivity(new Intent(PandoraTabActivity.this, PandoraDetailActivity.class)
+                                .putExtra(PandoraDetailActivity.EXTRA_DATA, data));
                     }
                     return true;
                 }
