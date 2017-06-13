@@ -55,7 +55,7 @@ public class ModelActivity extends BaseActivity {
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
         modelDataSource = getIntent().getStringExtra(EXTRA_MODEL_DATASOURCE);
 
-        setTitle(R.string.action_favourite);
+        setTitle(R.string.action_model);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
