@@ -212,7 +212,7 @@ public class PythonVideoDataSource implements IDataSource<List<VideoInfo>> {
         if (remote) {
             return next != null;
         } else {
-            return currentPage < pages;
+            return currentPage <= pages;
         }
     }
 }

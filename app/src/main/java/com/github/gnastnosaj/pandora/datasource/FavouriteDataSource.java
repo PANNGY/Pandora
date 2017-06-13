@@ -62,7 +62,7 @@ public class FavouriteDataSource implements IDataSource<List<JSoupData>> {
 
     @Override
     public boolean hasMore() {
-        return currentPage < pages;
+        return currentPage <= pages;
     }
 }
 
