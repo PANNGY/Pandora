@@ -290,7 +290,7 @@ public class PandoraActivity extends BaseActivity {
         });
         searchView.setOnItemClickListener((adapterView, view, i, l) -> {
             try {
-                ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+                ListView suggestionsListView = searchView.findViewById(R.id.suggestion_list);
                 if (suggestionsListView.getHeaderViewsCount() > 0) {
                     if (i == 0) {
                         searchView.clearAll();
@@ -313,7 +313,7 @@ public class PandoraActivity extends BaseActivity {
             }
         });
         try {
-            ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+            ListView suggestionsListView = searchView.findViewById(R.id.suggestion_list);
             if (suggestionsListView.getHeaderViewsCount() == 0) {
                 View deleteIconView = getLayoutInflater().inflate(R.layout.view_search_delete, null);
                 suggestionsListView.addHeaderView(deleteIconView);

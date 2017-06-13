@@ -121,10 +121,10 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
 
         resourceContainer.removeAllViews();
         for (int i = 0; i < resource.size(); i++) {
-            JSoupCatalog catalog = (JSoupCatalog) resource.get(i);
+            JSoupCatalog catalog = resource.get(i);
             View resourceView = getLayoutInflater().inflate(R.layout.item_pandora_resource, null, false);
             ((TextView) resourceView.findViewById(R.id.detail_resource_title)).setText(TextUtils.isEmpty(catalog.link.title) ? ("#" + (i + 1)) : catalog.link.title);
-            TagCloudView resourceCloudView = (TagCloudView) resourceView.findViewById(R.id.detail_resource_cloud);
+            TagCloudView resourceCloudView = resourceView.findViewById(R.id.detail_resource_cloud);
             List<String> tagList = new ArrayList<>();
             for (JSoupLink link : catalog.tags) {
                 tagList.add(link.title);
@@ -218,14 +218,6 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
         }
     }
 
-    private class WebVideoViewClient extends WebViewClient {
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);
-            extractVideoSrc();
-        }
-    }
-
     private void extractVideoSrc() {
         String extractScript = "javascript:(" +
                 "function() {" +
@@ -293,6 +285,22 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
         }
     }
 
+    private boolean isVideoSrc(String videoSrc) {
+        if (videoSrc.startsWith("https://k8dy.top/api/")) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private class WebVideoViewClient extends WebViewClient {
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            extractVideoSrc();
+        }
+    }
+
     private class WebChrome extends WebChromeClient implements MediaPlayer.OnCompletionListener {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
@@ -350,14 +358,6 @@ public class PandoraWebVideoViewActivity extends BaseActivity {
                 mp.reset();
                 mp.release();
             }
-        }
-    }
-
-    private boolean isVideoSrc(String videoSrc) {
-        if (videoSrc.startsWith("https://k8dy.top/api/")) {
-            return false;
-        } else {
-            return true;
         }
     }
 

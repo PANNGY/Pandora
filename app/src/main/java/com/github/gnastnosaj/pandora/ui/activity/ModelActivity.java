@@ -1,13 +1,11 @@
 package com.github.gnastnosaj.pandora.ui.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -15,32 +13,22 @@ import android.view.View;
 
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.R;
-import com.github.gnastnosaj.pandora.adapter.SimpleTabAdapter;
-import com.github.gnastnosaj.pandora.datasource.FavouriteDataSource;
+import com.github.gnastnosaj.pandora.adapter.ModelAdapter;
 import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
- * Created by jasontsang on 5/26/17.
+ * Created by jasontsang on 6/13/17.
  */
 
-public class SimpleTabActivity extends BaseActivity {
+public class ModelActivity extends BaseActivity {
     public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
-    public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
-    public final static String EXTRA_TYPE = "type";
-    public final static String EXTRA_TITLE = "title";
-    public final static String EXTRA_HREF = "href";
-    public final static String EXTRA_CACHE = "cache";
-
-    public final static int TYPE_DEFAULT = 0;
-    public final static int TYPE_FAVOURITE = 1;
+    public final static String EXTRA_MODEL_DATASOURCE = "model_datasource";
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -52,11 +40,8 @@ public class SimpleTabActivity extends BaseActivity {
     RecyclerView recyclerView;
 
     private String tabDataSource;
-    private String galleryDataSource;
-    private int type;
-    private String title;
-    private String href;
-    private List<JSoupData> cache;
+    private String modelDataSource;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +53,9 @@ public class SimpleTabActivity extends BaseActivity {
         initSystemBar();
 
         tabDataSource = getIntent().getStringExtra(EXTRA_TAB_DATASOURCE);
-        galleryDataSource = getIntent().getStringExtra(EXTRA_GALLERY_DATASOURCE);
-        type = getIntent().getIntExtra(EXTRA_TYPE, TYPE_DEFAULT);
-        title = getIntent().getStringExtra(EXTRA_TITLE);
-        href = getIntent().getStringExtra(EXTRA_HREF);
-        cache = getIntent().getParcelableArrayListExtra(EXTRA_CACHE);
+        modelDataSource = getIntent().getStringExtra(EXTRA_MODEL_DATASOURCE);
 
-        setTitle(TextUtils.isEmpty(title) ? "" : title);
+        setTitle(R.string.action_favourite);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -94,7 +75,7 @@ public class SimpleTabActivity extends BaseActivity {
     }
 
     private void initContentView() {
-        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter();
+        ModelAdapter modelAdapter = new ModelAdapter();
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
@@ -114,13 +95,9 @@ public class SimpleTabActivity extends BaseActivity {
                 if (gestureDetector.onTouchEvent(event)) {
                     View childView = rv.findChildViewUnder(event.getX(), event.getY());
                     int childPosition = rv.getChildAdapterPosition(childView);
-                    if (-1 < childPosition && childPosition < simpleTabAdapter.getData().size()) {
-                        JSoupData data = simpleTabAdapter.getData().get(childPosition);
-                        Intent i = new Intent(SimpleTabActivity.this, GalleryActivity.class);
-                        i.putExtra(GalleryActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
-                        i.putExtra(GalleryActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                        i.putExtra(GalleryActivity.EXTRA_DATA, data);
-                        startActivity(i);
+                    if (-1 < childPosition && childPosition < modelAdapter.getData().size()) {
+                        JSoupData data = modelAdapter.getData().get(childPosition);
+
                     }
                     return true;
                 }
@@ -137,15 +114,9 @@ public class SimpleTabActivity extends BaseActivity {
         });
 
         MVCHelper mvcHelper = new MVCSwipeRefreshHelper<>(swipeRefreshLayout);
-        if (type == TYPE_DEFAULT) {
-            SimpleDataSource simpleDataSource = new SimpleDataSource(this, tabDataSource, href);
-            simpleDataSource.setCache(cache);
-            mvcHelper.setDataSource(simpleDataSource);
-        } else if (type == TYPE_FAVOURITE) {
-            FavouriteDataSource favouriteDataSource = new FavouriteDataSource(tabDataSource);
-            mvcHelper.setDataSource(favouriteDataSource);
-        }
-        mvcHelper.setAdapter(simpleTabAdapter);
+        SimpleDataSource simpleDataSource = new SimpleDataSource(this, modelDataSource, null);
+        mvcHelper.setDataSource(simpleDataSource);
+        mvcHelper.setAdapter(modelAdapter);
         mvcHelper.refresh();
     }
 }

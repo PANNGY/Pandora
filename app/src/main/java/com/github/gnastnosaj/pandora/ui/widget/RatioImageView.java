@@ -29,7 +29,7 @@ public class RatioImageView extends SimpleDraweeView {
     public void setOriginalSize(int originalWidth, int originalHeight) {
         this.originalWidth = originalWidth;
         this.originalHeight = originalHeight;
-        
+
         ViewGroup.LayoutParams layoutParams = getLayoutParams();
         if (layoutParams != null) {
             float ratio = (float) originalWidth / (float) originalHeight;

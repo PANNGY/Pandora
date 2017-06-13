@@ -9,23 +9,20 @@ import android.view.View;
 import android.view.ViewGroup;
 
 public class PinnedHeaderDecoration extends RecyclerView.ItemDecoration {
+    private final SparseArray<PinnedHeaderCreator> mTypePinnedHeaderFactories = new SparseArray<>();
     private int mHeaderPosition;
     private int mPinnedHeaderTop;
     private int mParentWidth;
-
     private boolean mIsAdapterDataChanged;
-
-    private Rect mClipBounds;
-    private View mPinnedHeaderView;
-    private RecyclerView.Adapter mAdapter;
-
-    private final SparseArray<PinnedHeaderCreator> mTypePinnedHeaderFactories = new SparseArray<>();
     private final RecyclerView.AdapterDataObserver mAdapterDataObserver = new RecyclerView.AdapterDataObserver() {
         @Override
         public void onChanged() {
             mIsAdapterDataChanged = true;
         }
     };
+    private Rect mClipBounds;
+    private View mPinnedHeaderView;
+    private RecyclerView.Adapter mAdapter;
 
     public PinnedHeaderDecoration() {
         this.mHeaderPosition = -1;
@@ -76,7 +73,7 @@ public class PinnedHeaderDecoration extends RecyclerView.ItemDecoration {
         int headerPosition = findPinnedHeaderPosition(parent, firstVisiblePosition);
 
         if (headerPosition >= 0) {
-            if(mHeaderPosition != headerPosition) {
+            if (mHeaderPosition != headerPosition) {
                 mHeaderPosition = headerPosition;
                 int viewType = mAdapter.getItemViewType(headerPosition);
 
@@ -108,9 +105,9 @@ public class PinnedHeaderDecoration extends RecyclerView.ItemDecoration {
                 int hs = View.MeasureSpec.makeMeasureSpec(heightSize, heightMode);
                 mPinnedHeaderView.measure(ws, hs);
                 mPinnedHeaderView.layout(0, 0, mPinnedHeaderView.getMeasuredWidth(), mPinnedHeaderView.getMeasuredHeight());
-            }else {
+            } else {
                 int parentWidth = parent.getWidth();
-                if(mParentWidth != parentWidth) {
+                if (mParentWidth != parentWidth) {
                     mParentWidth = parentWidth;
 
                     // read layout parameters
@@ -158,7 +155,7 @@ public class PinnedHeaderDecoration extends RecyclerView.ItemDecoration {
     }
 
     private boolean isPinnedViewType(RecyclerView parent, int adapterPosition, int viewType) {
-        PinnedHeaderCreator pinnedHeaderCreator =  mTypePinnedHeaderFactories.get(viewType);
+        PinnedHeaderCreator pinnedHeaderCreator = mTypePinnedHeaderFactories.get(viewType);
 
         return pinnedHeaderCreator != null && pinnedHeaderCreator.create(parent, adapterPosition);
     }

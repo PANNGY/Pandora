@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora.adapter;
 
-import android.content.Context;
 import android.graphics.drawable.Animatable;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -30,13 +29,7 @@ import cn.trinea.android.common.util.ListUtils;
  */
 public class SimpleTabAdapter extends RecyclerView.Adapter implements IDataAdapter<List<JSoupData>> {
 
-    private Context context;
-
     private List<JSoupData> data = new ArrayList<>();
-
-    public SimpleTabAdapter(Context context) {
-        this.context = context;
-    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

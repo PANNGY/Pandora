@@ -3,7 +3,6 @@ package com.github.gnastnosaj.pandora.ui.activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -42,7 +41,6 @@ import java.util.Map;
 import br.com.mauker.materialsearchview.MaterialSearchView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
 import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -62,32 +60,23 @@ public class SimpleViewPagerActivity extends BaseActivity {
     public final static String EXTRA_TAB_DATASOURCE = "tab_datasource";
     public final static String EXTRA_GALLERY_DATASOURCE = "gallery_datasource";
     public final static String EXTRA_MODEL_DATASOURCE = "model_datasource";
-
+    private static Map<String, List> catalogMap = new HashMap<>();
+    private static Map<String, List<JSoupLink>> tabMap = new HashMap<>();
     @BindView(R.id.toolbar)
     Toolbar toolbar;
-
     @BindView(R.id.progress_bar)
     ProgressBar progressBar;
-
     @BindView(R.id.tab)
     TabLayout tabLayout;
-
     @BindView(R.id.view_pager)
     ViewPager viewPager;
-
     @BindView(R.id.search_view)
     MaterialSearchView searchView;
-
     ListView suggestionsListView;
-
     private String title;
     private String tabDataSource;
     private String galleryDataSource;
     private String modelDataSource;
-
-    private static Map<String, List> catalogMap = new HashMap<>();
-    private static Map<String, List<JSoupLink>> tabMap = new HashMap<>();
-
     private GithubService githubService = Retrofit.newGithubServicePlus();
     private RealmConfiguration tabCacheRealmConfig;
     private RealmConfiguration catalogCacheRealmConfig;
@@ -160,13 +149,17 @@ public class SimpleViewPagerActivity extends BaseActivity {
             case R.id.action_share:
                 ShareHelper.share(this, new ShareParamText(getResources().getString(R.string.action_share), getResources().getString(R.string.share_pandora)));
                 return true;
+            case R.id.action_model:
+                startActivity(new Intent(this, ModelActivity.class)
+                        .putExtra(ModelActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                        .putExtra(ModelActivity.EXTRA_MODEL_DATASOURCE, modelDataSource));
+                return true;
             case R.id.action_favourite:
-                Intent i = new Intent(this, SimpleTabActivity.class);
-                i.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource);
-                i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource);
-                i.putExtra(SimpleTabActivity.EXTRA_TYPE, SimpleTabActivity.TYPE_FAVOURITE);
-                i.putExtra(SimpleTabActivity.EXTRA_TITLE, getResources().getString(R.string.action_favourite));
-                startActivity(i);
+                startActivity(new Intent(this, SimpleTabActivity.class)
+                        .putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                        .putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource)
+                        .putExtra(SimpleTabActivity.EXTRA_TYPE, SimpleTabActivity.TYPE_FAVOURITE)
+                        .putExtra(SimpleTabActivity.EXTRA_TITLE, getResources().getString(R.string.action_favourite)));
                 return true;
             case R.id.action_about:
                 startActivity(new Intent(this, AboutActivity.class));
@@ -182,7 +175,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tabs -> {
                     dismissDynamicBox(this);
-                    SimpleViewPagerAdapter simplePagerAdapter = new SimpleViewPagerAdapter(this, getSupportFragmentManager(), tabs, tabDataSource, galleryDataSource);
+                    SimpleViewPagerAdapter simplePagerAdapter = new SimpleViewPagerAdapter(getSupportFragmentManager(), tabs, tabDataSource, galleryDataSource);
                     viewPager.setAdapter(simplePagerAdapter);
                     tabLayout.setupWithViewPager(viewPager);
                 });
@@ -285,10 +278,10 @@ public class SimpleViewPagerActivity extends BaseActivity {
                 List<JSoupCatalog> catalog = (List<JSoupCatalog>) _catalog;
                 for (JSoupCatalog jsoupCatalog : catalog) {
                     View tagGroupView = getLayoutInflater().inflate(R.layout.item_tag_cloud, null);
-                    TextView tagGroupTitle = (TextView) tagGroupView.findViewById(R.id.tag_group_title);
+                    TextView tagGroupTitle = tagGroupView.findViewById(R.id.tag_group_title);
                     tagGroupTitle.setText(jsoupCatalog.link.title);
 
-                    TagCloudView tagCloudView = (TagCloudView) tagGroupView.findViewById(R.id.tag_cloud_view);
+                    TagCloudView tagCloudView = tagGroupView.findViewById(R.id.tag_cloud_view);
 
                     List<String> tags = new ArrayList<>();
                     for (JSoupLink link : jsoupCatalog.tags) {
@@ -308,7 +301,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
             } else {
                 List<JSoupLink> catalog = (List<JSoupLink>) _catalog;
                 View tagGroupView = getLayoutInflater().inflate(R.layout.item_tag_cloud, null);
-                TagCloudView tagCloudView = (TagCloudView) tagGroupView.findViewById(R.id.tag_cloud_view);
+                TagCloudView tagCloudView = tagGroupView.findViewById(R.id.tag_cloud_view);
 
                 List<String> tags = new ArrayList<>();
                 for (JSoupLink link : catalog) {
@@ -347,7 +340,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
         });
         searchView.setOnItemClickListener((adapterView, view, i, l) -> {
             try {
-                ListView suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+                ListView suggestionsListView = searchView.findViewById(R.id.suggestion_list);
                 if (suggestionsListView.getHeaderViewsCount() > 0) {
                     if (i == 0) {
                         searchView.clearAll();
@@ -370,7 +363,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
             }
         });
         try {
-            suggestionsListView = (ListView) searchView.findViewById(R.id.suggestion_list);
+            suggestionsListView = searchView.findViewById(R.id.suggestion_list);
             if (suggestionsListView.getHeaderViewsCount() == 0) {
                 View deleteIconView = getLayoutInflater().inflate(R.layout.view_search_delete, null);
                 suggestionsListView.addHeaderView(deleteIconView);

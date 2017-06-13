@@ -1,6 +1,5 @@
 package com.github.gnastnosaj.pandora.adapter;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -19,7 +18,7 @@ public class SimpleViewPagerAdapter extends FragmentPagerAdapter {
     private List<JSoupLink> tabs;
     private List<Fragment> fragments;
 
-    public SimpleViewPagerAdapter(Context context, FragmentManager fm, List<JSoupLink> tabs, String tabDataSource, String galleryDataSource) {
+    public SimpleViewPagerAdapter(FragmentManager fm, List<JSoupLink> tabs, String tabDataSource, String galleryDataSource) {
         super(fm);
         this.tabs = new ArrayList<>(tabs);
         fragments = new ArrayList<>();
