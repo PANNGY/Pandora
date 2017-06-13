@@ -34,7 +34,8 @@
           "method": 1,
           "args": [
             "href"
-          ]
+          ],
+          "format": "{baseUrl}/{area}/%s"
         }
       },
       {

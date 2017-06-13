@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -78,7 +79,7 @@ public class ModelAdapter extends RecyclerView.Adapter implements IDataAdapter<L
 
         @Nullable
         @BindView(R.id.rank_up_down)
-        TextView rankUpDown;
+        ImageView rankUpDown;
 
         public ViewHolder(View itemView) {
             super(itemView);
