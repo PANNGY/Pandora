@@ -44,16 +44,16 @@
           ]
         }
       }
-    ]
-  },
-  "nextPageSelector": {
-    "cssQuery": "ul.pagination li a[name^=nextpage]",
-    "analyzer": {
-      "method": 1,
-      "args": [
-        "href"
-      ],
-      "format": "{baseUrl}%s"
+    ],
+    "nextPageSelector": {
+      "cssQuery": "ul.pagination li a[name^=nextpage]",
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
     }
   }
 }
