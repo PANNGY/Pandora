@@ -1,7 +1,10 @@
 package com.github.gnastnosaj.pandora.adapter;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +14,8 @@ import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupData;
+import com.mikepenz.iconics.IconicsDrawable;
+import com.mikepenz.material_design_iconic_typeface_library.MaterialDesignIconic;
 import com.shizhefei.mvc.IDataAdapter;
 
 import java.util.ArrayList;
@@ -25,6 +30,11 @@ import butterknife.ButterKnife;
 
 public class ModelAdapter extends RecyclerView.Adapter implements IDataAdapter<List<JSoupData>> {
     private List<JSoupData> data = new ArrayList<>();
+    private Context context;
+
+    public ModelAdapter(Context context) {
+        this.context = context;
+    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -38,6 +48,22 @@ public class ModelAdapter extends RecyclerView.Adapter implements IDataAdapter<L
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.thumbnail.setImageURI(jsoupData.getAttr("thumbnail"));
         holder.title.setText(jsoupData.getAttr("title"));
+        String rankStr = jsoupData.getAttr("rankStr");
+        if (!TextUtils.isEmpty(rankStr)) {
+            if (rankStr.contains("▼")) {
+                holder.rank.setText(rankStr.substring(0, rankStr.lastIndexOf(" ")));
+                holder.rankUpDown.setImageDrawable(new IconicsDrawable(context)
+                        .icon(MaterialDesignIconic.Icon.gmi_sort_desc)
+                        .color(Color.GREEN).sizeDp(18));
+            } else if (rankStr.contains("▲")) {
+                holder.rank.setText(rankStr.substring(0, rankStr.lastIndexOf(" ")));
+                holder.rankUpDown.setImageDrawable(new IconicsDrawable(context)
+                        .icon(MaterialDesignIconic.Icon.gmi_sort_asc)
+                        .color(Color.RED).sizeDp(18));
+            } else {
+                holder.rank.setText(rankStr);
+            }
+        }
     }
 
     @Override

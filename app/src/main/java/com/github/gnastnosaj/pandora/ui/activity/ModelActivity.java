@@ -80,7 +80,7 @@ public class ModelActivity extends BaseActivity {
     }
 
     private void initContentView() {
-        ModelAdapter modelAdapter = new ModelAdapter();
+        ModelAdapter modelAdapter = new ModelAdapter(this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
