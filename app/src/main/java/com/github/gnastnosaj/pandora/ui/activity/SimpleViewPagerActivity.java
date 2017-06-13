@@ -139,6 +139,9 @@ public class SimpleViewPagerActivity extends BaseActivity {
         menu.findItem(R.id.action_model).setIcon(new IconicsDrawable(this)
                 .icon(Glyphter.Icon.gly_noun_25619_cc)
                 .color(Color.WHITE).sizeDp(18));
+        if (!TextUtils.isEmpty(modelDataSource)) {
+            menu.findItem(R.id.action_model).setVisible(true);
+        }
         menu.findItem(R.id.action_favourite).setIcon(new IconicsDrawable(this)
                 .icon(MaterialDesignIconic.Icon.gmi_label_heart)
                 .color(Color.WHITE).sizeDp(18));

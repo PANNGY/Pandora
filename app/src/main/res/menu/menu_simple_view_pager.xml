@@ -17,6 +17,7 @@
         android:id="@+id/action_model"
         android:orderInCategory="100"
         android:title="@string/action_model"
+        android:visible="false"
         app:showAsAction="always" />
 
     <item
