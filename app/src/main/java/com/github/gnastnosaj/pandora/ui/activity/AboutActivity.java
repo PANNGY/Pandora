@@ -85,7 +85,7 @@ public class AboutActivity extends BaseActivity implements View.OnClickListener 
                         .putExtra(WebViewActivity.EXTRA_HREF, getResources().getString(R.string.url_help_and_feedback)));
                 break;
             case R.id.about_check_for_updates:
-                UpdateService.checkForUpdate(this);
+                UpdateService.checkForUpdate(this, true);
                 break;
         }
     }

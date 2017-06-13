@@ -24,6 +24,10 @@ import zlc.season.rxdownload2.RxDownload;
  */
 
 public class UpdateService {
+    public static void checkForUpdate(BaseActivity baseActivity) {
+        checkForUpdate(baseActivity, false);
+    }
+
     public static void checkForUpdate(BaseActivity baseActivity, boolean showAppUpdated) {
         new RxPermissions(baseActivity).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
                 .compose(baseActivity.bindUntilEvent(ActivityEvent.DESTROY))
