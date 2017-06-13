@@ -53,12 +53,12 @@ public class ModelAdapter extends RecyclerView.Adapter implements IDataAdapter<L
             if (rankStr.contains("▼")) {
                 holder.rank.setText(rankStr.substring(0, rankStr.lastIndexOf(" ")));
                 holder.rankUpDown.setImageDrawable(new IconicsDrawable(context)
-                        .icon(MaterialDesignIconic.Icon.gmi_sort_desc)
+                        .icon(MaterialDesignIconic.Icon.gmi_caret_down)
                         .color(Color.GREEN).sizeDp(18));
             } else if (rankStr.contains("▲")) {
                 holder.rank.setText(rankStr.substring(0, rankStr.lastIndexOf(" ")));
                 holder.rankUpDown.setImageDrawable(new IconicsDrawable(context)
-                        .icon(MaterialDesignIconic.Icon.gmi_sort_asc)
+                        .icon(MaterialDesignIconic.Icon.gmi_caret_up)
                         .color(Color.RED).sizeDp(18));
             } else {
                 holder.rank.setText(rankStr);

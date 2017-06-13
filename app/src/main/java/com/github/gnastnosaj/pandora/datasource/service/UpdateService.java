@@ -24,7 +24,7 @@ import zlc.season.rxdownload2.RxDownload;
  */
 
 public class UpdateService {
-    public static void checkForUpdate(BaseActivity baseActivity) {
+    public static void checkForUpdate(BaseActivity baseActivity, boolean showAppUpdated) {
         new RxPermissions(baseActivity).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
                 .compose(baseActivity.bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(grant -> {
@@ -32,6 +32,7 @@ public class UpdateService {
                                     .setDisplay(Display.DIALOG)
                                     .setUpdateFrom(UpdateFrom.JSON)
                                     .setUpdateJSON(baseActivity.getResources().getString(R.string.url_update))
+                                    .showAppUpdated(showAppUpdated)
                                     .setButtonUpdateClickListener((dialog, which) ->
                                             Retrofit.newGithubServicePlus()
                                                     .getUpdateData()
