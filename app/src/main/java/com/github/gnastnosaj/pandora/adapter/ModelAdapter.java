@@ -37,7 +37,7 @@ public class ModelAdapter extends RecyclerView.Adapter implements IDataAdapter<L
         JSoupData jsoupData = data.get(position);
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.thumbnail.setImageURI(jsoupData.getAttr("thumbnail"));
-        holder.title.setText(jsoupData.getAttr("titile"));
+        holder.title.setText(jsoupData.getAttr("title"));
     }
 
     @Override

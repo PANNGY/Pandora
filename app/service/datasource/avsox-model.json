@@ -29,7 +29,7 @@
         }
       },
       {
-        "label": "name",
+        "label": "title",
         "cssQuery": "div.photo-info",
         "analyzer": {
           "method": 0
