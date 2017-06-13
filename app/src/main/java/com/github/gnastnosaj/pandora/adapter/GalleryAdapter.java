@@ -8,7 +8,6 @@ import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.View;
@@ -44,8 +43,6 @@ import timber.log.Timber;
  * Created by Jason on 8/21/2016.
  */
 public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JSoupData>> {
-
-    public static final String TRANSIT_PIC = "Gallery";
 
     private List<JSoupData> data = new ArrayList<>();
     private Context context;
@@ -155,7 +152,6 @@ public class GalleryAdapter extends PagerAdapter implements IDataAdapter<List<JS
             return true;
         });
 
-        ViewCompat.setTransitionName(draweeView, TRANSIT_PIC);
         container.addView(draweeView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         return draweeView;

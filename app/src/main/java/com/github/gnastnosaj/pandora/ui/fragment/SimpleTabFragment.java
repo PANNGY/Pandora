@@ -62,7 +62,7 @@ public class SimpleTabFragment extends Fragment {
 
     private void initSimpleTabView() {
         SimpleDataSource simpleDataSource = new SimpleDataSource(getContext(), tabDataSource, href);
-        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter(getContext());
+        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter();
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);

@@ -95,7 +95,7 @@ public class PandoraTabActivity extends BaseActivity {
     }
 
     private void initContentView() {
-        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter(this);
+        SimpleTabAdapter simpleTabAdapter = new SimpleTabAdapter();
 
         int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
         StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
