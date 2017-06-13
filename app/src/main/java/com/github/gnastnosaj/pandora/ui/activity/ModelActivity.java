@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.GestureDetector;
 import android.view.MenuItem;
@@ -19,6 +19,7 @@ import com.github.gnastnosaj.pandora.datasource.SimpleDataSource;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
+import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -81,10 +82,10 @@ public class ModelActivity extends BaseActivity {
     private void initContentView() {
         ModelAdapter modelAdapter = new ModelAdapter();
 
-        int spanCount = getResources().getInteger(R.integer.pandora_tab_grid_span_count);
-        StaggeredGridLayoutManager staggeredGridLayoutManager = new StaggeredGridLayoutManager(spanCount, StaggeredGridLayoutManager.VERTICAL);
-        staggeredGridLayoutManager.setItemPrefetchEnabled(false);
-        recyclerView.setLayoutManager(staggeredGridLayoutManager);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new HorizontalDividerItemDecoration.Builder(this).size(1).build());
 
         GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
