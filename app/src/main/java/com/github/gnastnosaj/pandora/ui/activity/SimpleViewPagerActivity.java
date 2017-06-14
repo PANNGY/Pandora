@@ -152,6 +152,7 @@ public class SimpleViewPagerActivity extends BaseActivity {
             case R.id.action_model:
                 startActivity(new Intent(this, ModelActivity.class)
                         .putExtra(ModelActivity.EXTRA_TAB_DATASOURCE, tabDataSource)
+                        .putExtra(ModelActivity.EXTRA_GALLERY_DATASOURCE, galleryDataSource)
                         .putExtra(ModelActivity.EXTRA_MODEL_DATASOURCE, modelDataSource));
                 return true;
             case R.id.action_favourite:

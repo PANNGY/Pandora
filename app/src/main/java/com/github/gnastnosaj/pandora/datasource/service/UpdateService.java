@@ -1,6 +1,8 @@
 package com.github.gnastnosaj.pandora.datasource.service;
 
 import android.Manifest;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
@@ -32,6 +34,11 @@ public class UpdateService {
         new RxPermissions(baseActivity).request(Manifest.permission.INTERNET, Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS)
                 .compose(baseActivity.bindUntilEvent(ActivityEvent.DESTROY))
                 .subscribe(grant -> {
+                            if (showAppUpdated) {
+                                //hack disable show
+                                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(baseActivity);
+                                sharedPreferences.edit().putBoolean("prefAppUpdaterShow", true).commit();
+                            }
                             AppUpdater appUpdater = new AppUpdater(baseActivity)
                                     .setDisplay(Display.DIALOG)
                                     .setUpdateFrom(UpdateFrom.JSON)
