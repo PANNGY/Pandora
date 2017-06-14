@@ -5,8 +5,8 @@ import android.text.TextUtils;
 import com.github.gnastnosaj.boilerplate.Boilerplate;
 import com.github.gnastnosaj.pandora.R;
 import com.github.gnastnosaj.pandora.model.JSoupAttr;
-import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupCatalog;
+import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.github.gnastnosaj.pandora.model.JSoupLink;
 
 import org.jsoup.nodes.Document;
@@ -231,6 +231,7 @@ public class JSoupDataSource {
         for (JSoupSelector attrSelector : dataSelector.attrSelectors) {
             if (attrSelector.global) {
                 String attrContent = attrSelector.parse(document, null);
+                attrContent = betterData(attrContent);
                 globalData.attrs.add(new JSoupAttr(attrSelector.label, attrContent));
             }
         }
@@ -461,23 +462,6 @@ public class JSoupDataSource {
         return !TextUtils.isEmpty(nextPage);
     }
 
-    public static class TabSelector extends JSoupSelector {
-        public JSoupSelector titleSelector;
-        public JSoupSelector urlSelector;
-    }
-
-    public static class CatalogSelector extends TabSelector {
-        public CatalogSelector tagSelector;
-    }
-
-    public static class DataSelector extends JSoupSelector {
-        public DataSelector groupSelector;
-        public JSoupSelector[] attrSelectors;
-        public JSoupSelector nextPageSelector;
-        public CatalogSelector tagSelector;
-        public DataSelector reserveSelector;
-    }
-
     private String betterData(String data) {
         if (data != null) {
             data = data.trim();
@@ -510,5 +494,22 @@ public class JSoupDataSource {
             data = data.replace("/./", "/");
         }
         return data;
+    }
+
+    public static class TabSelector extends JSoupSelector {
+        public JSoupSelector titleSelector;
+        public JSoupSelector urlSelector;
+    }
+
+    public static class CatalogSelector extends TabSelector {
+        public CatalogSelector tagSelector;
+    }
+
+    public static class DataSelector extends JSoupSelector {
+        public DataSelector groupSelector;
+        public JSoupSelector[] attrSelectors;
+        public JSoupSelector nextPageSelector;
+        public CatalogSelector tagSelector;
+        public DataSelector reserveSelector;
     }
 }
