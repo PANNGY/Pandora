@@ -193,7 +193,7 @@ public class PandoraDetailActivity extends BaseActivity {
                                     JSoupCatalog catalog = (JSoupCatalog) data.get(i);
                                     View resourceView = getLayoutInflater().inflate(R.layout.item_pandora_resource, null, false);
                                     ((TextView) resourceView.findViewById(R.id.detail_resource_title)).setText(TextUtils.isEmpty(catalog.link.title) ? ("#" + (i + 1)) : catalog.link.title);
-                                    TagCloudView resourceCloudView = (TagCloudView) resourceView.findViewById(R.id.detail_resource_cloud);
+                                    TagCloudView resourceCloudView = resourceView.findViewById(R.id.detail_resource_cloud);
                                     List<String> tagList = new ArrayList<>();
                                     for (JSoupLink link : catalog.tags) {
                                         tagList.add(link.title);

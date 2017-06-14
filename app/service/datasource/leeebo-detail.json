@@ -59,7 +59,7 @@
       {
         "label": "href",
         "global": true,
-        "cssQuery": "section.page-bd div.page-btn a",
+        "cssQuery": "section.page-btn a",
         "analyzer": {
           "method": 1,
           "args": [
