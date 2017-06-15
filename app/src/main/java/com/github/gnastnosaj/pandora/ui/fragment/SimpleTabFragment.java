@@ -29,6 +29,10 @@ import butterknife.ButterKnife;
  */
 
 public class SimpleTabFragment extends Fragment {
+    public final static String STATE_HREF = "href";
+    public final static String STATE_TAB_DATASOURCE = "tabDataSource";
+    public final static String STATE_GALLERY_DATASOURCE = "galleryDataSource";
+
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -55,9 +59,23 @@ public class SimpleTabFragment extends Fragment {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.layout_recycler_view_with_swipe_refresh, container, false);
             ButterKnife.bind(this, rootView);
+
+            if (savedInstanceState != null) {
+                href = savedInstanceState.getString(STATE_HREF);
+                tabDataSource = savedInstanceState.getString(STATE_TAB_DATASOURCE);
+                galleryDataSource = savedInstanceState.getString(STATE_GALLERY_DATASOURCE);
+            }
             initSimpleTabView();
         }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(STATE_HREF, href);
+        outState.putString(STATE_TAB_DATASOURCE, tabDataSource);
+        outState.putString(STATE_GALLERY_DATASOURCE, galleryDataSource);
     }
 
     private void initSimpleTabView() {

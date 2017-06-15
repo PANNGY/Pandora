@@ -36,6 +36,8 @@ import butterknife.ButterKnife;
  */
 
 public class PandoraTabFragment extends Fragment {
+    public final static String STATE_TAB = "tab";
+
     @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout swipeRefreshLayout;
 
@@ -57,6 +59,10 @@ public class PandoraTabFragment extends Fragment {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.layout_recycler_view_with_swipe_refresh, container, false);
             ButterKnife.bind(this, rootView);
+
+            if (savedInstanceState != null) {
+                tab = savedInstanceState.getInt(STATE_TAB);
+            }
             if (tab == 0) {
                 initPandoraHomeView();
             } else {
@@ -64,6 +70,12 @@ public class PandoraTabFragment extends Fragment {
             }
         }
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(STATE_TAB, tab);
     }
 
     private void initPandoraHomeView() {
