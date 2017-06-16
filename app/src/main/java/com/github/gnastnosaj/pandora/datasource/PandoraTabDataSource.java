@@ -11,7 +11,6 @@ import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
-import com.shizhefei.mvc.IDataSource;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
@@ -29,12 +28,10 @@ import io.realm.RealmResults;
  * Created by jasontsang on 5/23/17.
  */
 
-public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+public class PandoraTabDataSource extends RxDataSource<List<JSoupData>> implements IDataCacheLoader<List<JSoupData>> {
     private GithubService githubService = Retrofit.newGithubServicePlus();
 
     private RealmConfiguration realmConfig;
-
-    private Context context;
 
     private int tab;
     private String keyword;
@@ -43,58 +40,20 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
     private JSoupDataSource leeeboTabDataSource;
     private JSoupDataSource k8dyTabDataSource;
 
-    private CountDownLatch initLock;
-    private CountDownLatch refreshLock;
-    private CountDownLatch loadMoreLock;
-
     public PandoraTabDataSource(Context context, String keyword) {
-        this.context = context;
+        super(context);
 
         realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB_" + keyword).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         this.keyword = keyword;
-
-        initLock = new CountDownLatch(1);
-
-        Observable init = Observable.zip(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB),
-                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_TAB),
-                (leeeboTabDataSource, k8dyTabDataSource) -> {
-                    this.leeeboTabDataSource = leeeboTabDataSource;
-                    this.k8dyTabDataSource = k8dyTabDataSource;
-                    return true;
-                }).retry();
-
-        if (context instanceof BaseActivity) {
-            init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        init.subscribeOn(Schedulers.newThread())
-                .subscribe(success -> initLock.countDown());
     }
 
     public PandoraTabDataSource(Context context, int tab) {
-        this.context = context;
+        super(context);
 
         realmConfig = new RealmConfiguration.Builder().name("PANDORA_TAB_" + tab).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
         this.tab = tab;
-
-        initLock = new CountDownLatch(1);
-
-        Observable init = Observable.zip(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB),
-                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_TAB),
-                (leeeboTabDataSource, k8dyTabDataSource) -> {
-                    this.leeeboTabDataSource = leeeboTabDataSource;
-                    this.k8dyTabDataSource = k8dyTabDataSource;
-                    return true;
-                }).retry();
-
-        if (context instanceof BaseActivity) {
-            init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        init.subscribeOn(Schedulers.newThread())
-                .subscribe(success -> initLock.countDown());
     }
 
     public void setCache(List<JSoupData> cache) {
@@ -119,20 +78,45 @@ public class PandoraTabDataSource implements IDataSource<List<JSoupData>>, IData
 
     @Override
     public List<JSoupData> refresh() throws Exception {
-        if (refreshLock != null) {
-            refreshLock.await();
-        }
-        if (loadMoreLock != null) {
-            loadMoreLock.await();
-        }
-        refreshLock = new CountDownLatch(1);
-
-        List<JSoupData> data = new ArrayList<>();
-
-        initLock.await();
+        Observable.zip(
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_TAB)
+                        .map(jsoupDataSource -> {
+                            leeeboTabDataSource = jsoupDataSource;
+                            return jsoupDataSource;
+                        }).flatMap(jsoupDataSource -> {
+                    Observable<List<JSoupData>> leeeboTabLoadData = TextUtils.isEmpty(keyword) ? leeeboTabDataSource.loadData(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab], true) : leeeboTabDataSource.searchData(keyword);
+                    if (leeeboTabDataSource.getNextPage().equals(leeeboTabDataSource.baseUrl)) {
+                        leeeboTabDataSource.setNextPage(null);
+                        leeeboTabLoadData = Observable.create(subscriber -> {
+                            subscriber.onNext(new ArrayList<>());
+                            subscriber.onComplete();
+                        });
+                    }
+                    return leeeboTabLoadData.onErrorReturn((throwable -> new ArrayList<>()));
+                }),
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_TAB)
+                        .map(jsoupDataSource -> {
+                            k8dyTabDataSource = jsoupDataSource;
+                            return jsoupDataSource;
+                        }).flatMap(jsoupDataSource -> {
+                    Observable<List<JSoupData>> k8dyTabLoadData = TextUtils.isEmpty(keyword) ? k8dyTabDataSource.loadData(k8dyTabDataSource.baseUrl + k8dyTabDataSource.pages[tab], true) : k8dyTabDataSource.searchData(keyword);
+                    if (k8dyTabDataSource.getNextPage().equals(k8dyTabDataSource.baseUrl)) {
+                        k8dyTabDataSource.setNextPage(null);
+                        k8dyTabLoadData = Observable.create(subscriber -> {
+                            subscriber.onNext(new ArrayList<>());
+                            subscriber.onComplete();
+                        });
+                    }
+                    return k8dyTabLoadData.onErrorReturn((throwable -> new ArrayList<>()));
+                }), (leeeboTabData, k8dyTabData) -> {
+                    List<JSoupData> jsoupData = new ArrayList<>();
+                    jsoupData.addAll(leeeboTabData);
+                    jsoupData.addAll(k8dyTabData);
+                    return jsoupData;
+                });
 
         Observable<List<JSoupData>> leeeboTabLoadData = TextUtils.isEmpty(keyword) ? leeeboTabDataSource.loadData(leeeboTabDataSource.baseUrl + leeeboTabDataSource.pages[tab], true) : leeeboTabDataSource.searchData(keyword);
-        Observable<List<JSoupData>> k8dyTabLoadData = TextUtils.isEmpty(keyword) ? k8dyTabDataSource.loadData(k8dyTabDataSource.baseUrl + k8dyTabDataSource.pages[tab], true) : k8dyTabDataSource.searchData(keyword);
+
 
         if (leeeboTabDataSource.getNextPage().equals(leeeboTabDataSource.baseUrl)) {
             leeeboTabDataSource.setNextPage(null);

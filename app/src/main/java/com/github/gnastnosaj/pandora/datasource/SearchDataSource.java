@@ -3,24 +3,18 @@ package com.github.gnastnosaj.pandora.datasource;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.datasource.jsoup.JSoupDataSource;
-import com.github.gnastnosaj.pandora.datasource.service.GithubService;
 import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
-import com.shizhefei.mvc.IDataSource;
-import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import cn.trinea.android.common.util.ListUtils;
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -29,42 +23,24 @@ import io.realm.RealmResults;
  * Created by jasontsang on 5/25/17.
  */
 
-public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCacheLoader<List<JSoupData>> {
+public class SearchDataSource extends RxDataSource<List<JSoupData>> implements IDataCacheLoader<List<JSoupData>> {
 
-    private GithubService githubService = Retrofit.newGithubServicePlus();
-
-    private RealmConfiguration realmConfig;
-
-    private Context context;
+    private String dataSource;
+    private String keyword;
 
     private JSoupDataSource searchDataSource;
 
-    private String keyword;
     private List<JSoupData> cache;
 
-    private CountDownLatch initLock;
-    private CountDownLatch refreshLock;
-    private CountDownLatch loadMoreLock;
+    private RealmConfiguration realmConfig;
 
     public SearchDataSource(Context context, String dataSource, String keyword) {
-        this.context = context;
+        super(context);
+
+        this.dataSource = dataSource;
         this.keyword = keyword;
 
         realmConfig = new RealmConfiguration.Builder().name(dataSource + (TextUtils.isEmpty(keyword) ? "" : ("_" + keyword.hashCode()))).schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
-
-        initLock = new CountDownLatch(1);
-
-        Observable<JSoupDataSource> init = githubService.getJSoupDataSource(dataSource);
-
-        if (context instanceof BaseActivity) {
-            init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        init.subscribeOn(Schedulers.newThread())
-                .subscribe(datasource -> {
-                    searchDataSource = datasource;
-                    initLock.countDown();
-                });
     }
 
     public void setKeyword(String keyword) {
@@ -91,77 +67,41 @@ public class SearchDataSource implements IDataSource<List<JSoupData>>, IDataCach
     }
 
     @Override
-    public List<JSoupData> refresh() throws Exception {
+    public Observable<List<JSoupData>> refresh() throws Exception {
         if (TextUtils.isEmpty(keyword)) {
             throw new Exception("keyword is empty");
         }
-        if (refreshLock != null) {
-            refreshLock.await();
-        }
-        if (loadMoreLock != null) {
-            loadMoreLock.await();
-        }
-        refreshLock = new CountDownLatch(1);
 
-        List<JSoupData> data = new ArrayList<>();
+        Observable<List<JSoupData>> refresh = Retrofit.newGithubServicePlus().getJSoupDataSource(dataSource).map(jsoupDataSource -> {
+            searchDataSource = jsoupDataSource;
+            return jsoupDataSource;
+        }).flatMap(searchDataSource -> searchDataSource.searchData(keyword, null, true));
 
-        initLock.await();
+        refresh = refresh.map(jsoupData -> {
+            Realm realm = Realm.getInstance(realmConfig);
+            realm.executeTransactionAsync(bgRealm -> {
+                bgRealm.delete(JSoupData.class);
+                bgRealm.insertOrUpdate(jsoupData);
+            });
+            realm.close();
+            return jsoupData;
+        });
 
-        Observable<List<JSoupData>> refresh = searchDataSource.searchData(keyword, null, true);
-
-        if (context instanceof BaseActivity) {
-            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        refresh.subscribeOn(Schedulers.newThread())
-                .subscribe(jsoupData -> {
-                    data.addAll(jsoupData);
-                    Realm realm = Realm.getInstance(realmConfig);
-                    realm.executeTransactionAsync(bgRealm -> {
-                        bgRealm.delete(JSoupData.class);
-                        bgRealm.insertOrUpdate(data);
-                    });
-                    realm.close();
-                    refreshLock.countDown();
-                }, throwable -> refreshLock.countDown());
-
-        refreshLock.await();
-
-        return data;
+        return refresh;
     }
 
     @Override
-    public List<JSoupData> loadMore() throws Exception {
-        if (refreshLock != null) {
-            refreshLock.await();
-        }
-        if (loadMoreLock != null) {
-            loadMoreLock.await();
-        }
-        loadMoreLock = new CountDownLatch(1);
-
-        List<JSoupData> data = new ArrayList<>();
-
-        initLock.await();
-
+    public Observable<List<JSoupData>> loadMore() throws Exception {
         Observable<List<JSoupData>> loadMore = searchDataSource.searchData(keyword);
 
-        if (context instanceof BaseActivity) {
-            loadMore = loadMore.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
+        loadMore = loadMore.map(jsoupData -> {
+            Realm realm = Realm.getInstance(realmConfig);
+            realm.executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(jsoupData));
+            realm.close();
+            return jsoupData;
+        });
 
-        loadMore.subscribeOn(Schedulers.newThread())
-                .subscribe(jsoupData -> {
-                    data.addAll(jsoupData);
-                    Realm realm = Realm.getInstance(realmConfig);
-                    realm.executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(data));
-                    realm.close();
-                    loadMoreLock.countDown();
-                }, throwable -> loadMoreLock.countDown());
-
-        loadMoreLock.await();
-
-        return data;
+        return loadMore;
     }
 
     @Override

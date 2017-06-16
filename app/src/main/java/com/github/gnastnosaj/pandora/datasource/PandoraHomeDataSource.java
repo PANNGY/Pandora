@@ -2,7 +2,6 @@ package com.github.gnastnosaj.pandora.datasource;
 
 import android.content.Context;
 
-import com.github.gnastnosaj.boilerplate.ui.activity.BaseActivity;
 import com.github.gnastnosaj.pandora.BuildConfig;
 import com.github.gnastnosaj.pandora.Pandora;
 import com.github.gnastnosaj.pandora.R;
@@ -12,16 +11,12 @@ import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.model.JSoupAttr;
 import com.github.gnastnosaj.pandora.model.JSoupData;
 import com.shizhefei.mvc.IDataCacheLoader;
-import com.shizhefei.mvc.IDataSource;
-import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import io.reactivex.Observable;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -30,43 +25,21 @@ import io.realm.RealmResults;
  * Created by jasontsang on 5/23/17.
  */
 
-public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSource.Model>>, IDataCacheLoader<List<PandoraHomeDataSource.Model>> {
+public class PandoraHomeDataSource extends RxDataSource<List<PandoraHomeDataSource.Model>> implements IDataCacheLoader<List<PandoraHomeDataSource.Model>> {
     private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_HOME").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
     private GithubService githubService = Retrofit.newGithubServicePlus();
-
-    private Context context;
 
     private String[] groups;
 
     private List<JSoupDataSource> dataSources;
 
-    private CountDownLatch initLock;
-    private CountDownLatch refreshLock;
-
     public PandoraHomeDataSource(Context context) {
-        this.context = context;
+        super(context);
 
         groups = context.getResources().getStringArray(R.array.pandora_home_groups);
 
-        initLock = new CountDownLatch(3);
-
         dataSources = new ArrayList<>();
-
-        Observable<JSoupDataSource> init = Observable.merge(githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE),
-                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_HOME),
-                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_HOME))
-                .retry();
-
-        if (context instanceof BaseActivity) {
-            init = init.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        init.subscribeOn(Schedulers.newThread())
-                .subscribe(jsoupDataSource -> {
-                    dataSources.add(jsoupDataSource);
-                    initLock.countDown();
-                });
     }
 
     @Override
@@ -79,69 +52,47 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
     }
 
     @Override
-    public List<Model> refresh() throws Exception {
-        if (refreshLock != null) {
-            refreshLock.await();
-        }
-        refreshLock = new CountDownLatch(1);
-
-        List<JSoupData> data = new ArrayList<>();
-
-        initLock.await();
-
-        Observable<List<JSoupData>> refresh = Observable.zip(dataSources.get(0).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
-                dataSources.get(1).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
-                dataSources.get(2).loadData(true).onErrorReturn((throwable -> new ArrayList<>())),
-                (data1, data2, data3) -> {
+    public Observable<List<Model>> refresh() throws Exception {
+        Observable<List<Model>> refresh = Observable.zip(
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE)
+                        .map(jsoupDataSource -> {
+                            dataSources.add(jsoupDataSource);
+                            return jsoupDataSource;
+                        }).flatMap(jsoupDataSource -> jsoupDataSource.loadData(true).onErrorReturn((throwable -> new ArrayList<>()))),
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_HOME)
+                        .map(jsoupDataSource -> {
+                            dataSources.add(jsoupDataSource);
+                            return jsoupDataSource;
+                        }).flatMap(jsoupDataSource -> jsoupDataSource.loadData(true).onErrorReturn((throwable -> new ArrayList<>()))),
+                githubService.getJSoupDataSource(GithubService.DATE_SOURCE_K8DY_HOME)
+                        .map(jsoupDataSource -> {
+                            dataSources.add(jsoupDataSource);
+                            return jsoupDataSource;
+                        }).flatMap(jsoupDataSource -> jsoupDataSource.loadData(true).onErrorReturn((throwable -> new ArrayList<>())))
+                , (data1, data2, data3) -> {
                     List<JSoupData> jsoupData = new ArrayList<>();
                     jsoupData.addAll(data1);
                     jsoupData.addAll(data2);
                     jsoupData.addAll(data3);
-                    return jsoupData;
-                });
-
-        if (context instanceof BaseActivity) {
-            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        refresh.subscribeOn(Schedulers.newThread())
-                .subscribe(jsoupData -> {
-                    data.addAll(jsoupData);
                     Realm realm = Realm.getInstance(realmConfig);
                     realm.executeTransactionAsync(bgRealm -> {
                         bgRealm.delete(JSoupData.class);
-                        bgRealm.insertOrUpdate(data);
+                        bgRealm.insertOrUpdate(jsoupData);
                     });
                     realm.close();
-                    refreshLock.countDown();
-                }, throwable -> refreshLock.countDown());
-
-        refreshLock.await();
-
-        return fromJSoupData(data);
+                    return fromJSoupData(jsoupData);
+                });
+        return refresh;
     }
 
     @Override
-    public List<Model> loadMore() throws Exception {
+    public Observable<List<Model>> loadMore() throws Exception {
         return null;
     }
 
     @Override
     public boolean hasMore() {
         return false;
-    }
-
-    public static class Model {
-        public final static String TYPE_SLIDE = "slide";
-        public final static String TYPE_GROUP = "group";
-        public final static String TYPE_DATA = "data";
-
-        public final static int TYPE_VALUE_SLIDE = 0;
-        public final static int TYPE_VALUE_GROUP = 1;
-        public final static int TYPE_VALUE_DATA = 2;
-
-        public int type;
-        public Object data;
     }
 
     public String[] getGroups() {
@@ -249,5 +200,18 @@ public class PandoraHomeDataSource implements IDataSource<List<PandoraHomeDataSo
             }
         }
         return position + 1;
+    }
+
+    public static class Model {
+        public final static String TYPE_SLIDE = "slide";
+        public final static String TYPE_GROUP = "group";
+        public final static String TYPE_DATA = "data";
+
+        public final static int TYPE_VALUE_SLIDE = 0;
+        public final static int TYPE_VALUE_GROUP = 1;
+        public final static int TYPE_VALUE_DATA = 2;
+
+        public int type;
+        public Object data;
     }
 }
