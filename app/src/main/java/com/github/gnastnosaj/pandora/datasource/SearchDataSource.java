@@ -71,36 +71,33 @@ public class SearchDataSource extends RxDataSource<List<JSoupData>> implements I
         if (TextUtils.isEmpty(keyword)) {
             throw new Exception("keyword is empty");
         }
-
-        Observable<List<JSoupData>> refresh = Retrofit.newGithubServicePlus().getJSoupDataSource(dataSource).map(jsoupDataSource -> {
-            searchDataSource = jsoupDataSource;
-            return jsoupDataSource;
-        }).flatMap(searchDataSource -> searchDataSource.searchData(keyword, null, true));
-
-        refresh = refresh.map(jsoupData -> {
-            Realm realm = Realm.getInstance(realmConfig);
-            realm.executeTransactionAsync(bgRealm -> {
-                bgRealm.delete(JSoupData.class);
-                bgRealm.insertOrUpdate(jsoupData);
-            });
-            realm.close();
-            return jsoupData;
-        });
-
+        Observable refresh = Retrofit.newGithubServicePlus().getJSoupDataSource(dataSource)
+                .map(jsoupDataSource -> {
+                    searchDataSource = jsoupDataSource;
+                    return jsoupDataSource;
+                })
+                .flatMap(searchDataSource -> searchDataSource.searchData(keyword, null, true))
+                .map(jsoupData -> {
+                    Realm realm = Realm.getInstance(realmConfig);
+                    realm.executeTransactionAsync(bgRealm -> {
+                        bgRealm.delete(JSoupData.class);
+                        bgRealm.insertOrUpdate(jsoupData);
+                    });
+                    realm.close();
+                    return jsoupData;
+                });
         return refresh;
     }
 
     @Override
     public Observable<List<JSoupData>> loadMore() throws Exception {
-        Observable<List<JSoupData>> loadMore = searchDataSource.searchData(keyword);
-
-        loadMore = loadMore.map(jsoupData -> {
-            Realm realm = Realm.getInstance(realmConfig);
-            realm.executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(jsoupData));
-            realm.close();
-            return jsoupData;
-        });
-
+        Observable loadMore = searchDataSource.searchData(keyword)
+                .map(jsoupData -> {
+                    Realm realm = Realm.getInstance(realmConfig);
+                    realm.executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(jsoupData));
+                    realm.close();
+                    return jsoupData;
+                });
         return loadMore;
     }
 

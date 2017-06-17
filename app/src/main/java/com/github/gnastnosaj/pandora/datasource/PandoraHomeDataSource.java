@@ -26,13 +26,12 @@ import io.realm.RealmResults;
  */
 
 public class PandoraHomeDataSource extends RxDataSource<List<PandoraHomeDataSource.Model>> implements IDataCacheLoader<List<PandoraHomeDataSource.Model>> {
-    private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_HOME").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
-
-    private GithubService githubService = Retrofit.newGithubServicePlus();
 
     private String[] groups;
 
     private List<JSoupDataSource> dataSources;
+
+    private RealmConfiguration realmConfig = new RealmConfiguration.Builder().name("PANDORA_HOME").schemaVersion(BuildConfig.VERSION_CODE).migration(Pandora.getRealmMigration()).build();
 
     public PandoraHomeDataSource(Context context) {
         super(context);
@@ -53,7 +52,8 @@ public class PandoraHomeDataSource extends RxDataSource<List<PandoraHomeDataSour
 
     @Override
     public Observable<List<Model>> refresh() throws Exception {
-        Observable<List<Model>> refresh = Observable.zip(
+        GithubService githubService = Retrofit.newGithubServicePlus();
+        Observable refresh = Observable.zip(
                 githubService.getJSoupDataSource(GithubService.DATE_SOURCE_LEEEBO_SLIDE)
                         .map(jsoupDataSource -> {
                             dataSources.add(jsoupDataSource);
