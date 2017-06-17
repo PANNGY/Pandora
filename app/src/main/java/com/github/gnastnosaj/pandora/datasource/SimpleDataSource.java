@@ -60,7 +60,7 @@ public class SimpleDataSource extends RxDataSource<List<JSoupData>> implements I
             Realm realm = Realm.getInstance(realmConfig);
             RealmResults<JSoupData> results = realm.where(JSoupData.class).findAll();
             List<JSoupData> data = JSoupData.from(results);
-            if (!ListUtils.isEmpty(data)) {
+            if (!ListUtils.isEmpty(data) && !TextUtils.isEmpty(href)) {
                 RxBus.getInstance().post(href, new TagEvent(data.get(0).tags));
             }
             realm.close();
@@ -77,7 +77,7 @@ public class SimpleDataSource extends RxDataSource<List<JSoupData>> implements I
                 })
                 .flatMap(jsoupDataSource -> jsoupDataSource.loadData(href, true))
                 .map(jsoupData -> {
-                    if (!ListUtils.isEmpty(jsoupData)) {
+                    if (!ListUtils.isEmpty(jsoupData) && !TextUtils.isEmpty(href)) {
                         RxBus.getInstance().post(href, new TagEvent(jsoupData.get(0).tags));
                     }
                     Realm realm = Realm.getInstance(realmConfig);
