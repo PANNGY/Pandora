@@ -14,7 +14,6 @@ import com.github.gnastnosaj.pandora.datasource.service.Retrofit;
 import com.github.gnastnosaj.pandora.event.PluginEvent;
 import com.github.gnastnosaj.pandora.model.Plugin;
 import com.shizhefei.mvc.IDataCacheLoader;
-import com.shizhefei.mvc.IDataSource;
 import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import org.zeroturnaround.zip.ZipUtil;
@@ -22,11 +21,8 @@ import org.zeroturnaround.zip.ZipUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
@@ -38,14 +34,15 @@ import zlc.season.rxdownload2.entity.DownloadStatus;
  * Created by jasontsang on 12/24/16.
  */
 
-public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataCacheLoader<List<Plugin>> {
-    private RealmConfiguration realmConfiguration;
+public class PluginCenterDataSource extends RxDataSource<List<Plugin>> implements IDataCacheLoader<List<Plugin>> {
 
     private Context context;
 
-    private CountDownLatch refreshLock;
+    private RealmConfiguration realmConfiguration;
 
     public PluginCenterDataSource(Context context) {
+        super(context);
+
         this.context = context;
 
         realmConfiguration = new RealmConfiguration.Builder().name("PLUGIN_CENTER").schemaVersion(BuildConfig.VERSION_CODE)
@@ -58,18 +55,10 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
     }
 
     @Override
-    public List<Plugin> refresh() throws Exception {
-
-        if (refreshLock != null) {
-            refreshLock.await();
-        }
-
-        refreshLock = new CountDownLatch(1);
-
-        List<Plugin> plugins = new ArrayList<>();
-
-        Observable<List<Plugin>> refresh = Retrofit.newGithubServicePlus().getPluginData()
+    public Observable<List<Plugin>> refresh() throws Exception {
+        Observable refresh = Retrofit.newGithubServicePlus().getPluginData()
                 .flatMap(pluginData -> {
+                    List<Plugin> plugins = new ArrayList<>();
                     boolean nsw = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Pandora.PRE_PRO_VERSION, false);
                     for (Plugin plugin : pluginData.plugins) {
                         if (nsw || !plugin.desc.contains(Plugin.NSW)) {
@@ -119,22 +108,11 @@ public class PluginCenterDataSource implements IDataSource<List<Plugin>>, IDataC
                     }
                     return Observable.just(plugins);
                 });
-
-        if (context instanceof BaseActivity) {
-            refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
-        }
-
-        refresh.subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(results -> refreshLock.countDown(), throwable -> refreshLock.countDown());
-
-        refreshLock.await();
-
-        return plugins;
+        return refresh;
     }
 
     @Override
-    public List<Plugin> loadMore() throws Exception {
+    public Observable<List<Plugin>> loadMore() throws Exception {
         return null;
     }
 

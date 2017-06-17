@@ -26,9 +26,11 @@ public abstract class RxDataSource<DATA> implements IAsyncDataSource<DATA> {
     @Override
     public final RequestHandle refresh(final ResponseSender<DATA> sender) throws Exception {
         Observable<DATA> refresh = refresh();
+
         if (context instanceof BaseActivity) {
             refresh = refresh.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
         }
+
         Disposable disposable = refresh.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(data -> sender.sendData(data), throwable -> sender.sendError(new Exception(throwable)));
@@ -51,9 +53,11 @@ public abstract class RxDataSource<DATA> implements IAsyncDataSource<DATA> {
     @Override
     public final RequestHandle loadMore(ResponseSender<DATA> sender) throws Exception {
         Observable<DATA> loadMore = loadMore();
+
         if (context instanceof BaseActivity) {
             loadMore = loadMore.compose(((BaseActivity) context).bindUntilEvent(ActivityEvent.DESTROY));
         }
+
         Disposable disposable = loadMore.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(data -> sender.sendData(data), throwable -> sender.sendError(new Exception(throwable)));
