@@ -79,7 +79,7 @@
       }
     ],
     "nextPageSelector": {
-      "content": "{baseUrl}{pages[1]}(keyword)&p={number}"
+      "content": "{baseUrl}{pages[1]}{keyword}&p={number}"
     }
   }
 }
