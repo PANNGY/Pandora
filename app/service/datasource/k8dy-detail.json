@@ -14,7 +14,8 @@
   "catalogSelector": {
     "headers": {
       "Accept": "*/*",
-      "Accept-Encoding": "gzip, deflate, sdch",
+      "Accept-Encoding": "gzip, deflate",
+      "Cookie": "ishistory=1; Hm_lvt_72325cb011834fc96378d703d160531d=1500441093; Hm_lpvt_72325cb011834fc96378d703d160531d=1500441093",
       "Accept-Language": "en-US,en;q=0.8,zh-CN;q=0.6,zh;q=0.4,ja;q=0.2",
       "DNT": "1",
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36"
