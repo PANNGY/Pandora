@@ -1,7 +1,7 @@
 [
   {
     "filterRegexp": "pics.dmm.co.jp",
-    "replaceWithIP": true
+    "replaceWithIP": false
   },
   {
     "filterRegexp": "girlatlas",
