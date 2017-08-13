@@ -26,8 +26,8 @@ import com.shizhefei.mvc.ILoadViewFactory;
 import com.shizhefei.mvc.MVCHelper;
 import com.shizhefei.mvc.MVCSwipeRefreshHelper;
 import com.shuyu.gsyvideoplayer.GSYVideoManager;
-import com.shuyu.gsyvideoplayer.GSYVideoPlayer;
 import com.shuyu.gsyvideoplayer.video.StandardGSYVideoPlayer;
+import com.shuyu.gsyvideoplayer.video.base.GSYVideoPlayer;
 import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
 
 import butterknife.BindView;
