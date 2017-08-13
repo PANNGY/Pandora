@@ -31,15 +31,15 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-    compile 'com.android.support:recyclerview-v7:26.0.0-alpha1'
-    compile 'com.android.support:cardview-v7:26.0.0-alpha1'
-    compile 'com.android.support:design:26.0.0-alpha1'
-    compile 'com.android.support:percent:26.0.0-alpha1'
+    compile 'com.android.support:appcompat-v7:26.+'
+    compile 'com.android.support:recyclerview-v7:26.+'
+    compile 'com.android.support:cardview-v7:26.+'
+    compile 'com.android.support:design:26.+'
+    compile 'com.android.support:percent:26.+'
     compile('com.github.gnastnosaj:PythonForAndroid:4e5469c') {
         exclude group: 'com.github.gnastnosaj', module: 'Boilerplate'
     }
-    compile('com.github.gnastnosaj:Boilerplate:6708157') {
+    compile('com.github.gnastnosaj:Boilerplate:f30a24e') {
         exclude group: 'com.android.support'
         exclude group: 'com.google.code.gson'
     }
@@ -64,4 +64,15 @@ dependencies {
     compile 'com.github.kingideayou:tagcloudview:+'
     compile 'org.jsoup:jsoup:+'
     compile 'com.shuyu:GSYVideoPlayer:+'
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '26.0.0-alpha1'
+            }
+        }
+    }
 }
