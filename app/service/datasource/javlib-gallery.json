@@ -38,8 +38,7 @@
           "method": 1,
           "args": [
             "src"
-          ],
-          "format": "http:%s"
+          ]
         }
       }
     ],
