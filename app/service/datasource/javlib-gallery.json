@@ -27,7 +27,8 @@
           "method": 1,
           "args": [
             "src"
-          ]
+          ],
+          "format": "http:%s"
         }
       },
       {
@@ -37,7 +38,8 @@
           "method": 1,
           "args": [
             "src"
-          ]
+          ],
+          "format": "http:%s"
         }
       }
     ],
