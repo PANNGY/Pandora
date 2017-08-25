@@ -9,10 +9,10 @@
     "/search/"
   ],
   "areas": {
-    "en": "en",
-    "ja": "ja",
-    "cn": "cn",
-    "tw": "tw"
+    "en": "avsopw",
+    "ja": "avsopw",
+    "cn": "avsopw",
+    "tw": "avsopw"
   },
   "tabSelector": {
     "url": "{baseUrl}/{area}{pages[0]}",
