@@ -1,6 +1,6 @@
 {
   "id": "leeebo-detail",
-  "baseUrl": "http://m.leeebo.com",
+  "baseUrl": "http://www.leeebo.com",
   "pages": [
     "/",
     "/vod-type-id-1-pg-1.html",
