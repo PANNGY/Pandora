@@ -1,6 +1,6 @@
 {
-  "id": "avsox-tab",
-  "baseUrl": "http://www.avsoxx.com",
+  "id": "avmoo-tab",
+  "baseUrl": "https://avmo.club",
   "pages": [
     "/",
     "/popular",
@@ -9,10 +9,10 @@
     "/search/"
   ],
   "areas": {
-    "en": "avsopw",
-    "ja": "avsopw",
-    "cn": "avsopw",
-    "tw": "avsopw"
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
   },
   "tabSelector": {
     "url": "{baseUrl}/{area}{pages[0]}",

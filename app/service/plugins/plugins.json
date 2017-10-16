@@ -84,13 +84,13 @@
       "versionName": "1.0.0"
     },
     {
-      "id": "com.github.gnastnosaj.pandora.plugin.avsox",
-      "name": "avso.pw",
-      "desc": "avso.pw, nsw",
+      "id": "com.github.gnastnosaj.pandora.plugin.avmoo",
+      "name": "avmoo.club",
+      "desc": "avmoo.club, nsw",
       "type": 1,
-      "reference": "avsox",
+      "reference": "avmoo",
       "args": "{\"model\": \"true\"}",
-      "icon": "https://avso.pw/favicon.ico",
+      "icon": "https://avmoo.club/favicon.ico",
       "versionCode": 1,
       "versionName": "1.0.0"
     }

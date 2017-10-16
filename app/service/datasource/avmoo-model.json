@@ -1,6 +1,6 @@
 {
-  "id": "avsox-model",
-  "baseUrl": "http://www.avsoxx.com",
+  "id": "avmoo-model",
+  "baseUrl": "https://avmo.club",
   "pages": [
     "/",
     "/popular",
@@ -9,10 +9,10 @@
     "/search/"
   ],
   "areas": {
-    "en": "avsopw",
-    "ja": "avsopw",
-    "cn": "avsopw",
-    "tw": "avsopw"
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
   },
   "dataSelector": {
     "url": "{baseUrl}/{area}{pages[2]}",
