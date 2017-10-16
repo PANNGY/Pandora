@@ -1,6 +1,6 @@
 {
   "id": "btdb",
-  "baseUrl": "https://btdb.in",
+  "baseUrl": "http://btdb.to/",
   "pages": [
     "/",
     "/q"
