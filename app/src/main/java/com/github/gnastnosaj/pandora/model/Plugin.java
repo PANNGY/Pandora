@@ -158,6 +158,15 @@ public class Plugin extends RealmObject implements Parcelable {
     public Plugin() {
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Plugin && ((Plugin) obj).id.equals(id)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     protected Plugin(Parcel in) {
         this.id = in.readString();
         this.name = in.readString();
@@ -171,6 +180,15 @@ public class Plugin extends RealmObject implements Parcelable {
         this.author = in.readString();
         this.license = in.readString();
         this.licenseUrl = in.readString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Plugin && ((Plugin) obj).id.equals(id)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public static final Parcelable.Creator<Plugin> CREATOR = new Parcelable.Creator<Plugin>() {

@@ -41,16 +41,6 @@
       "versionName": "1.0.0"
     },
     {
-      "id": "com.github.gnastnosaj.pandora.plugin.youjizz",
-      "name": "YouJizz.com",
-      "desc": "YouJizz.com, nsw",
-      "type": 0,
-      "reference": "youjizz",
-      "icon": "icon.png",
-      "versionCode": 1,
-      "versionName": "1.0.0"
-    },
-    {
       "id": "com.github.gnastnosaj.pandora.plugin.girlatlas",
       "name": "girl-atlas.com",
       "desc": "girl-atlas.com",

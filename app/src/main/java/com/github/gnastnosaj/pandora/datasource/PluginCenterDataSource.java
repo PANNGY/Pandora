@@ -60,21 +60,24 @@ public class PluginCenterDataSource extends RxDataSource<List<Plugin>> implement
                 .flatMap(pluginData -> {
                     List<Plugin> plugins = new ArrayList<>();
                     boolean nsw = PreferenceManager.getDefaultSharedPreferences(context).getBoolean(Pandora.PRE_PRO_VERSION, false);
+
+                    Realm pluginCenterRealm = Realm.getInstance(realmConfiguration);
+                    Realm defaultRealm = Realm.getDefaultInstance();
+
+                    pluginCenterRealm.beginTransaction();
+                    defaultRealm.beginTransaction();
+
                     for (Plugin plugin : pluginData.plugins) {
                         if (nsw || !plugin.desc.contains(Plugin.NSW)) {
                             plugins.add(plugin);
                         }
-                        Realm realm = Realm.getInstance(realmConfiguration);
-                        Plugin result = realm.where(Plugin.class).equalTo("id", plugin.id).findFirst();
+                        Plugin result = pluginCenterRealm.where(Plugin.class).equalTo("id", plugin.id).findFirst();
                         if (result == null || plugin.versionCode > result.versionCode || pluginData.force || (plugin.type == Plugin.TYPE_PYTHON_VIDEO && !plugin.getPluginDirectory(context).exists())) {
-                            Realm.getInstance(realmConfiguration).executeTransactionAsync(bgRealm -> bgRealm.insertOrUpdate(plugin));
-                            Realm.getDefaultInstance().executeTransactionAsync(bgRealm -> {
-                                RealmResults<Plugin> results = bgRealm.where(Plugin.class).equalTo("id", plugin.id).findAll();
-                                if (!results.isEmpty()) {
-                                    bgRealm.insertOrUpdate(plugin);
-                                }
-                            });
-
+                            pluginCenterRealm.insertOrUpdate(plugin);
+                            RealmResults<Plugin> results = defaultRealm.where(Plugin.class).equalTo("id", plugin.id).findAll();
+                            if (!results.isEmpty()) {
+                                defaultRealm.insertOrUpdate(plugin);
+                            }
                             if (plugin.type == Plugin.TYPE_PYTHON_VIDEO) {
                                 String url = context.getResources().getString(R.string.url_python_plugin, plugin.reference);
                                 Observable<DownloadStatus> download = RxDownload.getInstance(Boilerplate.getInstance())
@@ -104,8 +107,24 @@ public class PluginCenterDataSource extends RxDataSource<List<Plugin>> implement
                                 RxBus.getInstance().post(PluginEvent.class, new PluginEvent(PluginEvent.TYPE_UPDATE, plugin));
                             }
                         }
-                        realm.close();
                     }
+
+                    RealmResults<Plugin> origin = pluginCenterRealm.where(Plugin.class).findAll();
+                    for (Plugin plugin : origin) {
+                        if (!pluginData.plugins.contains(plugin)) {
+                            RealmResults<Plugin> results = defaultRealm.where(Plugin.class).equalTo("id", plugin.id).findAll();
+                            if (!results.isEmpty()) {
+                                results.deleteAllFromRealm();
+                            }
+                            plugin.deleteFromRealm();
+                        }
+                    }
+
+                    defaultRealm.commitTransaction();
+                    pluginCenterRealm.commitTransaction();
+
+                    defaultRealm.close();
+                    pluginCenterRealm.close();
                     return Observable.just(plugins);
                 });
         return refresh;
