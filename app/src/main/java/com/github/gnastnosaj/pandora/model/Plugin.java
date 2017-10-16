@@ -27,7 +27,17 @@ public class Plugin extends RealmObject implements Parcelable {
 
     public final static int TYPE_PYTHON_VIDEO = 0;
     public final static int TYPE_JSOUP_GALLERY = 1;
+    public static final Parcelable.Creator<Plugin> CREATOR = new Parcelable.Creator<Plugin>() {
+        @Override
+        public Plugin createFromParcel(Parcel source) {
+            return new Plugin(source);
+        }
 
+        @Override
+        public Plugin[] newArray(int size) {
+            return new Plugin[size];
+        }
+    };
     @PrimaryKey
     public String id;
     public String name;
@@ -41,6 +51,32 @@ public class Plugin extends RealmObject implements Parcelable {
     public String author;
     public String license;
     public String licenseUrl;
+
+    public Plugin() {
+    }
+
+    protected Plugin(Parcel in) {
+        this.id = in.readString();
+        this.name = in.readString();
+        this.desc = in.readString();
+        this.type = in.readInt();
+        this.reference = in.readString();
+        this.icon = in.readString();
+        this.args = in.readString();
+        this.versionCode = in.readInt();
+        this.versionName = in.readString();
+        this.author = in.readString();
+        this.license = in.readString();
+        this.licenseUrl = in.readString();
+    }
+
+    public static List<Plugin> from(RealmResults<Plugin> results) {
+        List<Plugin> plugins = new ArrayList<>();
+        for (Plugin plugin : results) {
+            plugins.add(plugin.clone());
+        }
+        return plugins;
+    }
 
     public File getPluginDirectory(Context context) {
         if (type == TYPE_PYTHON_VIDEO) {
@@ -126,14 +162,6 @@ public class Plugin extends RealmObject implements Parcelable {
         return plugin;
     }
 
-    public static List<Plugin> from(RealmResults<Plugin> results) {
-        List<Plugin> plugins = new ArrayList<>();
-        for (Plugin plugin : results) {
-            plugins.add(plugin.clone());
-        }
-        return plugins;
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -155,9 +183,6 @@ public class Plugin extends RealmObject implements Parcelable {
         dest.writeString(this.licenseUrl);
     }
 
-    public Plugin() {
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Plugin && ((Plugin) obj).id.equals(id)) {
@@ -166,40 +191,4 @@ public class Plugin extends RealmObject implements Parcelable {
             return false;
         }
     }
-
-    protected Plugin(Parcel in) {
-        this.id = in.readString();
-        this.name = in.readString();
-        this.desc = in.readString();
-        this.type = in.readInt();
-        this.reference = in.readString();
-        this.icon = in.readString();
-        this.args = in.readString();
-        this.versionCode = in.readInt();
-        this.versionName = in.readString();
-        this.author = in.readString();
-        this.license = in.readString();
-        this.licenseUrl = in.readString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Plugin && ((Plugin) obj).id.equals(id)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static final Parcelable.Creator<Plugin> CREATOR = new Parcelable.Creator<Plugin>() {
-        @Override
-        public Plugin createFromParcel(Parcel source) {
-            return new Plugin(source);
-        }
-
-        @Override
-        public Plugin[] newArray(int size) {
-            return new Plugin[size];
-        }
-    };
 }
