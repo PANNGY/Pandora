@@ -1,0 +1,59 @@
+{
+  "id": "avsox-model",
+  "baseUrl": "https://avso.club",
+  "pages": [
+    "/",
+    "/popular",
+    "/actresses",
+    "/genre",
+    "/search/"
+  ],
+  "areas": {
+    "en": "en",
+    "ja": "ja",
+    "cn": "cn",
+    "tw": "tw"
+  },
+  "dataSelector": {
+    "url": "{baseUrl}/{area}{pages[2]}",
+    "cssQuery": "div#waterfall div.item a.avatar-box",
+    "attrSelectors": [
+      {
+        "label": "thumbnail",
+        "cssQuery": "div.photo-frame img",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "src"
+          ]
+        }
+      },
+      {
+        "label": "title",
+        "cssQuery": "div.photo-info",
+        "analyzer": {
+          "method": 0
+        }
+      },
+      {
+        "label": "href",
+        "analyzer": {
+          "method": 1,
+          "args": [
+            "href"
+          ]
+        }
+      }
+    ],
+    "nextPageSelector": {
+      "cssQuery": "ul.pagination li a[name^=nextpage]",
+      "analyzer": {
+        "method": 1,
+        "args": [
+          "href"
+        ],
+        "format": "{baseUrl}%s"
+      }
+    }
+  }
+}

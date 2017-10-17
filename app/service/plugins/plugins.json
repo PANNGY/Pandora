@@ -83,6 +83,17 @@
       "icon": "https://avmoo.club/favicon.ico",
       "versionCode": 1,
       "versionName": "1.0.0"
+    },
+    {
+      "id": "com.github.gnastnosaj.pandora.plugin.avsox",
+      "name": "avso.club",
+      "desc": "avso.club, nsw",
+      "type": 1,
+      "reference": "avsox",
+      "args": "{\"model\": \"true\"}",
+      "icon": "https://avso.club/favicon.ico",
+      "versionCode": 1,
+      "versionName": "1.0.0"
     }
   ],
   "force": false
