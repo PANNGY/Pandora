@@ -49,6 +49,26 @@ public class SearchService {
         this.searchListener = searchListener;
     }
 
+    public static void search(@NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(null, keyword);
+    }
+
+    public static void search(@Nullable String title, @NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(title, keyword);
+    }
+
+    public static void search(@NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(keyword, null, type);
+    }
+
+    public static void search(@Nullable String title, @NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
+        new SearchService(context, searchListener).search(title, keyword, type);
+    }
+
+    public static String betterKeyword(String keyword) {
+        return keyword.replace("-", " ");
+    }
+
     private void search(String keyword) {
         search(null, keyword, TYPE_DEFAULT);
     }
@@ -223,6 +243,14 @@ public class SearchService {
                                                     i.putParcelableArrayListExtra(SimpleTabActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
                                                     context.startActivity(i);
                                                 }
+                                            } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_AVSOX_TAB)) {
+                                                Intent i = new Intent(context, SimpleTabActivity.class);
+                                                i.putExtra(SimpleTabActivity.EXTRA_TAB_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_TAB);
+                                                i.putExtra(SimpleTabActivity.EXTRA_GALLERY_DATASOURCE, GithubService.DATE_SOURCE_AVSOX_GALLERY);
+                                                i.putExtra(SimpleTabActivity.EXTRA_TITLE, TextUtils.isEmpty(title) ? keyword : title);
+                                                i.putExtra(SimpleTabActivity.EXTRA_HREF, searchDataSource.getCurrentPage());
+                                                i.putParcelableArrayListExtra(SimpleTabActivity.EXTRA_CACHE, (ArrayList<? extends Parcelable>) data);
+                                                context.startActivity(i);
                                             } else if (searchDataSource.id.equals(GithubService.DATE_SOURCE_BTDB) || searchDataSource.id.equals(GithubService.DATE_SOURCE_BTCHERRY)) {
                                                 Intent i = new Intent(context, BTActivity.class);
                                                 i.putExtra(BTActivity.EXTRA_DATASOURCE, searchDataSource.id);
@@ -251,26 +279,6 @@ public class SearchService {
                         }
                     });
         }
-    }
-
-    public static void search(@NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
-        new SearchService(context, searchListener).search(null, keyword);
-    }
-
-    public static void search(@Nullable String title, @NonNull String keyword, @NonNull Context context, @Nullable SearchListener searchListener) {
-        new SearchService(context, searchListener).search(title, keyword);
-    }
-
-    public static void search(@NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
-        new SearchService(context, searchListener).search(keyword, null, type);
-    }
-
-    public static void search(@Nullable String title, @NonNull String keyword, int type, @NonNull Context context, @Nullable SearchListener searchListener) {
-        new SearchService(context, searchListener).search(title, keyword, type);
-    }
-
-    public static String betterKeyword(String keyword) {
-        return keyword.replace("-", " ");
     }
 
     public interface SearchListener {
