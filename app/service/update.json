@@ -1,6 +1,6 @@
 {
-  "latestVersion": "1.0.5",
-  "latestVersionCode": 6,
+  "latestVersion": "1.0.6",
+  "latestVersionCode": 7,
   "url": "https://raw.githubusercontent.com/gnastnosaj/Pandora/master/app/app-release.apk",
   "releaseNotes": [
     "- 优化数据源"
